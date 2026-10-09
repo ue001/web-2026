@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jihae Cha</title>
+<!-- tab icon: the landing grid in miniature, one area taking the space and the others rounding away -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b0b0a'/%3E%3Crect x='5' y='5' width='13' height='13' rx='3' fill='%23f2f2f0'/%3E%3Crect x='20' y='5' width='7' height='13' rx='3.5' fill='%238a8a85'/%3E%3Crect x='5' y='20' width='13' height='7' rx='3.5' fill='%238a8a85'/%3E%3Crect x='20' y='20' width='7' height='7' rx='3.5' fill='%238a8a85'/%3E%3C/svg%3E">
 <style>
   @import url("https://api.fontshare.com/v2/css?f[]=switzer@300,400,500&display=swap");
 
@@ -947,6 +949,7 @@
   .s2 .dgrid { opacity: 1; }
   .dgrid { --tdur: 1s; --tease: cubic-bezier(.45, 0, .2, 1); }
   .dgrid .ring { overflow: hidden; }
+  .s2 .dgrid .ring { pointer-events: auto; cursor: pointer; }   /* once Designs is open, each area is a way into its project */
   /* the reel fills the whole cell, cut by its outline; the text sits on top of it */
   .dgrid .m { position: absolute; inset: 0; overflow: hidden; }   /* clipped by the cell&#x27;s own rounded edge, so the picture meets the line exactly */
   .dgrid .m video, .dgrid .m img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
@@ -1108,6 +1111,11 @@
       // show project i: its reel and its name
       c.show = i =&gt; { [...m.children].forEach((el, j) =&gt; el.classList.toggle(&#x27;cur&#x27;, j === i)); k.textContent = exs[i] || exs[0]; };
       c.n = srcs.length; c.next = 0;
+      // clicking an area takes the page down to the project it is showing
+      c.addEventListener(&#x27;click&#x27;, e =&gt; {
+        if (!document.getElementById(&#x27;stage&#x27;).classList.contains(&#x27;s2&#x27;) || window.parent === window) return;
+        e.stopPropagation(); window.parent.postMessage({ landingWork: k.textContent }, &#x27;*&#x27;);
+      });
       return c;
     });
     const pct = w =&gt; { const t = w.reduce((a, b) =&gt; a + b, 0); return w.map(x =&gt; x / t * 100); };
@@ -3259,6 +3267,34 @@
       var d=e.data; if(!d || typeof d.landingScroll!=='number') return;
       if(free()) window.scrollBy({ top:d.landingScroll, left:0 });
       else if(scroller) scroller.scrollBy({ top:d.landingScroll, left:0 });
+    });
+    /* clicking an area in Designs: a quick run down to that project */
+    var key=function(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,''); };
+    var running=0;
+    function rush(box, to){
+      var from=box===window?scrollY:box.scrollTop, dist=to-from, t0=null, dur=Math.min(900, 380+Math.abs(dist)*.08);
+      var set=function(y){ if(box===window) window.scrollTo(0,y); else box.scrollTop=y; };
+      if(matchMedia('(prefers-reduced-motion: reduce)').matches){ set(to); return; }
+      var el=box===window?root:box, snap=el.style.scrollSnapType, me=++running;
+      el.style.scrollSnapType='none';
+      var end=function(){ if(me!==running) return; running++; set(to); el.style.scrollSnapType=snap; };
+      setTimeout(end, dur+250);   // if frames stall, still arrive
+      requestAnimationFrame(function f(now){
+        if(me!==running) return;
+        if(t0===null) t0=now;
+        var p=Math.min(1,(now-t0)/dur), e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;   // fast in the middle, settled at the end
+        set(from+dist*e);
+        if(p<1) requestAnimationFrame(f); else end();
+      });
+    }
+    addEventListener('message', function(e){
+      var d=e.data; if(!d || typeof d.landingWork!=='string') return;
+      var want=key(d.landingWork), target=null;
+      var heads=free()?document.querySelectorAll('#free .tile__name'):document.querySelectorAll('.band--work h2');
+      heads.forEach(function(h){ if(!target && want && key(h.textContent).indexOf(want)===0) target=h.closest(free()?'.tile':'.band--work'); });
+      if(!target) return;
+      if(free()) rush(window, target.getBoundingClientRect().top+scrollY);
+      else if(scroller) rush(scroller, target.getBoundingClientRect().top-scroller.getBoundingClientRect().top+scroller.scrollTop);
     });
     /* the same landing opens Free: the frame moves to Free's slot and back
        (moving it restarts its animation, which reads as a fresh arrival) */
