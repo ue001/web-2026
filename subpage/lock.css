@@ -1,0 +1,59 @@
+/* =====================================================================
+   subpage/lock.css
+   ---------------------------------------------------------------------
+   The password screen for protected projects, in two forms:
+
+     .lock-page   the project page's own screen, before the work loads
+     .lock-box    on the index, over the project's reel once it is clicked
+
+   Uses the colour tokens both the index and preview.css define
+   (--paper, --ink, --ink-soft, --rule), so it follows the theme.
+   ===================================================================== */
+
+  /* ---- the field and its message, shared ---- */
+  .lock-form{ display:flex; flex-direction:column; gap:10px; margin:0; }
+  .lock-note{ margin:0; color:var(--ink-soft); font-size:15px; line-height:1.45; }
+  /* the contact link reads as part of the sentence: same colour, no underline; only the arrow and a hover mark it */
+  .lock-ask{ color:inherit; text-decoration:none; border:0; white-space:nowrap; transition:color .2s; }
+  .lock-ask:hover, .lock-ask:focus-visible{ color:var(--ink); outline:0; }
+  .lock-field{ display:flex; width:min(240px,100%); margin-top:4px;
+    border:1.5px solid var(--rule); border-radius:8px; overflow:hidden; transition:border-color .2s; }
+  .lock-field:focus-within{ border-color:var(--ink-soft); }
+  .lock-field input{ flex:1; min-width:0; border:0; background:transparent; color:var(--ink);
+    font:inherit; font-size:14px; padding:8px 11px; outline:0; }
+  .lock-field input::placeholder{ color:var(--ink-soft); }
+  .lock-field button{ border:0; border-left:1.5px solid var(--rule); background:transparent; color:var(--ink);
+    font:inherit; font-size:13px; padding:0 12px; cursor:pointer; }
+  .lock-field.bad{ animation:lock-shake .35s; border-color:var(--ink); }
+  @keyframes lock-shake{ 20%,60%{ translate:-6px 0; } 40%,80%{ translate:6px 0; } }
+  .lock-msg{ margin:0; min-height:1.2em; font-size:12px; color:var(--ink-soft); }
+  @media (prefers-reduced-motion: reduce){ .lock-field.bad{ animation:none; } }
+
+  /* ---- the project page's screen ---- */
+  .lock-page{ min-height:100svh; display:grid; place-items:center; padding:var(--pad, 24px);
+    background:var(--paper); color:var(--ink);
+    font-family:"Switzer", "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight:300; -webkit-font-smoothing:antialiased; }
+  .lock-name{ position:fixed; top:var(--pad, 24px); left:var(--pad, 24px);
+    font-size:20px; font-weight:400; line-height:1; letter-spacing:-.01em;
+    color:var(--ink); text-decoration:none; border:0; }
+  .lock-wrap{ width:min(380px,100%); display:flex; flex-direction:column; gap:14px; }
+  .lock-wrap h1{ margin:0; font-weight:300; font-size:clamp(2rem, 5vw, 3.2rem); line-height:1; letter-spacing:-.03em; }
+  .lock-back{ font-size:13px; color:var(--ink-soft); text-decoration:none; border:0; transition:color .2s; }
+  .lock-back:hover, .lock-back:focus-visible{ color:var(--ink); outline:0; }
+
+  /* ---- on the index: over the reel that was clicked ---- */
+  .lock-box{ position:fixed; z-index:70; display:grid; place-items:center; padding:20px; box-sizing:border-box;
+    background:rgba(11,11,10,.62); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+    color:#f2f2f0; opacity:0; transition:opacity .3s ease; cursor:pointer; }
+  .lock-box .lock-form{ cursor:default; }
+  .lock-box.on{ opacity:1; }
+  .lock-box .lock-form{ width:min(240px,100%); }
+  .lock-box .lock-note{ font-size:14px; line-height:1.4; color:#b5b5b0; }
+  .lock-box .lock-ask:hover, .lock-box .lock-ask:focus-visible{ color:#fff; }
+  .lock-box .lock-field{ border-color:rgba(255,255,255,.3); }
+  .lock-box .lock-field:focus-within{ border-color:rgba(255,255,255,.6); }
+  .lock-box .lock-field input, .lock-box .lock-field button{ color:#f2f2f0; }
+  .lock-box .lock-field input::placeholder{ color:#b5b5b0; }
+  .lock-box .lock-field button{ border-left-color:rgba(255,255,255,.3); }
+  .lock-box .lock-field.bad{ border-color:#f2f2f0; }
+  .lock-box .lock-msg{ color:#b5b5b0; }

@@ -15,7 +15,7 @@
 */
 window.CHAPTERS['media/AI-companion.mp4'] = {
   numeral:'IV',
-  file:'sub-04-ai-companion.html',
+  file:null,   /* opens in the index overlay; only the protected projects have pages */
   head:'AI Companion, Impulse Spending\u00a0Coach',
   title:'AI Companion',
   year:'2025',

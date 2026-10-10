@@ -15,7 +15,7 @@
 */
 window.CHAPTERS['media/bodiless.jpg'] = {
   numeral:'II',
-  file:'sub-02-bodiless.html',
+  file:null,   /* opens in the index overlay; only the protected projects have pages */
   head:'Bodiless Spacing, Thesis',
   title:'Bodiless Spacing',
   year:'2024',

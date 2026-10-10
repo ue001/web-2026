@@ -287,9 +287,10 @@
     /* the loop — an ordinary link, so it works off file:// */
     var nx=ch.next, nch=nx?CH[name(nx)]:null;
     var foot=row();
-    if(nch && nch.file){
+    var slug=function(t){ return (t||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); };   /* as the index names its chapters */
+    if(nch){
       foot.innerHTML=cell([1,3],'<p class="mkey">Continue</p>'+
-        '<a class="proj__back" href="'+nch.file+'">'+
+        '<a class="proj__back" href="'+(nch.file || 'index.html#'+slug(nch.title))+'">'+
           (nch.numeral?nch.numeral+'. ':'')+esc(nch.title||'')+' &rarr;</a>',true)+
         cell([3,13],'',false);
     } else {
@@ -433,7 +434,7 @@
   var sm=null; try{ sm=localStorage.getItem(MKEY)||localStorage.getItem(OLDKEY); }catch(e){}
   setMode(MODES[sm]?sm:'even', false);
   var st=null; try{ st=localStorage.getItem(TKEY); }catch(e){}
-  setTheme(st==='dark'?'dark':'light', false);
+  setTheme(st==='light'?'light':'dark', false);   /* dark unless the visitor chose light, as on the index */
 
   document.title = (ch.title||'Project') + ' — Jihae';
 

@@ -30,7 +30,7 @@
    ===================================================================== */
 window.CHAPTERS['media/line0.mp4'] = {
   numeral:'I',
-  file:'sub-01-line0.html',
+  file:null,   /* opens in the index overlay; only the protected projects have pages */
   head:'Line 0, Speculative Metro',
   title:'Line 0',
   year:'2024',

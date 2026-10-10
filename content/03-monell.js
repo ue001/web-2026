@@ -8,7 +8,7 @@ CHAPTERS['media/monell.mp4'] = {
   year:'2025',
   /* the top image is the same file as the index tile on the home page */
   cover:'media/monell.mp4',
-  file:'sub-03-monell.html',
+  file:null,   /* opens in the index overlay; only the protected projects have pages */
   lede:'A brand identity and website that bring a cosmetics line to Gen Z.',
   role:'Identity design, Web design, Photoshoot art direction',
   tools:'Figma, Nano Banana',

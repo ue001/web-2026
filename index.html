@@ -4,8 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jihae Cha</title>
-<!-- tab icon: the landing grid in miniature, one area taking the space and the others rounding away -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b0b0a'/%3E%3Crect x='5' y='5' width='13' height='13' rx='3' fill='%23f2f2f0'/%3E%3Crect x='20' y='5' width='7' height='13' rx='3.5' fill='%238a8a85'/%3E%3Crect x='5' y='20' width='13' height='7' rx='3.5' fill='%238a8a85'/%3E%3Crect x='20' y='20' width='7' height='7' rx='3.5' fill='%238a8a85'/%3E%3C/svg%3E">
+<!-- tab icon: a square drawn as a line, like the site's grid, its corners slightly rounded. Dark on light tabs, light on dark ones -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cstyle%3Erect%7Bfill:none;stroke:%23121211%7D@media (prefers-color-scheme:dark)%7Brect%7Bstroke:%23f2f2f0%7D%7D%3C/style%3E%3Crect x='4' y='4' width='24' height='24' rx='4' stroke-width='2.5'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="subpage/lock.css">
 <style>
   @import url("https://api.fontshare.com/v2/css?f[]=switzer@300,400,500&display=swap");
 
@@ -27,8 +28,6 @@
   /* instant to full strength, then the 600ms ease below carries it back */
   .grid-on .strip{ transition:grid-template-columns var(--move), border-color 0ms; }
   .grid-on .cell{ transition:border-color 0ms; }
-  .grid-on .content::before,
-  .grid-on .gallery::before{ transition:left var(--move), background 0ms; }
 
   [data-theme="dark"]{
     --rule:#2b2b29;
@@ -194,79 +193,7 @@
   [data-mode="read"] .lede{ font-size:clamp(1.15rem, 4.8cqi, 2.3rem); line-height:1.4; }
   [data-mode="read"] .tags{ font-size:clamp(.85rem, 2.8cqi, 1.15rem); }
 
-  /* ---- ALL: the same sections, zoomed out ---- */
-  .gallery{ display:none !important; }
-
-  [data-mode="grid"] .content{
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    align-items:start;
-    align-content:start;
-    column-gap:var(--pad);
-    row-gap:var(--pad);
-    padding:0 var(--pad) 6rem;
-    scroll-snap-type:none;
-  }
-
-  /* landing still opens the page, full height, rules intact */
-  [data-mode="grid"] .band--landing{
-    grid-column:1 / -1;
-    height:100svh;
-    min-height:0;
-    margin:0 calc(var(--pad) * -1) calc(var(--pad) * 2);
-  }
-
-  /* each project: fixed compact box. !important so nothing from the
-     full-page modes can reassert a viewport height here. */
-  [data-mode="grid"] .band--work{
-    display:block !important;
-    height:26svh !important;
-    min-height:0 !important;
-    scroll-snap-align:none;
-    border:1px solid var(--rule);
-    overflow:hidden;
-  }
-  /* the meta strip (number, year, link) is dropped at this scale */
-  [data-mode="grid"] .band--work .strip + .strip{ display:none !important; }
-
-  [data-mode="grid"] .band--work .strip{
-    height:100% !important;
-    min-height:0 !important;
-    border-bottom:0;
-  }
-  [data-mode="grid"] .band--work .cell{
-    height:100% !important;
-    min-height:0 !important;
-    padding:calc(var(--pad) * .45);
-    overflow:hidden;
-  }
-  [data-mode="grid"] .band--work .shot{ padding:0; }
-  [data-mode="grid"] .band--work .shot img,
-  [data-mode="grid"] .band--work .shot video{
-    width:100%; height:100%;
-    object-fit:cover;
-  }
-
-  /* both small */
-  [data-mode="grid"]{ --tscale:.55; }
-  [data-mode="grid"] .lede,
-  [data-mode="grid"] .note,
-  [data-mode="grid"] .band--work .meta{ display:none !important; }
-  [data-mode="grid"] .band--work h2{
-    font-size:clamp(.72rem, 4.2cqi, 1rem) !important;
-    line-height:1.15;
-  }
-  [data-mode="grid"] .band--work .tags{
-    font-size:clamp(.6rem, 2.6cqi, .72rem) !important;
-    margin-top:.3rem;
-  }
-
-  @media (max-width:900px){
-    [data-mode="grid"] .content{ grid-template-columns:1fr; }
-  }
-
   @media (max-width:760px){
-    .gallery__grid{ grid-template-columns:1fr; }
     .strip{ grid-template-columns:1fr !important; }
     .cell{ border-right:0; border-bottom:var(--line) solid var(--rule); }
     .cell:last-child{ border-bottom:0; }
@@ -278,240 +205,13 @@
   }
   @media (prefers-reduced-motion: reduce){ .strip,.cell{ transition:none; } }
 
-  /* Cross-fade the whole page between layouts instead of cutting.
-     Per-element morphing is avoided: snapshots are viewport-relative,
-     and our scroller is .content, so off-screen items land wrong. */
-  ::view-transition-old(root),
-  ::view-transition-new(root){
-    animation-duration:420ms;
-    animation-timing-function:cubic-bezier(.22,.61,.36,1);
-  }
-
   /* 19 defines this; the base file does not, so the row gap collapsed */
   :root{ --gap:clamp(1.5rem, 4vw, 4.5rem); }
   /* the weight of every grid line on the site */
   :root{ --line:2px; }
 
-  /* ===== Free: portfolio19's index, brought over whole ================
-     Its own markup, CSS, line layers and transitions, scoped so that
-     Read / Even / Look / All are untouched. ============================ */
-  .free{ display:none; }
-  [data-layout="free"] .free{ display:block; }
-  [data-layout="free"] .content{ display:none; }
-  [data-layout="free"] body{ overflow-y:auto; }
-[data-layout="free"] .wrap{ padding:0 var(--pad) 12rem; }
-
-[data-layout="free"] .intro{
-    min-height:100svh; display:flex; flex-direction:column; justify-content:center;
-    padding-bottom:0;
-  }
-
-  /* a held beat between the statement and the work */
-[data-layout="free"] .mark{
-    display:flex; justify-content:space-between; align-items:flex-end;
-    margin:24svh 0 14svh;
-    padding-bottom:.7rem; border-bottom:var(--line) solid var(--rule);
-    font-size:15px; font-weight:500; color:var(--ink-soft);
-  }
-[data-layout="free"] .mark span:last-child{ font-variant-numeric:tabular-nums; }
-[data-layout="free"] .intro h1{
-    margin:0; font-weight:500; letter-spacing:-.035em;
-    font-size:clamp(1.8rem, 4.6vw, 4.2rem); line-height:1.08; max-width:22ch;
-  }
-[data-layout="free"] .intro h1 em{ font-style:normal; color:var(--ink-soft); }
-
-  /* ---- the grid: twelve columns, ruled, tiles placed on it ----
-     Column rules run the full height of the page behind everything,
-     so every tile edge and every caption sits on a visible vertical. */
-
-[data-layout="free"] .wrap{ position:relative; z-index:1; }
-
-[data-layout="free"] .grid{
-    display:grid;
-    grid-template-columns:repeat(12, minmax(0,1fr));
-    row-gap:calc(var(--gap) * 1.6);
-  }
-
-  /* placement from the 1920 Figma frame. Pairs that sit beside each
-     other share a grid row, so the row reserves height for both and
-     the stagger is a positive offset inside it — nothing can overlap.
-     The two 16:9 boxes are the wide anchors; the portrait boxes sit
-     opposite them so each row has one broad and one upright shape. */
-[data-layout="free"] .tile{ display:flex; flex-direction:column; min-height:0; align-self:start; }
-[data-layout="free"] .tile:nth-child(1){ grid-column:1 / 6;   grid-row:1; }                       /* Motion Explainer */
-[data-layout="free"] .tile:nth-child(2){ grid-column:9 / 13;  grid-row:1; margin-top:22svh; }     /* MoneLL */
-[data-layout="free"] .tile:nth-child(3){ grid-column:2 / 8;   grid-row:2; }                       /* Generative Title Slide, 16:9 */
-  /* AI Companion: the offset is measured, not guessed — see the script
-     at the foot of the page. It lands so that the bottom of its picture
-     sits on the bottom of the Generative Title Slide's caption box, and
-     the 26svh here is only the value before that measurement lands. */
-[data-layout="free"] .tile:nth-child(4){ grid-column:10 / 13; grid-row:2; margin-top:26svh; }     /* AI Companion */
-[data-layout="free"] .tile:nth-child(5){ grid-column:1 / 8;   grid-row:3; }                       /* Line 0, 16:9 */
-[data-layout="free"] .tile:nth-child(6){ grid-column:9 / 13;  grid-row:3; margin-top:34svh; }     /* Bodiless Spacing */
-[data-layout="free"] .tile:nth-child(7){ grid-column:3 / 7;   grid-row:4; }                       /* Slash */
-
-[data-layout="free"] .tile--tall .tile__media{ aspect-ratio:3 / 4; }
-[data-layout="free"] .tile--wide .tile__media{ aspect-ratio:4 / 3; }
-[data-layout="free"] .tile--169 .tile__media{ aspect-ratio:16 / 9; }
-
-  /* each project is one ruled rectangle, divided like a strip:
-     media above, caption row below, split into its own cells. */
-[data-layout="free"] .tile{
-    display:block; color:inherit; text-decoration:none;
-  }
-[data-layout="free"] .tile__media{
-    width:100%; aspect-ratio:3 / 4; background:var(--shot-bg);
-    overflow:hidden;
-  }
-[data-layout="free"] .tile__media img, [data-layout="free"] .tile__media video{
-    width:100%; height:100%; object-fit:cover; display:block;
-    transition:transform var(--move), opacity var(--move);
-  }
-[data-layout="free"] .tile:hover .tile__media img, [data-layout="free"] .tile:hover .tile__media video{ transform:scale(1.02); }
-
-  /* the caption: three lines, one size, separated only by colour */
-  /* the caption row: two cells, divided by a rule, like the meta strip */
-[data-layout="free"] .tile__label{
-    margin:0; display:grid; grid-template-columns:1fr auto;
-  }
-[data-layout="free"] .tile__label > *{ padding:.6rem .7rem; }
-[data-layout="free"] .tile__names{ min-width:0; }
-[data-layout="free"] .tile__label span{
-    display:block;
-    font-size:15px;                 /* fixed — it does not scale */
-    font-weight:500; letter-spacing:-.005em; line-height:1.45;
-  }
-[data-layout="free"] .tile__status{ align-self:start; white-space:nowrap; }
-[data-layout="free"] .tile__name{ color:var(--ink); }
-[data-layout="free"] .tile__disc{ color:var(--ink-soft); }
-[data-layout="free"] .tile__status{ color:var(--ink-soft); }
-
-[data-layout="free"] .end{
-    margin-top:14rem; font-weight:500; letter-spacing:-.03em;
-    font-size:clamp(1.4rem, 3.4vw, 3rem); line-height:1.15; max-width:20ch;
-  }
-[data-layout="free"] .end a{ color:var(--ink); text-decoration:none; border-bottom:1px solid currentColor; }
-
-
-  /* ---- extended edges ---------------------------------------------
-     Each project projects its own four edges (plus its two internal
-     rules) across the whole page. The grid is not imposed — the work
-     draws it, and the empty cells are defined by boxes elsewhere. */
-[data-layout="free"] .wrap{ position:relative; }
-[data-layout="free"] .edges{ position:absolute; inset:0; z-index:0; pointer-events:none; }
-  /* The rule where a picture ends is drawn in front of the tiles rather
-     than behind them, so it reads as one line carrying across the page
-     and over the bottom of the image — not as a line that stops at the
-     picture and picks up again on the other side. */
-[data-layout="free"] .edges--front{ z-index:2; }
-  /* the front layer carries only the rule under a picture — it must sit
-     at exactly the weight of every other line, not brighter */
-  [data-layout="free"] .edges--front b{
-    background:var(--ink-soft) !important; opacity:.32 !important;
-  }
-  [data-layout="free"] .edges--front[data-hot="true"] b{
-    background:var(--ink) !important; opacity:1 !important;
-  }
-[data-layout="free"] .edges b{
-    position:absolute; background:var(--ink-soft); display:block; opacity:.32;
-  }
-[data-layout="free"] .edges b.v{ width:var(--line); }
-[data-layout="free"] .edges b.h{ height:var(--line); }
-[data-layout="free"] .grid, [data-layout="free"] .mark, [data-layout="free"] .intro{ position:relative; z-index:1; }
-[data-layout="free"] .tile{ background:var(--paper); }
-
-  /* the lines travel between layouts, and go to full ink while they do */
-[data-layout="free"] .edges b{
-    transition:left var(--move), top var(--move), width var(--move),
-               height var(--move), background 260ms ease;
-  }
-[data-layout="free"] .edges[data-hot="true"] b{ background:var(--ink); opacity:1; }
-  /* the lines lead: they travel immediately and fast, and the boxes
-     start a beat later on a slower curve, so the grid appears to push
-     them into place rather than to chase them. */
-[data-layout="free"] .edges b{
-    transition:left 380ms cubic-bezier(.22,.61,.36,1),
-               top 380ms cubic-bezier(.22,.61,.36,1),
-               width 380ms cubic-bezier(.22,.61,.36,1),
-               height 380ms cubic-bezier(.22,.61,.36,1),
-               background 260ms ease, opacity 260ms ease;
-  }
-[data-layout="free"] html.nofx .edges b{ transition:none !important; }
-  
-  /* height, not aspect-ratio — aspect-ratio does not animate in every
-     browser, which made the image jump and the lines look late. */
-
-
-
-
-  /* ---- ALL: one ruled field, not seven outlined boxes ----------------
-     Every box edge carries to the margins, and the caption/image split
-     carries too, so the positions after the last project are cells in
-     the same field rather than empty rectangles. */
-  [data-mode="grid"] .band--work{ border:0 !important; }
-  [data-mode="grid"] .content{ position:relative; }
-  .allgrid{ display:none; }
-  [data-mode="grid"] .allgrid{
-    display:block; position:absolute; inset:0;
-    z-index:0; pointer-events:none;
-  }
-  .allgrid b{ position:absolute; background:var(--rule); display:block; }
-  .allgrid b.v{ width:var(--line); }
-  .allgrid b.h{ height:var(--line); }
-  /* the field sits in front of the projects, so a line carries over the
-     top of a picture the way it already does over the bottom */
-  [data-mode="grid"] .allgrid{ z-index:2; }
-  [data-mode="grid"] .band--work{ position:relative; z-index:1; }
-
-  /* ---- one weight for every line in Free ---------------------------
-     Whatever draws a line here — the layer, a border on a tile, or a
-     border on its caption — is pinned to the same hairline colour, so
-     nothing can render brighter than the rest of the field. */
-  [data-layout="free"] .edges b,
-  [data-layout="free"] .edges--front b{
-    background:var(--rule) !important;
-    opacity:1 !important;
-  }
-  [data-layout="free"] .tile,
-  [data-layout="free"] .tile *,
-  [data-layout="free"] .tile__label,
-  [data-layout="free"] .tile__label > *,
-  [data-layout="free"] .tile__media{
-    border-color:var(--rule) !important;
-  }
-  /* the tile draws no border at all — the layer draws every line, and a
-     border here would sit a pixel from the layer's own and read as two */
-  [data-layout="free"] .tile,
-  [data-layout="free"] .tile *{
-    border:0 !important;
-    outline:0 !important;
-    box-shadow:none !important;
-  }
-
-  /* and nothing in a tile draws a rule of its own */
-  [data-layout="free"] .tile__label,
-  [data-layout="free"] .tile__label > *,
-  [data-layout="free"] .tile__names,
-  [data-layout="free"] .tile__media{
-    border-top:0 !important; border-bottom:0 !important;
-  }
-  /* the flash state stays available for transitions */
-  [data-layout="free"] .edges[data-hot="true"] b,
-  [data-layout="free"] .edges--front[data-hot="true"] b{
-    background:var(--ink) !important;
-  }
-
-  /* The tile had a paper background, which painted over every line
-     crossing it — including the run under its own caption. It is the
-     same colour as the page, so it is simply removed and the field
-     shows through; the picture still covers what it covers. */
-  [data-layout="free"] .tile{ background:transparent !important; }
-  [data-layout="free"] .tile__label{ background:transparent !important; }
   /* the landing lives in its own frame so its styles and the page's never collide */
   .band--landing{ position:relative; display:block; border-bottom:var(--line) solid var(--rule); }   /* quiet, like the landing lines above it and the works below */
-  /* the landing and its rule, placed at the top of Free as well */
-  .free-landing{ position:relative; height:100svh; border-bottom:var(--line) solid var(--rule); }
-  @supports not (height:100svh){ .free-landing{ height:100vh; } }
 
   /* the beat between landing and work: the landing's rule above it,
      the first project's rule below it, so no line is left hanging */
@@ -525,17 +225,12 @@
     margin:0; max-width:46ch; color:var(--ink); opacity:.55;
     font-size:clamp(.95rem, 1.05vw, 1.15rem); line-height:1.4; letter-spacing:-.005em; font-weight:300;
   }
-  /* the same note in Free, where the statement used to be */
-  [data-layout="free"] .free-note{ position:relative; z-index:1; padding-top:calc(var(--pad) * 3); }
-  [data-layout="free"] .mark{ margin-top:30svh; }
   .interlude__mark{
     display:flex; justify-content:space-between; align-items:flex-end;
     padding-bottom:.7rem; font-size:15px; font-weight:500; color:var(--ink-soft);
   }
   .interlude__mark span:last-child{ font-variant-numeric:tabular-nums; }
   .interlude + .band--work{ border-top:var(--line) solid var(--rule); }
-  [data-mode="grid"] .interlude{ grid-column:1 / -1; min-height:30svh; margin:0 calc(var(--pad) * -1); }
-  [data-mode="grid"] .interlude + .band--work{ border-top:var(--line) solid var(--rule); }
   .landing-frame{ position:absolute; inset:0; width:100%; height:100%; border:0; display:block; background:var(--paper); }
 
   /* the section after the landing: the Jihae Cha panel, full width, with the work mark under it */
@@ -561,13 +256,76 @@
   .intro .interlude__mark{ padding:.9rem var(--pad) .7rem; }   /* no line above "Selected work" */
   @media (max-width:700px){ .intro__facts{ grid-template-columns:1fr; } .intro__facts div{ border-right:0; border-bottom:var(--line) solid var(--rule); } }
   @media (prefers-reduced-motion: reduce){ .intro:not(.seen) .intro__lede{ letter-spacing:-.025em; opacity:1; } }
+  @media (max-width:760px){   /* phones: the statement a step larger, so it reads as the page's voice, not a caption */
+    .intro__lede{ font-size:clamp(1.6rem, 7vw, 2rem); line-height:1.18; }
+    .intro__more{ font-size:16px; }
+  }
 
   /* "View project" sits right under the project's image */
   .band--work .shot{ flex-direction:column; }
   .shot-link{ margin:.9rem 0 0; flex:none; }
 
-  .shot-link a{ border-bottom:0; color:var(--ink-soft); }
-  .shot-link a:hover{ color:var(--ink); }
+  /* the way into the project, on hover: the reel reaches the grid. Its cell gives up the gap on
+     the left and above, so the reel grows out until it meets the divider and the line above;
+     the grid itself never moves, and the room under it stays. "View more" then arrives in the
+     corner they meet at, a small tab whose two edges are grid lines too.
+     THIS VERSION: see the block below — here the reels rest against the lines. */
+  .band--work .reel{ position:relative; width:100%; min-height:0; display:flex; flex-direction:column; }
+  .shot-link a{ border-bottom:0; color:inherit; }
+  .shot-link a span{ display:inline-block; transition:translate .3s ease; }
+  .shot-link a:hover{ color:inherit; }
+  .shot-link a:hover span, .shot-link a:focus-visible span{ translate:4px 0; }
+  .band--work .reel .shot-link{
+    position:absolute; z-index:2; left:0; top:0; margin:0;
+    padding:.6em .95em; font-size:clamp(14px, 1.2vw, 18px); font-weight:400; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;
+    color:var(--ink);
+    /* the page colour let partly through, so over light footage it reads as a tint, not a block */
+    background:color-mix(in srgb, var(--paper) 62%, transparent);
+    -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+    border-right:var(--line) solid var(--rule); border-bottom:var(--line) solid var(--rule);
+    opacity:0; transition:opacity .3s ease, border-color 600ms ease;
+    pointer-events:none;   /* the reel itself takes the click */
+  }
+  .band--work .reel .shot-link a{ pointer-events:auto; }
+  .band--work .shot:hover .shot-link, .band--work .shot:focus-within .shot-link{ opacity:1; transition:opacity .3s ease .3s, border-color 600ms ease; }   /* once the lines have arrived */
+  .band--work .strip:first-child > .cell{ transition:border-color 600ms ease, padding var(--move); }
+  .grid-on .band--work .strip:first-child > .cell{ transition:border-color 0ms, padding var(--move); }
+  /* THIS VERSION, at rest (no hover needed): every reel already meets its grid lines. The divider keeps
+     the original split for every project, so the grid lines up down the page and text and image keep
+     their original proportion; the reel's cell gives up its gap on the left and above, so the reel
+     reaches the divider and the line above. Hovering only brings up "View more". */
+  @media (min-width:761px){
+    html:not([data-mode="grid"]) .band--work .strip:first-child > .shot{ padding-left:0; padding-top:0; }
+  }
+  /* hover, in this version: no tab — the reel dims a little and "View more →" comes up in its middle,
+     in white, so it reads over light and dark footage alike */
+  @media (hover:hover) and (min-width:761px){
+    .band--work .reel img, .band--work .reel video{ transition:filter .35s ease; }
+    .band--work .shot:hover .reel img, .band--work .shot:hover .reel video{ filter:brightness(.65); }
+    /* the project's cell grows a little: the divider moves left by most of a gap and the room under the
+       reel shrinks by the same, so the lines and the reel inside them both get bigger; the text cell gives
+       up the same amount of its own padding, so its type stays the same size */
+    html:not([data-mode="grid"]) .band--work .strip:first-child:has(.reel:hover){
+      grid-template-columns:calc(var(--split) * 0.8 - var(--pad) * .6) 1fr !important; }
+    html:not([data-mode="grid"]) .band--work .strip:first-child:has(.reel:hover) > .cell:first-child{ padding-right:calc(var(--pad) * .4); }
+    html:not([data-mode="grid"]) .band--work .strip:first-child > .shot:has(.reel:hover){ padding-bottom:calc(clamp(110px, 20svh, 260px) - var(--pad) * .6); }
+    .band--work .reel .shot-link{ left:50%; top:50%; translate:-50% -50%; padding:0;
+      background:none; -webkit-backdrop-filter:none; backdrop-filter:none; border:0;
+      color:#fff; text-shadow:0 1px 14px rgba(0,0,0,.4);
+      font-size:clamp(16px, 1.8vw, 30px); font-weight:500; letter-spacing:-.02em; }
+    .band--work .shot:hover .shot-link{ transition:opacity .3s ease .15s; }
+  }
+  /* phones and touch screens keep the original link: "View more", small and grey, under the reel */
+  @media (hover:none), (max-width:760px){
+    .band--work .reel .shot-link{ position:static; flex:none; margin:.9rem 0 0; padding:0;
+      font-size:var(--fs-meta); letter-spacing:normal; color:var(--ink-soft);
+      background:none; -webkit-backdrop-filter:none; backdrop-filter:none; border:0;
+      opacity:1; transition:none; pointer-events:auto; }
+    .band--work .reel .shot-link a:hover{ color:var(--ink); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .band--work .strip:first-child, .band--work .strip:first-child > .cell{ transition:border-color 600ms ease; }
+  }
 
   /* Look: title and tags only, the project description stays hidden */
   [data-mode="look"] .band--work .lede{ display:none; }
@@ -581,6 +339,7 @@
     html[data-mode="read"] .band--work .shot img, html[data-mode="read"] .band--work .shot video{
       flex:1 1 auto; min-height:0; width:100%; height:auto; max-height:none; aspect-ratio:auto; object-fit:cover;
     }
+    html[data-mode="even"] .band--work .reel, html[data-mode="read"] .band--work .reel{ flex:1 1 auto; }
   }
 
   /* the name panel's study, playing quietly in the lower right of the statement section */
@@ -610,10 +369,61 @@
     font-size:calc(var(--fs-meta) * var(--tscale)); }
   .band--work .cell > .meta.push{ margin-top:62px; }
   .band--work .cell > .meta.role{ margin-top:0; }
-  .band--work .shot-link{ font-size:var(--fs-meta); }
   /* Read keeps its own larger set, in the same proportions */
   [data-mode="read"] .band--work .lede{ font-size:clamp(1.15rem, 4.8cqi, 2.3rem); line-height:1.4; }
   [data-mode="read"] .band--work .tags{ font-size:clamp(1.15rem, 4.8cqi, 2.3rem); }
+
+  /* ---- phones: each project stacks, its reel first, its words under it, View more last ----
+     The split rule above is more specific than the general one-column rule, so it is
+     undone here. A project is as tall as it needs, not a full screen. The reel's cell and
+     its wrapper step aside (display:contents), so the reel, the words and the link lay out
+     as one column in that order; taps still reach the cell as before. The menu chooses the
+     balance and the order never changes: Image (where phones open) runs the reel edge to
+     edge over a short caption, Shared keeps both at reading size, Text sets the words large
+     under a smaller reel. */
+  @media (max-width:760px){
+    :root:not(.grid-on){ --rule:var(--rule-on); }
+    /* the fixed name and menu icon sit on a band of page colour with a rule under it, so titles
+       scrolling up pass beneath them instead of crossing them */
+    body::before{ content:""; position:fixed; z-index:24; top:0; left:0; right:0;
+      height:calc(var(--pad) * 2 + 20px); background:var(--paper); border-bottom:var(--line) solid var(--rule);
+      pointer-events:none; transition:opacity .45s ease; }
+    .on-landing body::before{ opacity:0; }
+    html:has(.proj[data-open="true"]) body::before{ opacity:0; }
+    /* the Text / Shared / Image menu sits on the left, on the same edge as the name and the captions */
+    .ratio{ left:var(--pad) !important; transform:none !important; }   /* small screens and daylight lose the faintest grey: the lines a step stronger */
+    .band--work .strip:first-child{ grid-template-columns:1fr !important; }
+    html:not([data-mode="grid"]) .band--work{ min-height:auto; }
+    html:not([data-mode="grid"]) .band--work .strip:first-child > .shot,
+    html:not([data-mode="grid"]) .band--work .reel{ display:contents; }
+    html:not([data-mode="grid"]) .band--work .reel video,
+    html:not([data-mode="grid"]) .band--work .reel img{ order:1; width:calc(100% - var(--pad) * 2); margin:var(--pad) var(--pad) 0; }
+    html:not([data-mode="grid"]) .band--work .strip:first-child > .cell:first-child{ order:2; padding:calc(var(--pad) * .8) var(--pad) 0; border-right:0; border-bottom:0; }
+    html:not([data-mode="grid"]) .band--work .reel .shot-link{ order:3; margin:1rem var(--pad) clamp(56px, 12svh, 110px); }   /* then room before the next project */
+    .band--work .cell > .meta.push{ margin-top:1.2rem; }
+
+    [data-mode="even"] .band--work h2{ font-size:clamp(1.7rem, 8.4vw, 2.4rem); }
+    [data-mode="even"] .band--work .lede{ font-size:16px; line-height:1.55; }
+    [data-mode="even"] .band--work .tags{ font-size:14px; }
+
+    html[data-mode="read"] .band--work .reel video, html[data-mode="read"] .band--work .reel img{ width:72%; }   /* the words lead, the reel steps back */
+
+    /* Image: the reel edge to edge, meeting the line above, then a caption —
+       title / categories / "Internship, CLEVER°FRANKE, 2026" at one size and one leading, then View more */
+    html[data-mode="look"] .band--work .reel video, html[data-mode="look"] .band--work .reel img{ width:100%; margin:0; }
+    [data-mode="look"] .band--work h2{ font-size:clamp(1.3rem, 6vw, 1.8rem); }
+    html[data-mode="look"] .band--work .strip:first-child > .cell:first-child{ display:flex; flex-direction:row; flex-wrap:wrap; align-items:baseline; }   /* flex, so no stray space sneaks in before the comma */
+    html[data-mode="look"] .band--work .cell:first-child > h2,
+    html[data-mode="look"] .band--work .cell:first-child > .tags{ flex:0 0 100%; }
+    html[data-mode="look"] .band--work .cell:first-child > .tags{ margin:.5rem 0 0; }
+    html[data-mode="look"] .band--work .cell > .meta.push,
+    html[data-mode="look"] .band--work .cell > .meta.role{ display:block; margin:0; }
+    html[data-mode="look"] .band--work .cell > .meta.push::after{ content:",\00a0"; }
+    html[data-mode="look"] .band--work .cell:first-child > .tags,
+    html[data-mode="look"] .band--work .cell > .meta.push,
+    html[data-mode="look"] .band--work .cell > .meta.role{ font-size:14px; line-height:1.4; color:var(--ink-soft); }   /* Image would scale these to about 10px here */
+    html[data-mode="look"] .band--work .reel .shot-link{ margin:1.1rem var(--pad) clamp(40px, 8svh, 72px); font-size:14px; }
+  }
 
   /* ---- footer: one ruled strip, small grey text like the project meta ---- */
   .site-foot{
@@ -632,12 +442,15 @@
   .site-foot a{ color:var(--ink); border-bottom:1px solid currentColor; }
   .site-foot a:hover{ color:var(--ink-soft); }
   .band--work + .site-foot{ border-top:0; }   /* the last project's own rule already sits above it */
-  [data-mode="grid"] .site-foot{ grid-column:1 / -1; margin:0 calc(var(--pad) * -1) -6rem; }
   @media (max-width:760px){
     .site-foot{ grid-template-columns:1fr; }
     .site-foot__cell{ border-right:0; border-bottom:var(--line) solid var(--rule); }
     .site-foot__cell:last-child{ border-bottom:0; }
     .site-foot__end{ text-align:left; }
+    .site-foot{ min-height:auto; }   /* stacked, the strip is only as tall as its two cells */
+    /* phones: the invitation first, the copyright last as the page's sign-off */
+    .site-foot__cell:last-child{ order:1; padding:calc(var(--pad) * 2) var(--pad); border-bottom:var(--line) solid var(--rule); }
+    .site-foot__cell:first-child{ order:2; padding:calc(var(--pad) * 1.5) var(--pad) calc(var(--pad) * 1.5 + 3rem); border-bottom:0; }   /* room under it for the fixed menu */
   }
 
   /* "More about Jihae": dark at rest, full white on hover */
@@ -667,6 +480,32 @@
   .theme svg{ width:20px; height:20px; display:block; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
   .top-nav a:hover, .theme:hover{ opacity:.55; }
   .top-nav a:focus-visible, .theme:focus-visible{ outline:1px solid currentColor; outline-offset:4px; }
+  /* phones: About, Contact and the theme fold into three lines; they open a full-screen menu set in the
+     landing's light headline type, each item on its own ruled row */
+  .menu-btn, .menu-panel{ display:none; }
+  @media (max-width:760px){
+    .top-nav > a, .top-nav > .theme{ display:none; }
+    .menu-btn{ position:relative; display:flex; flex-direction:column; justify-content:center; gap:5px; width:24px; height:20px; padding:0; margin:0;
+      background:none; border:0; color:inherit; cursor:pointer; }
+    .menu-btn::after{ content:""; position:absolute; inset:-12px; }   /* a thumb-sized touch area */
+    .menu-btn i{ display:block; height:1.7px; background:currentColor; border-radius:1px;
+      transition:transform .35s cubic-bezier(.7,0,.15,1), opacity .2s ease; }
+    .menu-open .menu-btn i:nth-child(1){ transform:translateY(6.7px) rotate(45deg); }
+    .menu-open .menu-btn i:nth-child(2){ opacity:0; }
+    .menu-open .menu-btn i:nth-child(3){ transform:translateY(-6.7px) rotate(-45deg); }
+    .menu-btn:focus-visible{ outline:1px solid currentColor; outline-offset:6px; }
+    .menu-panel{ position:fixed; inset:0; z-index:24; color:var(--ink);   /* under the nav, so the lines stay on top as the close */
+      background:color-mix(in srgb, var(--paper) 72%, transparent);   /* the page shows through, softened, rather than a solid black */
+      -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);
+      display:flex; flex-direction:column; justify-content:flex-end; padding:var(--pad) var(--pad) calc(var(--pad) * 2 + 3rem);
+      font-family:"Switzer", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      opacity:0; visibility:hidden; transition:opacity .35s ease, visibility 0s linear .35s; }
+    .menu-open .menu-panel{ opacity:1; visibility:visible; transition:opacity .35s ease; }
+    .menu-panel a, .menu-panel button{ display:block; width:100%; text-align:left; background:none; border:0; border-top:var(--line) solid var(--rule);
+      color:var(--ink); font:inherit; font-weight:300; font-size:clamp(40px, 12vw, 56px); letter-spacing:-.035em; line-height:1;
+      padding:.3em 0 .25em; text-decoration:none; cursor:pointer; }
+    .menu-panel button{ font-size:18px; letter-spacing:-.01em; color:var(--ink-soft); padding:1em 0; }
+  }
   /* ---- the name as the home logo ------------------------------------------------
      Just JIHAE CHA, no cell and no line. It sits on the same left edge as the bottom menu
      (var(--pad)), so the two fixed corners line up. Drawn with mix-blend-mode:difference,
@@ -687,7 +526,6 @@
   html:not(.on-landing) .stuck-name{ opacity:1; visibility:visible; translate:0 0;
     transition:opacity .45s ease, translate .45s cubic-bezier(.2,.7,.2,1); }
   .stuck-name:hover, .stuck-name:focus-visible{ color:#fff; outline:0; }
-  [data-layout="free"] .stuck-name{ display:none; }
 
   /* ---- the menu, from the sketch: a small project strip. Text on the left, the
      picture on the right, the page's white dividing line between them ---- */
@@ -719,7 +557,15 @@
 <a class="stuck-name" id="stuckName" href="#top" aria-label="Jihae Cha, back to the landing">Jihae Cha</a>
 <nav class="top-nav" aria-label="Site">
   <a href="#about" id="navAbout">About</a>
+  <a href="mailto:jihae.cha9@gmail.com" id="navContact">Contact</a>
   <button type="button" id="theme" class="theme" aria-pressed="false" aria-label="Switch to dark mode"></button>
+  <button type="button" class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="menuPanel"><i></i><i></i><i></i></button>
+</nav>
+<!-- phones: About, Contact and the theme, behind the three lines -->
+<nav class="menu-panel" id="menuPanel" aria-label="Menu">
+  <a href="#about" data-go="navAbout">About</a>
+  <a href="mailto:jihae.cha9@gmail.com" data-go="navContact">Contact</a>
+  <button type="button" data-go="theme" id="menuTheme">Light mode</button>
 </nav>
 
 <main class="content">
@@ -975,7 +821,7 @@
     .stage, .stage.s1, .stage.s2 { grid-template-columns: 1fr; }
     .stage { grid-template-rows: 1fr 1fr; }
     .stage.s1 { grid-template-rows: 6fr 1fr; }
-    .stage.s2 { grid-template-rows: 1fr 6fr; }
+    .stage.s2 { grid-template-rows: var(--s2rows, 1fr 6fr); }   /* the name&#x27;s row is just tall enough for the name: set in fit() */
     .panel.name { margin: calc(-1 * var(--line)) calc(-1 * var(--line)) 0 calc(-1 * var(--line)); }
     .panel.designs { margin: calc(-1 * var(--line)); }
   }
@@ -1046,6 +892,13 @@
     }
     nameHead.style.setProperty(&#x27;--fs&#x27;, (n * SCALE).toFixed(1) + &#x27;px&#x27;);
     desHead.style.setProperty(&#x27;--fs&#x27;, (d * SCALE).toFixed(1) + &#x27;px&#x27;);
+    // stacked, with Designs open: the name&#x27;s row holds the name and an even gap above and below it,
+    // so Designs that move sits right under it rather than a seventh of the screen down
+    if (phone.matches) {
+      const pad = parseFloat(getComputedStyle(nameHead).paddingLeft), L = 2;
+      const need = Math.round(pad * 2 + n * SCALE * .95 + L), H = stage.clientHeight;
+      if (H &gt; need) stage.style.setProperty(&#x27;--s2rows&#x27;, need + &#x27;fr &#x27; + (H - need) + &#x27;fr&#x27;);
+    } else stage.style.removeProperty(&#x27;--s2rows&#x27;);
     // line the two headings up along the top of their capitals: the smaller one stays put and
     // the larger one moves up by the difference in where each size puts its cap tops in its line
     const c = capTop(), small = Math.min(n, d) * SCALE;
@@ -1084,7 +937,7 @@
       [&#x27;Interaction&#x27;,       &#x27;Motion Explainer&#x27;,                      &#x27;media/motion-explainer.mp4&#x27;],
       [&#x27;UX/UI&#x27;,             [&#x27;AI Companion&#x27;, &#x27;Monell&#x27;],              [&#x27;media/AI-companion.mp4&#x27;, &#x27;media/monell.mp4&#x27;]],
       // an area can hold several projects: each time it takes the space it shows the next one
-      [&#x27;Visual systems&#x27;,    [&#x27;Generative Title Slide&#x27;, &#x27;Slash&#x27;],     [&#x27;media/generative.mp4&#x27;, &#x27;media/slash.mp4&#x27;]]
+      [&#x27;Visual systems&#x27;,    [&#x27;Generative Title Slide&#x27;, &#x27;Slash&#x27;, &#x27;Bodiless Spacing&#x27;],     [&#x27;media/generative.mp4&#x27;, &#x27;media/slash.mp4&#x27;, &#x27;media/bodiless.jpg&#x27;]]
     ];
     const GROW = { col: 2.4, row: 3 };     // how much an area grows: tall, its row takes three quarters of the height
     const SOFTEN = 0.55;                 // corners touching it round about halfway
@@ -1525,7 +1378,7 @@
   <!-- between the landing and the work: a held beat, closed by rules on both sides -->
   <section class="interlude intro" aria-label="About Jihae Cha">
     <div class="intro__body">
-      <p class="intro__lede">Jihae Cha is a Korean-born designer in the Netherlands. Living between cultures, she noticed how differently people space themselves. In her work, elements gather, linger or give way, so whoever meets them feels that space too.</p>
+      <p class="intro__lede">Jihae Cha is a Korean-born designer in the Netherlands. Living between cultures, she noticed how differently people space themselves. She applies this to identity, motion and UX, focusing on how elements are positioned, timed and made to respond.</p>
       <a class="intro__more" href="#about" id="introMore">More about Jihae <span aria-hidden="true">→</span></a>
     </div>
     <div class="interlude__mark"><span>Selected work</span><span>07</span></div>
@@ -1541,8 +1394,10 @@
         <p class="meta role">2026</p>
       </div>
       <div class="cell shot">
-        <video src="media/generative.mp4" autoplay muted loop playsinline preload="metadata" width="1200" height="675" aria-label="A title slide composed of coloured data bands"></video>
-        <p class="meta shot-link"><a href="#">View more</a></p>
+        <div class="reel">
+          <video src="media/generative.mp4" autoplay muted loop playsinline preload="metadata" width="1200" height="675" aria-label="A title slide composed of coloured data bands"></video>
+          <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
+        </div>
       </div>
     </div>
   </section>
@@ -1557,8 +1412,10 @@
         <p class="meta role">2026</p>
       </div>
       <div class="cell shot">
-        <video src="media/motion-explainer.mp4" autoplay muted loop playsinline preload="metadata" width="1600" height="869" aria-label="Data points gathering toward the cursor"></video>
-        <p class="meta shot-link"><a href="#">View more</a></p>
+        <div class="reel">
+          <video src="media/motion-explainer.mp4" autoplay muted loop playsinline preload="metadata" width="1600" height="869" aria-label="Data points gathering toward the cursor"></video>
+          <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
+        </div>
       </div>
     </div>
   </section>
@@ -1572,8 +1429,10 @@
         <p class="meta push">2025</p>
       </div>
       <div class="cell shot">
-        <video src="media/monell.mp4" autoplay muted loop playsinline preload="metadata" width="1600" height="900" aria-label="MoneLL brand and website in motion"></video>
-        <p class="meta shot-link"><a href="#">View more</a></p>
+        <div class="reel">
+          <video src="media/monell.mp4" autoplay muted loop playsinline preload="metadata" width="1600" height="900" aria-label="MoneLL brand and website in motion"></video>
+          <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
+        </div>
       </div>
     </div>
   </section>
@@ -1582,14 +1441,16 @@
     <div class="strip" style="--t: var(--split) 1fr;">
       <div class="cell">
         <h2>AI Companion, <span class="h2-sub">Impulse Spending&nbsp;Coach</span></h2>
-        <p class="tags">UX Design, Conversational AI, Service Design</p>
+        <p class="tags">UX Research, UX Design</p>
         <p class="lede">An AI companion for the seconds before an impulse purchase. It opens a conversation when someone lingers in a shopping app, pairing that interruption with longer-term reflection on where the spending comes from.</p>
         <p class="meta push">Team of three</p>
         <p class="meta role">2025</p>
       </div>
       <div class="cell shot">
-        <video src="media/AI-companion.mp4" autoplay muted loop playsinline preload="metadata" width="1600" height="900" aria-label="AI companion opening a conversation during a shopping session"></video>
-        <p class="meta shot-link"><a href="#">View more</a></p>
+        <div class="reel">
+          <video src="media/AI-companion.mp4" autoplay muted loop playsinline preload="metadata" width="1600" height="900" aria-label="AI companion opening a conversation during a shopping session"></video>
+          <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
+        </div>
       </div>
     </div>
   </section>
@@ -1604,8 +1465,10 @@
         <p class="meta role">2024</p>
       </div>
       <div class="cell shot">
-        <video src="media/line0.mp4" autoplay muted loop playsinline preload="metadata" width="1600" height="900" aria-label="Speculative metro car animation"></video>
-        <p class="meta shot-link"><a href="#">View more</a></p>
+        <div class="reel">
+          <video src="media/line0.mp4" autoplay muted loop playsinline preload="metadata" width="1600" height="900" aria-label="Speculative metro car animation"></video>
+          <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
+        </div>
       </div>
     </div>
   </section>
@@ -1614,14 +1477,16 @@
     <div class="strip" style="--t: var(--split) 1fr;">
       <div class="cell">
         <h2>Bodiless Spacing, <span class="h2-sub">Thesis</span></h2>
-        <p class="tags">Editorial Design, Book Design, Writing</p>
+        <p class="tags">Editorial Design, Visual Systems, Identity Design</p>
         <p class="lede">A thesis that asks how personal space can be materialized, through experiments in physical and digital space. In the book's design, the distancing between letters, lines and elements gives the static page a sense of motion, so the book performs the distance it describes.</p>
         <p class="meta push">Selected for Matter Does Matter</p>
         <p class="meta role">2024</p>
       </div>
       <div class="cell shot">
-        <img src="media/bodiless.jpg" alt="The thesis book held open at an experiment spread" width="1800" height="1205" loading="lazy" decoding="async">
-        <p class="meta shot-link"><a href="#">View more</a></p>
+        <div class="reel">
+          <img src="media/bodiless.jpg" alt="The thesis book held open at an experiment spread" width="1800" height="1205" loading="lazy" decoding="async">
+          <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
+        </div>
       </div>
     </div>
   </section>
@@ -1630,124 +1495,29 @@
     <div class="strip" style="--t: calc(var(--split) * 1.1) 1fr;">
       <div class="cell">
         <h2>Slash, <span class="h2-sub">Graduation Identity</span></h2>
-        <p class="tags">Identity Design, Art Direction, Photoshoot</p>
+        <p class="tags">Identity Design, Art Direction</p>
         <p class="lede">The identity for the 2024 Interactive/Media/Design graduation show. The students become the slash, tilting between the digital and the physical.</p>
         <p class="meta push">2024</p>
       </div>
       <div class="cell shot">
-        <video src="media/slash.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Slash graduation identity, students posed at the angle of the marks"></video>
-        <p class="meta shot-link"><a href="#">View more</a></p>
+        <div class="reel">
+          <video src="media/slash.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Slash graduation identity, students posed at the angle of the marks"></video>
+          <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
+        </div>
       </div>
     </div>
   </section>
 
-  <footer class="site-foot" aria-label="Contact">
+  <footer class="site-foot" id="contact" aria-label="Contact">
     <p class="site-foot__cell">&copy; 2026 Jihae Cha</p>
     <div class="site-foot__cell">
       <p class="site-foot__say">Open to new projects, collaborations and conversations. Say hello.</p>
-      <p class="site-foot__link"><a href="#">Contact</a></p>   <!-- set href to where Contact should lead -->
+      <p class="site-foot__link"><a href="mailto:jihae.cha9@gmail.com">Contact</a></p>
     </div>
   </footer>
 
-  <div class="allgrid" id="allgrid" aria-hidden="true"></div>
 </main>
 
-<div class="free" id="free">
-<section class="free-landing" id="freeLanding"></section>
-<div class="wrap">
-<div class="edges edges--front" id="edgesFront" aria-hidden="true"></div>
-  <div class="edges" id="edges" aria-hidden="true"></div>
-
-  <p class="interlude__text free-note">Seven projects across motion, interaction, identity and space, each about how the distance between people gets made visible.</p>
-
-  <div class="mark"><span>Selected work</span><span>07</span></div>
-
-  <section class="grid">
-
-    <a class="tile tile--tall" href="#">
-      <div class="tile__media">
-        <video src="media/motion-explainer.mp4" autoplay muted loop playsinline preload="metadata"></video>
-      </div>
-      <div class="tile__label">
-        <div class="tile__names"><span class="tile__name">Motion Explainer.</span>
-        <span class="tile__disc">UX Research, Motion Design.</span></div>
-        <span class="tile__status">2026</span>
-      </div>
-    </a>
-    <a class="tile tile--wide" href="#">
-      <div class="tile__media">
-        <video src="media/monell.mp4" autoplay muted loop playsinline preload="metadata"></video>
-      </div>
-      <div class="tile__label">
-        <div class="tile__names"><span class="tile__name">MoneLL.</span>
-        <span class="tile__disc">Identity Design, Web Design.</span></div>
-        <span class="tile__status">2025</span>
-      </div>
-    </a>
-    <a class="tile tile--169" href="#">
-      <div class="tile__media">
-        <video src="media/generative.mp4" autoplay muted loop playsinline preload="metadata"></video>
-      </div>
-      <div class="tile__label">
-        <div class="tile__names"><span class="tile__name">Generative Title Slide.</span>
-        <span class="tile__disc">Generative Design, System Design.</span></div>
-        <span class="tile__status">2026</span>
-      </div>
-    </a>
-    <a class="tile tile--wide" href="#">
-      <div class="tile__media">
-        <video src="media/AI-companion.mp4" autoplay muted loop playsinline preload="metadata"></video>
-      </div>
-      <div class="tile__label">
-        <div class="tile__names"><span class="tile__name">AI Companion.</span>
-        <span class="tile__disc">UX Design, Service Design.</span></div>
-        <span class="tile__status">2025</span>
-      </div>
-    </a>
-    <a class="tile tile--169" href="#">
-      <div class="tile__media">
-        <video src="media/line0.mp4" autoplay muted loop playsinline preload="metadata"></video>
-      </div>
-      <div class="tile__label">
-        <div class="tile__names"><span class="tile__name">Line 0.</span>
-        <span class="tile__disc">3D Design, Spatial Design.</span></div>
-        <span class="tile__status">2024</span>
-      </div>
-    </a>
-    <a class="tile tile--wide" href="#">
-      <div class="tile__media">
-        <img src="media/bodiless.jpg" alt="The thesis book held open at an experiment spread" loading="lazy" decoding="async">
-      </div>
-      <div class="tile__label">
-        <div class="tile__names"><span class="tile__name">Bodiless Spacing.</span>
-        <span class="tile__disc">Editorial Design, Writing.</span></div>
-        <span class="tile__status">2024</span>
-      </div>
-    </a>
-    <a class="tile tile--tall" href="#">
-      <div class="tile__media">
-        <video src="media/slash.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Slash graduation identity"></video>
-      </div>
-      <div class="tile__label">
-        <div class="tile__names"><span class="tile__name">Slash.</span>
-        <span class="tile__disc">Identity Design, Art Direction.</span></div>
-        <span class="tile__status">2024</span>
-      </div>
-    </a>
-
-  </section>
-</div>
-</div>
-
-
-<div class="gallery" id="gallery" aria-hidden="true">
-  <div class="gallery__landing">
-    <div class="row" style="grid-template-columns:var(--split) 1fr;"><i></i><i></i></div>
-    <div class="row" style="grid-template-columns:calc(var(--split) * 1.5) 1fr;"><i></i><i></i></div>
-    <div class="row" style="grid-template-columns:calc(var(--split) * 0.6) 1fr calc(var(--split) * 0.5);"><i></i><i></i><i></i></div>
-  </div>
-  <div class="gallery__grid" id="galleryGrid"></div>
-</div>
 
 <div class="ratio" role="group" aria-label="Layout">
   <div class="dial dial--strip" id="dial" tabindex="0" role="slider" aria-label="Text, Even or Image" aria-valuemin="15" aria-valuemax="68" aria-valuenow="38"><div class="st"><b style="width:82%"></b><b style="width:56%"></b><b style="width:70%"></b></div><div class="si"><i></i></div></div>
@@ -1803,15 +1573,6 @@
   }
 
   function pinnedApply(mode){
-    var cur=document.documentElement.dataset.mode;
-    if(mode==='grid' || cur==='grid'){
-      if(document.startViewTransition){
-        document.startViewTransition(function(){ apply(mode,true); });
-      } else {
-        apply(mode,true);
-      }
-      return;
-    }
     var el=anchorEl();
     var before=el?el.getBoundingClientRect().top:0;
     var snap=scroller.style.scrollSnapType;
@@ -1844,35 +1605,8 @@
   });
 
   var saved=null; try{ saved=localStorage.getItem(KEY); }catch(e){}
-  apply('even',false);   /* always opens in Even */
+  apply(matchMedia('(max-width:760px)').matches ? 'look' : 'even', false);   /* opens in Even; on phones in Image, the work first */
 
-  // Build the gallery once, cloning each project's media and title.
-  (function buildGallery(){
-    var grid=document.getElementById('galleryGrid');
-    document.querySelectorAll('.band--work').forEach(function(band){
-      var media=band.querySelector('.shot img, .shot video');
-      var title=band.querySelector('h2');
-      if(!media||!title) return;
-      var card=document.createElement('div'); card.className='card';
-      var box=document.createElement('div'); box.className='card__media';
-      var clone=media.cloneNode(true);
-      clone.removeAttribute('width'); clone.removeAttribute('height');
-      box.appendChild(clone);
-      var raw=title.textContent.trim();
-      var bits=raw.split(',');
-      var name=bits.shift().trim();
-      var sub=bits.join(',').trim();
-      var cap=document.createElement('span'); cap.className='card__label';
-      var n=document.createElement('span'); n.className='card__name'; n.textContent=name;
-      cap.appendChild(n);
-      if(sub){
-        var t=document.createElement('span'); t.className='card__sub'; t.textContent=sub;
-        cap.appendChild(t);
-      }
-      card.appendChild(box); card.appendChild(cap);
-      grid.appendChild(card);
-    });
-  })();
 
   var themeBtn=document.getElementById('theme');
   var TKEY='jihae-theme';
@@ -1902,7 +1636,7 @@
 
 <!-- ===== click a project image → it grows into a project chapter ===== -->
 <style>
-  .content .shot img, .content .shot video{ cursor:zoom-in; }
+  .content .shot img, .content .shot video{ cursor:pointer; }   /* opens the project, so a plain pointer rather than a zoom */
   .content .shot [data-zoom-hidden="true"]{ opacity:0; }
 
   .proj{
@@ -2222,73 +1956,6 @@
   <div class="proj__inner" id="projInner"></div>
 </div>
 
-<script>
-/* window.__flyLines(from, to) — four lines: the two verticals of the
-   clicked box and its two horizontals, each extended across the
-   viewport, animated from the box they left to the box they are going
-   to. While they travel, the index's own rules go to full ink, so the
-   whole field lifts for the length of the move. */
-(function(){
-  var layer=null, timers=[];
-  function ensure(){
-    if(layer) return layer;
-    layer=document.createElement('div');
-    layer.className='glines';
-    layer.setAttribute('aria-hidden','true');
-    document.body.appendChild(layer);
-    return layer;
-  }
-  function clearTimers(){ timers.forEach(clearTimeout); timers=[]; }
-
-  window.__flyLines=function(from,to){
-    if(!from||!to) return;
-    var html=document.documentElement;
-    if(html.classList.contains('nofx')) return;
-    if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    if(window.innerWidth<=760) return;
-
-    var L=ensure();
-    clearTimers();
-    L.innerHTML='';
-    L.dataset.state='fly';
-    html.classList.add('grid-on');      /* the index's rules flash with them */
-
-    var vw=window.innerWidth, vh=window.innerHeight;
-    function cx(x){ return Math.max(0, Math.min(vw-1, x)); }
-    function cy(y){ return Math.max(0, Math.min(vh-1, y)); }
-
-    var pairs=[
-      {k:'v', a:cx(from.left),            z:cx(to.left)},
-      {k:'v', a:cx(from.left+from.width), z:cx(to.left+to.width)},
-      {k:'h', a:cy(from.top),             z:cy(to.top)},
-      {k:'h', a:cy(from.top+from.height), z:cy(to.top+to.height)}
-    ];
-    var made=pairs.map(function(p){
-      var b=document.createElement('b');
-      b.className=p.k;
-      if(p.k==='v') b.style.left=Math.round(p.a)+'px';
-      else b.style.top=Math.round(p.a)+'px';
-      L.appendChild(b);
-      return {el:b, p:p};
-    });
-
-    L.getBoundingClientRect();           /* settle the start state */
-    requestAnimationFrame(function(){
-      made.forEach(function(m){
-        if(m.p.k==='v') m.el.style.left=Math.round(m.p.z)+'px';
-        else m.el.style.top=Math.round(m.p.z)+'px';
-      });
-    });
-
-    timers.push(setTimeout(function(){ L.dataset.state='land'; }, 420));
-    timers.push(setTimeout(function(){
-      L.dataset.state='off';
-      html.classList.remove('grid-on');
-    }, 700));
-    timers.push(setTimeout(function(){ L.innerHTML=''; }, 1000));
-  };
-})();
-</script>
 
 <!-- PROJECT CONTENT — one file per project. Order here is load
      order only; the running order is each chapter's `next`. -->
@@ -2300,6 +1967,8 @@
 <script src="content/05-line0.js"></script>
 <script src="content/06-bodiless.js"></script>
 <script src="content/07-slash.js"></script>
+<script src="subpage/lock.js"></script>
+<script src="subpage/protect.js"></script>
 
 <script>
 (function(){
@@ -2634,6 +2303,7 @@
     n.style.width=r.width+'px'; n.style.height=r.height+'px';
   }
   function ch0(i){ try{ return CHAPTERS[key(shots[i])]||{}; }catch(e){ return {}; } }
+  function locked(i){ var c=ch0(i); return !!(c.locked && c.file); }
   /* ---- the flight between a tile and its chapter ----------------------
      Kept simple and light on purpose. The flying piece is a still picture of
      the frame on screen when it was clicked, so no second copy of the video
@@ -2711,7 +2381,12 @@
   function startRect(i){ return originRect || rectOf(shots[i]); }
 
   function open(i,push){
-    if(busy) return; busy=true;
+    if(busy) return;
+    if(locked(i)){   // a protected project asks for the password over its reel, then opens its own page
+      if(push && window.__lockAsk) window.__lockAsk(startRect(i), ch0(i).file); else location.href=ch0(i).file;
+      return;
+    }
+    busy=true;
     sweep();
     thumb=i;
     var name=build(i);
@@ -2782,7 +2457,9 @@
   }
 
   function jump(ni){
-    if(busy||ni<0) return; busy=true;
+    if(busy||ni<0) return;
+    if(locked(ni)){ location.href=ch0(ni).file; return; }   // its page asks for the password
+    busy=true;
     var old=thumb;
     proj.dataset.settled='false';
     proj.dataset.in='false';
@@ -2828,7 +2505,8 @@
   shots.forEach(function(el,i){
     var box=el.closest('.shot')||el;
     box.addEventListener('click',function(e){
-      if(e.target.closest&&e.target.closest('a')) return;
+      var a=e.target.closest&&e.target.closest('a');
+      if(a && !a.closest('.shot-link')) return;   // View more opens the project, same as its reel; other links go their own way
       e.preventDefault(); open(i,true);
     });
   });
@@ -2896,8 +2574,6 @@
 
     /* the index's own lines go hot too, so the whole field lifts for
        the duration of the move rather than only the four that travel */
-    var edges=[document.getElementById('edges'), document.getElementById('edgesFront')];
-    edges.forEach(function(e){ if(e) e.dataset.hot='true'; });
 
     var vw=window.innerWidth, vh=window.innerHeight;
     function cx(x){ return Math.max(0, Math.min(vw-1, x)); }
@@ -2933,349 +2609,32 @@
     timers.push(setTimeout(function(){ L.dataset.state='land'; }, 420));
     timers.push(setTimeout(function(){
       L.dataset.state='off';
-      edges.forEach(function(e){ if(e) e.removeAttribute('data-hot'); });
     }, 700));
     timers.push(setTimeout(function(){ L.innerHTML=''; }, 1000));
   };
 })();
 </script>
-<script>
-(function(){
-  var wrap=document.querySelector('.free .wrap');
-  var layer=document.getElementById('edges');
-  var front=document.getElementById('edgesFront');
-  if(!wrap||!layer||!front) return;
-
-  /* Align pass: the offset box in each row starts exactly on a line its
-     neighbour already draws — the caption rule of the box beside it. A
-     coincident line reads as structure; a line 9px away reads as a slip. */
-  /* No align pass: the placements in the CSS stand exactly as written. */
-  function align(){}
-
-  function draw(){
-    align();
-    var w=wrap.getBoundingClientRect();
-    var W=wrap.offsetWidth, H=wrap.offsetHeight;
-
-    var boxes=[].map.call(document.querySelectorAll('.free .tile'), function(t){
-      var r=t.getBoundingClientRect();
-      return {el:t, l:r.left-w.left, r:r.right-w.left, t:r.top-w.top, b:r.bottom-w.top};
-    });
-
-    /* A vertical leaving a box travels until it meets another box, then
-       stops. The field still divides, but each line bounds a region
-       instead of ruling the whole page. */
-    function vSeg(x, from, dir){
-      var edge = dir<0 ? 0 : H;
-      boxes.forEach(function(b){
-        if(x <= b.l+1 || x >= b.r-1) return;
-        if(dir<0 && b.b <= from+1 && b.b > edge) edge=b.b;
-        if(dir>0 && b.t >= from-1 && b.t < edge) edge=b.t;
-      });
-      return dir<0 ? {a:edge, b:from} : {a:from, b:edge};
-    }
-    function hSeg(y, from, dir){
-      var edge = dir<0 ? 0 : W;
-      boxes.forEach(function(b){
-        if(y <= b.t+1 || y >= b.b-1) return;
-        if(dir<0 && b.r <= from+1 && b.r > edge) edge=b.r;
-        if(dir>0 && b.l >= from-1 && b.l < edge) edge=b.l;
-      });
-      return dir<0 ? {a:edge, b:from} : {a:from, b:edge};
-    }
-
-    var segs=[], fore=[];
-    boxes.forEach(function(b){
-      /* each edge is drawn as ONE line that runs through the box and out
-         to where it stops on either side — so the box outline is made of
-         grid lines rather than of a border. */
-      /* A line is drawn from its own left/top and the tiles are opaque,
-         so a line sitting on a box's left or top edge falls INSIDE that
-         box and is painted over by it — which is why only the right-hand
-         edges were showing. Those two are drawn one pixel out, so every
-         edge line sits just outside the box it belongs to. */
-      [[b.l,-1],[b.r,0]].forEach(function(p){
-        var x=p[0], a=vSeg(x, b.t, -1).a, z=vSeg(x, b.b, 1).b;
-        if(z-a > 14) segs.push({k:'v', a:Math.round(x)+p[1], b:Math.round(a), c:Math.round(z-a)});
-      });
-      [[b.t,-1],[b.b,0]].forEach(function(p){
-        var y=p[0], a=hSeg(y, b.l, -1).a, z=hSeg(y, b.r, 1).b;
-        if(z-a > 14) segs.push({k:'h', a:Math.round(y)+p[1], b:Math.round(a), c:Math.round(z-a)});
-      });
-      /* the rule where the picture ends, drawn in front so it carries
-         over the bottom of the image rather than stopping at it */
-      var lab=b.el.querySelector('.tile__label');
-      if(lab){
-        var ly=Math.round(lab.getBoundingClientRect().top-w.top);
-        var la=hSeg(ly, b.l, -1).a, lz=hSeg(ly, b.r, 1).b;
-        fore.push({k:'h', a:ly, b:Math.round(la), c:Math.round(lz-la)});
-      }
-    });
-    /* Reuse the existing line elements and restyle them — because the
-       same nodes persist, the CSS transition animates every line from
-       its old position to its new one instead of cutting. */
-    /* Two segments on the same pixel stack their opacity and read as one
-       much brighter line — a box's bottom edge meeting a neighbour's top
-       edge, typically. Keep one of each. */
-    /* Lines within a few pixels of each other are one line seen from two
-       boxes — a bottom edge and the next box's top edge. Snap them to a
-       single position and keep one, so they cannot double up or travel
-       at slightly different times. */
-    segs.sort(function(a,b){ return a.k===b.k ? a.a-b.a : (a.k<b.k?-1:1); });
-    var kept=[], lastK='', lastA=-999;
-    segs.forEach(function(g){
-      if(g.k===lastK && Math.abs(g.a-lastA) < 4){
-        var prev=kept[kept.length-1];
-        /* join them: one line spanning both runs, so a rule at the same
-           height carries on under the neighbouring box's caption rather
-           than stopping where its own box ends */
-        var start=Math.min(prev.b, g.b);
-        var end=Math.max(prev.b+prev.c, g.b+g.c);
-        prev.b=start; prev.c=end-start;
-        return;
-      }
-      lastK=g.k; lastA=g.a; kept.push(g);
-    });
-    segs = kept;
-
-    /* Every box keeps a line along its own top and bottom, whatever the
-       merge did — otherwise a box whose edge was absorbed into a longer
-       neighbouring run ends up with no rule under its caption. */
-    boxes.forEach(function(b){
-      [Math.round(b.t), Math.round(b.b)].forEach(function(y){
-        /* A line already snapped to this height by the merge above is
-           THIS box's line, even if it does not yet reach across it.
-           Widen that one. Pushing a fresh segment at the box's own y
-           instead put a second rule a pixel or two from the first —
-           which is what drew two lines where a picture's bottom met a
-           neighbouring caption's bottom. Only add a line when there is
-           no line at this height at all. */
-        var near=null;
-        for(var i=0;i<segs.length;i++){
-          var g=segs[i];
-          if(g.k==='h' && Math.abs(g.a-y) < 4){ near=g; break; }
-        }
-        if(near){
-          var start=Math.min(near.b, Math.round(b.l));
-          var end  =Math.max(near.b+near.c, Math.round(b.r));
-          near.b=start; near.c=end-start;
-        } else {
-          segs.push({k:'h', a:y, b:Math.round(b.l), c:Math.round(b.r-b.l)});
-        }
-      });
-    });
-    paint(layer, segs);
-    paint(front, fore);
-  }
-
-  function paint(host, list){
-    var W=wrap.offsetWidth, H=wrap.offsetHeight;
-    var kids=host.children;
-    while(kids.length > list.length) host.removeChild(host.lastChild);
-    while(kids.length < list.length) host.appendChild(document.createElement('b'));
-    list.forEach(function(sg,i){
-      var el=kids[i];
-      el.className=sg.k;
-      /* A line is one pixel wide and is drawn from its own left/top, so a
-         line sitting exactly on the right or bottom edge of the field
-         starts where the field ends and never appears — which is why the
-         tiles that run to the last column had no line down their right
-         side. Pull those back inside by that one pixel. */
-      if(sg.k==='v'){ sg.a = Math.max(0, Math.min(W-1, sg.a)); }
-      else{ sg.a = Math.max(0, Math.min(H-1, sg.a)); }
-      if(sg.k==='v'){ el.style.left=sg.a+'px'; el.style.top=sg.b+'px'; el.style.height=sg.c+'px'; el.style.width=''; }
-      else{ el.style.top=sg.a+'px'; el.style.left=sg.b+'px'; el.style.width=sg.c+'px'; el.style.height=''; }
-    });
-  }
-
-  window.__drawEdges=draw;
-  var raf=null;
-  function schedule(){ if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(draw); }
-
-  if(window.ResizeObserver){
-    var ro=new ResizeObserver(schedule);
-    ro.observe(wrap);
-    document.querySelectorAll('.free .tile').forEach(function(t){ ro.observe(t); });
-  }
-  window.addEventListener('resize',schedule);
-  window.addEventListener('load',schedule);
-  document.querySelectorAll('.tile img, .tile video').forEach(function(m){
-    m.addEventListener('load',schedule); m.addEventListener('loadedmetadata',schedule);
-  });
-  schedule();
-})();
-</script>
-<script>
-(function(){
-  var root=document.documentElement, btn=document.getElementById('freeBtn');
-  if(!btn) return;
-  var modeBtns=document.querySelectorAll('.ratio button[data-mode]');
-
-  btn.addEventListener('click', function(){
-    var on = root.getAttribute('data-layout')==='free';
-    if(window.__setFlightOrigin) window.__setFlightOrigin(null);   /* bands again */
-    function swap(){
-      if(on) root.removeAttribute('data-layout'); else root.setAttribute('data-layout','free');
-      btn.setAttribute('aria-pressed', String(!on));
-    }
-    if(document.startViewTransition){
-      document.startViewTransition(swap).finished.then(done, done);
-    } else { swap(); done(); }
-    function done(){ window.dispatchEvent(new Event('resize')); }
-  });
-
-  /* the other four leave Free and apply themselves */
-  modeBtns.forEach(function(b){
-    b.addEventListener('click', function(){
-      if(root.getAttribute('data-layout')!=='free') return;
-      if(window.__setFlightOrigin) window.__setFlightOrigin(null);
-      function swap(){
-        root.removeAttribute('data-layout');
-        btn.setAttribute('aria-pressed','false');
-      }
-      if(document.startViewTransition) document.startViewTransition(swap);
-      else swap();
-    }, true);            /* capture, so it runs before the mode handler */
-  });
-
-  /* a tile opens the band's subpage, with 19's own line flight */
-  var tiles=[].slice.call(document.querySelectorAll('.free .tile'));
-  var shots=[].slice.call(document.querySelectorAll('.band--work .shot img, .band--work .shot video'));
-  function srcOf(n){ var m=n.querySelector?n.querySelector('img,video'):n; return m?(m.getAttribute('src')||''):''; }
-
-  tiles.forEach(function(t){
-    t.addEventListener('click', function(e){
-      e.preventDefault();
-      var want=srcOf(t);
-      var hit=shots.filter(function(s){ return s.getAttribute('src')===want; })[0];
-      if(!hit) return;
-      var m=t.querySelector('img,video');
-      var from=m?m.getBoundingClientRect():t.getBoundingClientRect();
-      /* where the subpage hero lands — the same 16:9 plate 19 flies into */
-      var pad=Math.min(64, window.innerWidth*0.05);
-      var w=window.innerWidth-pad*2, h=w*9/16;
-      if(h>window.innerHeight-pad*2){ h=window.innerHeight-pad*2; w=h*16/9; }
-      var to={left:(window.innerWidth-w)/2, top:(window.innerHeight-h)/2, width:w, height:h};
-      if(window.__setFlightOrigin) window.__setFlightOrigin(from);
-      hit.click();
-    });
-  });
-})();
-</script>
-
-<script>
-(function(){
-  var layer=document.getElementById('allgrid');
-  var content=document.querySelector('.content');
-  if(!layer||!content) return;
-
-  function draw(){
-    if(document.documentElement.dataset.mode!=='grid'){ layer.innerHTML=''; return; }
-    var bands=[].slice.call(document.querySelectorAll('.band--work'));
-    if(!bands.length) return;
-    var base=content.getBoundingClientRect();
-    var xs={}, ys={};
-    bands.forEach(function(b){
-      var r=b.getBoundingClientRect();
-      xs[Math.round(r.left-base.left+content.scrollLeft)]=1;
-      xs[Math.round(r.right-base.left+content.scrollLeft)]=1;
-      ys[Math.round(r.top-base.top+content.scrollTop)]=1;
-      ys[Math.round(r.bottom-base.top+content.scrollTop)]=1;
-    });
-    /* Edges within a few pixels of each other are the same column or row
-       seen from different boxes — merged, so the line runs continuously
-       rather than doubling. */
-    function merge(obj){
-      var out=[], last=-999;
-      Object.keys(obj).map(Number).sort(function(a,b){ return a-b; }).forEach(function(v){
-        if(v-last < 6) return;
-        last=v; out.push(v);
-      });
-      return out;
-    }
-    var yv=merge(ys), xv=merge(xs);
-
-    /* The lines do not close the boxes: verticals run the full height of
-       the scroller and horizontals the full width, so they leave the
-       page on both sides the way the rules do in Read, Even and Look. */
-    var H=content.scrollHeight, W=content.scrollWidth;
-    var html='';
-    xv.forEach(function(x){
-      html+='<b class="v" style="left:'+x+'px;top:0;height:'+H+'px"></b>';
-    });
-    yv.forEach(function(y){
-      html+='<b class="h" style="top:'+y+'px;left:0;width:'+W+'px"></b>';
-    });
-    layer.innerHTML=html;
-  }
-
-  var raf=null;
-  function schedule(){ if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(draw); }
-  window.__drawAllGrid=schedule;
-  window.addEventListener('resize', schedule);
-  window.addEventListener('load', schedule);
-  new MutationObserver(schedule).observe(document.documentElement, {attributes:true, attributeFilter:['data-mode']});
-  schedule();
-})();
-</script>
 
 
-<script>
-(function(){
-  /* AI Companion sits so the bottom of its picture lands on the bottom
-     of the Generative Title Slide's caption box. Measured, because the
-     caption's height depends on how its text wraps. */
-  function place(){
-    if(document.documentElement.getAttribute('data-layout')!=='free') return;
-    var tiles=document.querySelectorAll('.free .tile');
-    var gen=tiles[2], ai=tiles[3];        /* Generative, AI Companion */
-    if(!gen||!ai) return;
-    var media=ai.querySelector('.tile__media');
-    if(!media) return;
-    ai.style.marginTop='0px';
-    var target=gen.getBoundingClientRect().bottom;
-    var now=media.getBoundingClientRect().bottom;
-    /* Not rounded, and corrected once after it lands. Rounding to whole
-       pixels left the two bottoms up to a pixel apart, which the edge
-       layer then drew as two hairlines instead of one. */
-    var m=Math.max(0, target-now);
-    ai.style.marginTop=m+'px';
-    var drift=gen.getBoundingClientRect().bottom - media.getBoundingClientRect().bottom;
-    if(Math.abs(drift) > 0.01) ai.style.marginTop=Math.max(0, m+drift)+'px';
-    if(window.__drawEdges) window.__drawEdges();
-    else window.dispatchEvent(new Event('resize'));
-  }
-  window.addEventListener('load', place);
-  window.addEventListener('resize', place);
-  new MutationObserver(place).observe(document.documentElement,
-    {attributes:true, attributeFilter:['data-layout']});
-  document.querySelectorAll('.free .tile img, .free .tile video').forEach(function(m){
-    m.addEventListener('load', place);
-    m.addEventListener('loadedmetadata', place);
-  });
-  place();
-})();
-</script>
+
 
 <script>
   /* scrolling over the landing frame scrolls the page */
   (function(){
     var root=document.documentElement;
     var scroller=document.querySelector('.content');
-    var free=function(){ return root.getAttribute('data-layout')==='free'; };
     addEventListener('message', function(e){
       var d=e.data; if(!d || typeof d.landingScroll!=='number') return;
-      if(free()) window.scrollBy({ top:d.landingScroll, left:0 });
-      else if(scroller) scroller.scrollBy({ top:d.landingScroll, left:0 });
+      if(scroller) scroller.scrollBy({ top:d.landingScroll, left:0 });
     });
     /* clicking an area in Designs: a quick run down to that project */
     var key=function(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,''); };
     var running=0;
     function rush(box, to){
-      var from=box===window?scrollY:box.scrollTop, dist=to-from, t0=null, dur=Math.min(900, 380+Math.abs(dist)*.08);
-      var set=function(y){ if(box===window) window.scrollTo(0,y); else box.scrollTop=y; };
+      var from=box.scrollTop, dist=to-from, t0=null, dur=Math.min(900, 380+Math.abs(dist)*.08);
+      var set=function(y){ box.scrollTop=y; };
       if(matchMedia('(prefers-reduced-motion: reduce)').matches){ set(to); return; }
-      var el=box===window?root:box, snap=el.style.scrollSnapType, me=++running;
+      var el=box, snap=el.style.scrollSnapType, me=++running;
       el.style.scrollSnapType='none';
       var end=function(){ if(me!==running) return; running++; set(to); el.style.scrollSnapType=snap; };
       setTimeout(end, dur+250);   // if frames stall, still arrive
@@ -3290,22 +2649,9 @@
     addEventListener('message', function(e){
       var d=e.data; if(!d || typeof d.landingWork!=='string') return;
       var want=key(d.landingWork), target=null;
-      var heads=free()?document.querySelectorAll('#free .tile__name'):document.querySelectorAll('.band--work h2');
-      heads.forEach(function(h){ if(!target && want && key(h.textContent).indexOf(want)===0) target=h.closest(free()?'.tile':'.band--work'); });
-      if(!target) return;
-      if(free()) rush(window, target.getBoundingClientRect().top+scrollY);
-      else if(scroller) rush(scroller, target.getBoundingClientRect().top-scroller.getBoundingClientRect().top+scroller.scrollTop);
+      document.querySelectorAll('.band--work h2').forEach(function(h){ if(!target && want && key(h.textContent).indexOf(want)===0) target=h.closest('.band--work'); });
+      if(target && scroller) rush(scroller, target.getBoundingClientRect().top-scroller.getBoundingClientRect().top+scroller.scrollTop);
     });
-    /* the same landing opens Free: the frame moves to Free's slot and back
-       (moving it restarts its animation, which reads as a fresh arrival) */
-    var frame=document.querySelector('.landing-frame');
-    var homeSlot=document.querySelector('.band--landing'), freeSlot=document.getElementById('freeLanding');
-    function place(){
-      var slot=free()?freeSlot:homeSlot;
-      if(frame && slot && frame.parentNode!==slot) slot.appendChild(frame);
-    }
-    new MutationObserver(place).observe(root,{attributes:true, attributeFilter:['data-layout']});
-    place();
   })();
 </script>
 <script>
@@ -3327,8 +2673,7 @@
     const REACH = 240;  // how close the cursor has to be to a corner for that corner to start rounding (px)
     const CAP = 220;    // the most a corner rounds (px); small cells always reach a full pill
     // the landing's bottom line is left alone: it stays one solid white line under the landing's own rounded cells
-    const BORDERS = '.strip, .cell, .band:not(.band--landing), .tile, .tile__label, .tile__media';
-    const BARS = '.allgrid b, .edges b, .edges--front b';
+    const BORDERS = '.strip, .cell, .band:not(.band--landing)';
     const MARGIN = 600; // rules this far off screen still count, so cells cut by the screen edge stay square there
 
     const root = document.documentElement;
@@ -3338,17 +2683,18 @@
     document.body.appendChild(layer);
     const css = document.createElement('style');
     css.textContent =
-      '.rounding .strip,.rounding .cell,.rounding .band:not(.band--landing),.rounding .tile,.rounding .tile__label,.rounding .tile__media{border-color:transparent!important}' +
+      '.rounding .strip,.rounding .cell,.rounding .band:not(.band--landing){border-color:transparent!important}' +
       '.rounding .cell{transition:none!important}' +
       '.rounding .strip{transition:grid-template-columns var(--move)!important}' +
-      '.rounding .allgrid b,.rounding .edges b,.rounding .edges--front b{visibility:hidden!important}' +
       '.rcell{position:absolute;box-sizing:border-box;border:var(--line,1px) solid var(--rule);border-radius:var(--r,0px);transition:border-radius .5s cubic-bezier(.7,0,.15,1)}' +
       '.rwall{position:absolute;background:var(--rule)}';
     document.head.appendChild(css);
 
-    const clear = c => !c || c === 'transparent' || /rgba\(.*,\s*0\)$/.test(c);
     const faded = el => { for (; el && el !== root; el = el.parentElement) { const cs = getComputedStyle(el); if (+cs.opacity === 0 || cs.display === 'none') return true; } return false; };
-    const blocked = () => !!document.querySelector('.proj[data-open="true"]');
+    // off while a chapter is open, and in the stacked phone layout, where the reel's cell steps aside
+    // and the cells it would trace no longer match what is on screen; the real rules stay
+    const narrow = matchMedia('(max-width:760px)');
+    const blocked = () => narrow.matches || !!document.querySelector('.proj[data-open="true"]');
 
     // every drawn rule near the screen, as axis-aligned pixel runs
     // the visible width: the screen less any scrollbar, so lines stop where the page does
@@ -3377,13 +2723,6 @@
           if (s === 'left') push(true, r.left, r.top, r.bottom);
           if (s === 'right') push(true, r.right - w, r.top, r.bottom);
         });
-      });
-      document.querySelectorAll(BARS).forEach(el => {
-        const r = el.getBoundingClientRect();
-        if ((r.width < 2 && r.height < 2) || !near(r)) return;
-        const cs = getComputedStyle(el);
-        if (clear(cs.backgroundColor) || faded(el)) return;
-        if (r.width >= r.height) push(false, r.top, r.left, r.right); else push(true, r.left, r.top, r.bottom);
       });
       return out;
     }
@@ -3440,7 +2779,7 @@
     const scrollingElement = () => document.scrollingElement || root;
     function draw() {
       const sy = Math.round(scrollY()), seen = new Set();
-      layer.style.zIndex = root.dataset.layout === 'free' ? '0' : '3';
+      layer.style.zIndex = '3';
       cells.forEach(c => {
         const key = c.x0 + ',' + c.x1 + ',' + Math.round(c.y0 + sy) + ',' + Math.round(c.y1 + sy);
         let el = pool.get(key);
@@ -3593,10 +2932,10 @@
 </script>
 <script>
   /* hide the menu while the landing fills the screen; show it once the work is reached.
-     Watches the landing in whichever slot it sits (the sections or Free). */
+  */
   (function(){
     var root=document.documentElement;
-    var slots=[document.querySelector('.band--landing'), document.getElementById('freeLanding')].filter(Boolean);
+    var slots=[document.querySelector('.band--landing')].filter(Boolean);
     root.classList.add('on-landing');
     if(!('IntersectionObserver' in window)) return;
     var seen=new Map();
@@ -3652,7 +2991,7 @@
   var MIN=15, MAX=68;
   var btn=function(m){ return document.querySelector('.ratio .dialbtn[data-mode="'+m+'"]'); };
   var still=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var val=38, dragging=false;
+  var val=(STOPS.filter(function(s){ return s.m===document.documentElement.dataset.mode; })[0]||{v:38}).v, dragging=false;   // where the page opened: Even, or Image on phones
   function nearest(v){ return STOPS.reduce(function(a,s){ return Math.abs(s.v-v)<Math.abs(a.v-v)?s:a; }); }
   function tscale(v){ for(var i=0;i<STOPS.length-1;i++){ var a=STOPS[i], b=STOPS[i+1]; if(v<=b.v){ var k=Math.max(0,(v-a.v)/(b.v-a.v)); return a.t+(b.t-a.t)*k; } } return STOPS[2].t; }
   function live(v){
@@ -3735,14 +3074,16 @@
   try{ used=!!sessionStorage.getItem(KEY); }catch(e){}
   if(used) return;
   var still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var short=matchMedia('(max-width:760px)').matches;   // phones get a quicker tour
   var tip=document.createElement('div'); tip.className='menu-hint'; tip.setAttribute('role','status');
   tip.textContent='Drag to get closer to the image or the text';
   document.body.appendChild(tip);
-  function place(){ var r=dial.getBoundingClientRect(); tip.style.left=(r.left+r.width/2)+'px'; tip.style.top=(r.top-8)+'px'; }
+  function place(){ var r=dial.getBoundingClientRect(), left=matchMedia('(max-width:760px)').matches;   // phones: the menu is on the left, so the hint starts at its edge
+    tip.style.left=(left ? r.left : r.left+r.width/2)+'px'; tip.style.transform=left ? 'none' : ''; tip.style.top=(r.top-8)+'px'; }
   if(window.ResizeObserver) new ResizeObserver(function(){ if(tip.classList.contains('on')) place(); }).observe(dial);
   addEventListener('resize',function(){ if(tip.classList.contains('on')) place(); });
 
-  var running=false, stopped=false, idleT=null, hideT=null;
+  var running=false, stopped=false, played=false, idleT=null, hideT=null;
   function draw(v){ window.__dialDraw && window.__dialDraw(v, D.nearest(v)); }      // the menu only; the page is not touched
   function tween(a,b,ms,next){ var t0=performance.now();
     (function f(now){ if(stopped) return; var t=still?1:Math.min(1,(now-t0)/ms), e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2; draw(a+(b-a)*e); if(t<1) requestAnimationFrame(f); else next&&next(); })(t0); }
@@ -3755,23 +3096,26 @@
     // a full tour: from where it rests over to Text, across to Image, then home again,
     // holding at each stop so each one can be read
     var home=D.val(), text=D.stops[2].v, image=D.stops[0].v;
-    var path=[ {to:text, ms:2400, hold:2600},
-               {to:image, ms:3400, hold:2600},
-               {to:home, ms:2400, hold:1600} ];
+    var path= short ? [ {to:text, ms:1100, hold:800},    // phones: the same tour, about 9s instead of 21s
+                        {to:image, ms:1500, hold:800},
+                        {to:home, ms:1100, hold:400} ]
+                    : [ {to:text, ms:2400, hold:2600},
+                        {to:image, ms:3400, hold:2600},
+                        {to:home, ms:2400, hold:1600} ];
     function leg(i, at){
       if(stopped) return;
-      if(i>=path.length){ running=false; draw(D.val());
+      if(i>=path.length){ running=false; played=true; draw(D.val());
         // the words fade as the menu folds: the two end together
-        clearTimeout(hideT); hideT=setTimeout(function(){ tip.classList.remove('on'); dial.classList.remove('demo'); if(!dial.matches(':hover')) dial.classList.remove('open'); },2600);
+        clearTimeout(hideT); hideT=setTimeout(function(){ tip.classList.remove('on'); dial.classList.remove('demo'); if(!dial.matches(':hover')) dial.classList.remove('open'); },short?1000:2600);
         armIdle(); return; }
       var p=path[i];
       tween(at,p.to,p.ms,function(){ setTimeout(function(){ leg(i+1,p.to); },p.hold); });
     }
-    setTimeout(function(){ tip.classList.remove('on'); },2900);      // the hint leaves...
-    setTimeout(function(){ leg(0,home); },3300);                       // ...then the line moves, its name riding above
+    setTimeout(function(){ tip.classList.remove('on'); },short?2200:2900);      // the hint leaves...
+    setTimeout(function(){ leg(0,home); },short?2500:3300);                     // ...then the line moves, its name riding above
   }
   // left alone for a while: show it again
-  function armIdle(){ clearTimeout(idleT); if(!used) idleT=setTimeout(show, IDLE); }
+  function armIdle(){ clearTimeout(idleT); if(!used && !(short && played)) idleT=setTimeout(show, IDLE); }   // phones: once it has played through, not again
   // any touch on the menu stops what is playing and resets the wait
   function touched(){ stopped=true; if(running){ running=false; draw(D.val()); } clearTimeout(hideT); tip.classList.remove('on'); dial.classList.remove('demo'); armIdle(); }
   ['pointerdown','wheel','keydown'].forEach(function(t){ dial.addEventListener(t,touched,true); });
@@ -3779,7 +3123,7 @@
   function done(){ used=true; try{ sessionStorage.setItem(KEY,'1'); }catch(e){} clearTimeout(idleT); tip.classList.remove('on'); dial.classList.remove('demo'); }
   dial.addEventListener('pointerup',done,true);
   dial.addEventListener('keydown',function(e){ if(/Arrow/.test(e.key)) done(); },true);
-  // only over the work itself: a project band (or a project tile in Free) has to fill a
+  // only over the work itself: a project band has to fill a
   // good part of the screen. Leaving the landing for the about text is not enough.
   var onWork=false, first=true, seen=new Map();
   function quiet(){   // scrolled away mid-demo: stop it without counting it as used
@@ -3793,7 +3137,7 @@
       if(onWork && !was && first){ first=false; setTimeout(show,750); }   // once the menu has faded in
       if(!onWork && was) quiet();
     },{ threshold:[0,.15,.3,.45,.6] });
-    document.querySelectorAll('.band--work, .tile').forEach(function(el){ io.observe(el); });
+    document.querySelectorAll('.band--work').forEach(function(el){ io.observe(el); });
   } else { onWork=true; setTimeout(show,750); }
 })();
 </script>
@@ -3808,6 +3152,24 @@
       c.scrollTo({ top:0, behavior:'smooth' }); });
   })();
   (function(){
+    /* phones: the three lines open and close the menu; its items do what the nav's own do */
+    (function(){
+      var btn=document.getElementById('menuBtn'), panel=document.getElementById('menuPanel'), root=document.documentElement;
+      if(!btn||!panel) return;
+      var tl=document.getElementById('menuTheme');
+      function label(){ tl.textContent = root.dataset.theme==='dark' ? 'Light mode' : 'Dark mode'; }
+      function set(open){ root.classList.toggle('menu-open',open); btn.setAttribute('aria-expanded',String(open)); btn.setAttribute('aria-label',open?'Close menu':'Menu'); label(); }
+      btn.addEventListener('click', function(){ set(!root.classList.contains('menu-open')); });
+      panel.addEventListener('click', function(e){
+        var t=e.target.closest('[data-go]'); if(!t) return; e.preventDefault();
+        var go=document.getElementById(t.dataset.go); if(!go) return;
+        if(t.dataset.go==='theme'){ go.click(); label(); return; }
+        if(t.getAttribute('href') && t.getAttribute('href').indexOf('mailto:')===0){ set(false); location.href=t.getAttribute('href'); return; }   /* Contact: straight to mail */
+        set(false); setTimeout(function(){ go.click(); }, 200);   /* once the menu has faded */
+      });
+      addEventListener('keydown', function(e){ if(e.key==='Escape' && root.classList.contains('menu-open')){ set(false); btn.focus(); } });
+      matchMedia('(max-width:760px)').addEventListener('change', function(m){ if(!m.matches) set(false); });   /* wider: the nav is back, the menu goes */
+    })();
     var a=document.getElementById('navAbout'), c=document.querySelector('.content'), f=document.querySelector('.landing-frame');
     if(!a||!c) return;
     a.addEventListener('click', function(e){ e.preventDefault();

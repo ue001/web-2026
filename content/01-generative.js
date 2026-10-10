@@ -3,7 +3,8 @@
    each slide under these names, or change the paths. */
 window.CHAPTERS['media/generative.mp4'] = {
   numeral:'VII',
-  file:null,
+  file:'sub-07-generative.html',
+  locked:true,   /* asks for the password: see subpage/lock.js */
   head:'Generative Title Slide, CLEVER°FRANKE',
   title:'Generative Title Slide',
   year:'2026',
