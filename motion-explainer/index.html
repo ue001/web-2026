@@ -2,21 +2,18 @@
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
+<base href="../">   <!-- one folder down: every path below is from the site root -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Motion Explainer — Jihae</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cstyle%3Erect%7Bfill:none;stroke:%23121211%7D@media (prefers-color-scheme:dark)%7Brect%7Bstroke:%23f2f2f0%7D%7D%3C/style%3E%3Crect x='4' y='4' width='24' height='24' rx='4' stroke-width='2.5'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="subpage/preview.css">
+<link rel="stylesheet" href="subpage/lock-page.css">
 <link rel="stylesheet" href="subpage/lock.css">
 </head>
-<!-- a protected project: subpage/lock.js asks for the password, then loads data-load in order -->
+<!-- a protected project: subpage/lock.js asks for the password, then opens it on the index (data-go) -->
 <body data-chapter="media/motion-explainer.mp4" data-title="Motion Explainer" data-locked
-      data-load="content/01-generative.js content/02-motion-explainer.js content/03-monell.js content/04-ai-companion.js content/05-line0.js content/06-bodiless.js content/07-slash.js subpage/preview.js">
+      data-go="./#motion-explainer">
 
-<div class="proj" id="proj" aria-hidden="true" data-mode="even">
-  <div class="proj__inner" id="projInner"></div>
-</div>
 
-<script>window.CHAPTERS = {};</script>
 <script src="subpage/lock.js"></script>
 <script src="subpage/protect.js"></script>
 </body>

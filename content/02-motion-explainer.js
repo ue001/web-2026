@@ -2,8 +2,9 @@
    Replaces the old 01-motion-explainer.js and 01-motion-explainer-.js. */
 window.CHAPTERS['media/motion-explainer.mp4'] = {
   numeral:'V',
-  file:'sub-05-motion-explainer.html',
-  locked:true,   /* asks for the password: see subpage/lock.js */
+  file:'motion-explainer/',
+  locked:true,
+  mode:'look',   /* opens in Image mode; leaving it brings back the reader's own mode */   /* asks for the password: see subpage/lock.js */
   head:'Motion Explainer, Personalized\u00a0Search',
   title:'Motion Explainer',
   year:'2026',

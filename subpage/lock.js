@@ -64,7 +64,9 @@
       s.onload=function(){ load(i+1); };
       body.appendChild(s);
     };
-    if(unlocked()){ load(0); }
+    var go=body.getAttribute('data-go');   /* the project opens in the index overlay: send the visitor there once unlocked */
+    var done=function(){ if(go) location.replace(go); else load(0); };
+    if(unlocked()){ done(); }
     else {
       /* same rule as the index: dark unless the visitor chose light */
       var t=null; try{ t=localStorage.getItem('jihae-theme'); }catch(e){}
@@ -74,7 +76,7 @@
       page.innerHTML='<a class="lock-name" href="index.html">Jihae Cha</a><div class="lock-wrap"><h1></h1></div>';
       var wrap=page.querySelector('.lock-wrap');
       wrap.querySelector('h1').textContent=body.getAttribute('data-title')||'';
-      wrap.appendChild(form(function(){ page.remove(); load(0); }));
+      wrap.appendChild(form(function(){ if(!go) page.remove(); done(); }));
       var back=document.createElement('a'); back.className='lock-back'; back.href='index.html'; back.innerHTML='&larr; Back to all work';
       wrap.appendChild(back);
       body.insertBefore(page, body.firstChild);
@@ -94,14 +96,17 @@
   }
   function onKey(e){ if(e.key==='Escape'){ e.stopPropagation(); shut(); } }
   function onOut(e){ if(box && !box.contains(e.target)) shut(); }
+  window.__lockUnlocked=unlocked;
+  /* href is an address to go to, or a function to call once the password is right */
   window.__lockAsk=function(r, href){
-    if(unlocked()){ location.href=href; return; }
+    var go=function(){ if(typeof href==='function') href(); else location.href=href; };
+    if(unlocked()){ go(); return; }
     shut();
     box=document.createElement('div');
     box.className='lock-box';
     box.style.left=r.left+'px'; box.style.top=r.top+'px';
     box.style.width=r.width+'px'; box.style.height=r.height+'px';
-    var f=form(function(){ location.href=href; });
+    var f=form(function(){ shut(); go(); });
     box.appendChild(f);
     /* a second click on the reel, anywhere but the field, puts the reel back */
     box.addEventListener('click',function(e){ if(!f.contains(e.target)) shut(); });

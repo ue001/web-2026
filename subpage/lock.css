@@ -6,7 +6,7 @@
      .lock-page   the project page's own screen, before the work loads
      .lock-box    on the index, over the project's reel once it is clicked
 
-   Uses the colour tokens both the index and preview.css define
+   Uses the colour tokens both the index and lock-page.css define
    (--paper, --ink, --ink-soft, --rule), so it follows the theme.
    ===================================================================== */
 

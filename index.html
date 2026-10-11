@@ -1392,7 +1392,7 @@
   <!-- between the landing and the work: a held beat, closed by rules on both sides -->
   <section class="interlude intro" aria-label="About Jihae Cha">
     <div class="intro__body">
-      <p class="intro__lede">Jihae Cha is a Korean-born designer in the Netherlands. Living between cultures, she noticed how differently people space themselves. She applies this to identity, motion and UX, focusing on how elements are positioned, timed and made to respond.</p>
+      <p class="intro__lede">Jihae Cha is a Korean-born designer in the Netherlands. Living between cultures, she noticed how differently people space themselves. That awareness shapes her work in identity, motion and UX, in how elements are placed, how they move and how they respond.</p>
       <a class="intro__more" href="#about" id="introMore">More about Jihae <span aria-hidden="true">→</span></a>
     </div>
     <div class="interlude__mark"><span>Selected work</span><span>07</span></div>
@@ -2248,6 +2248,7 @@
     var yearText=yearOf(i);
     var title=titleOf(i);
     var k=key(shots[i]);
+    proj.dataset.chapter=k;   /* lets a chapter carry its own default mode, see `mode` below */
     var ch=CHAPTERS[k]||{};
     if(ch.year) yearText=ch.year;   /* the chapter file is the source of truth */
     var sections=ch.sections||[];
@@ -2306,7 +2307,7 @@
       var nch=CHAPTERS[name(nx)]||{};
       foot.innerHTML=cell([1,3],'<p class="mkey">Continue</p>'+
         '<button class="proj__back" type="button" data-proj-go="'+ni+'">'+
-          (nch.numeral?nch.numeral+'. ':'')+esc(titleOf(ni))+' &rarr;</button>',true)+
+          esc(titleOf(ni))+' &rarr;</button>',true)+
         cell([3,13],'',false);
     } else {
       foot.innerHTML=cell([1,3],'<button class="proj__back" type="button" data-proj-close>&larr; Back</button>',true)+
@@ -2326,7 +2327,7 @@
     n.style.width=r.width+'px'; n.style.height=r.height+'px';
   }
   function ch0(i){ try{ return CHAPTERS[key(shots[i])]||{}; }catch(e){ return {}; } }
-  function locked(i){ var c=ch0(i); return !!(c.locked && c.file); }
+  function locked(i){ var c=ch0(i); return !!c.locked && !(window.__lockUnlocked && window.__lockUnlocked()); }
   /* ---- the flight between a tile and its chapter ----------------------
      Kept simple and light on purpose. The flying piece is a still picture of
      the frame on screen when it was clicked, so no second copy of the video
@@ -2405,8 +2406,9 @@
 
   function open(i,push){
     if(busy) return;
-    if(locked(i)){   // a protected project asks for the password over its reel, then opens its own page
-      if(push && window.__lockAsk) window.__lockAsk(startRect(i), ch0(i).file); else location.href=ch0(i).file;
+    if(locked(i)){   // a protected project asks for the password over its reel, then opens here like the rest
+      if(push && window.__lockAsk) window.__lockAsk(startRect(i), function(){ open(i,push); });
+      else if(ch0(i).file) location.href=ch0(i).file;   // a direct link: its own page asks, then comes back
       return;
     }
     busy=true;
@@ -2482,7 +2484,7 @@
 
   function jump(ni){
     if(busy||ni<0) return;
-    if(locked(ni)){ location.href=ch0(ni).file; return; }   // its page asks for the password
+    if(locked(ni)){ if(ch0(ni).file) location.href=ch0(ni).file; return; }   // its page asks for the password, then comes back
     busy=true;
     var old=thumb;
     proj.dataset.settled='false';
@@ -3234,10 +3236,20 @@
     var past=isOpen() && hero && proj.scrollTop > hero.offsetHeight*0.6;
     root.classList.toggle('proj-past-hero', !!past);
   }
-  new MutationObserver(function(){ follow(true); })
+  /* a chapter may open in its own mode (`mode:'look'` in its content file);
+     leaving it brings back the reader's mode, unless they changed it there */
+  var prev=null, ours=false;
+  function press(m){ var b=document.querySelector('.ratio button[data-mode="'+m+'"]'); if(b){ ours=true; b.click(); ours=false; } }
+  function chapterMode(){
+    var c=isOpen() && window.CHAPTERS && CHAPTERS[proj.dataset.chapter];
+    var want=c && MODES[c.mode] ? c.mode : null;
+    if(want){ if(prev===null) prev=root.dataset.mode; if(root.dataset.mode!==want) press(want); }
+    else if(prev!==null){ var p=prev; prev=null; if(root.dataset.mode!==p) press(p); }
+  }
+  new MutationObserver(function(){ if(!ours) prev=null; follow(true); })
     .observe(root,{attributes:true,attributeFilter:['data-mode']});
-  new MutationObserver(function(){ follow(false); pastHero(); })
-    .observe(proj,{attributes:true,attributeFilter:['data-open']});
+  new MutationObserver(function(){ chapterMode(); follow(false); pastHero(); })
+    .observe(proj,{attributes:true,attributeFilter:['data-open','data-chapter']});
   proj.addEventListener('scroll', pastHero, {passive:true});
 })();
 </script>
