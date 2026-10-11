@@ -1,6 +1,6 @@
 /* CHAPTER — Slash. Field reference: content/05-line0.js
    Media, in media/07-slash/, names as on disk:
-     01-insta-story.gif   the mark animating on an Instagram story
+     01-insta-story.mp4   the mark animating on an Instagram story
      02-story.jpg         the mark on an Instagram story
      03-campaign.jpg      the campaign line, phone and posters on the wall
      04-portraits.jpg     the three tilted portraits
@@ -29,7 +29,7 @@ window.CHAPTERS['media/slash.mp4'] = {
     ], more:[
       'With design support from Minji Cha.'
     ], figures:[
-      {src:'media/07-slash/01-insta-story.gif', ratio:FRAME, fit:'contain', align:'center', bg:'#000'}
+      {src:'media/07-slash/01-insta-story.mp4', ratio:FRAME, fit:'contain', align:'center', bg:'#000'}
     ]},
     {name:'Identity', body:[
       'The name comes from the slashes in the department\u2019s title. The identity is not the icon but the tilt, a way of looking at things from another angle, and the students carry the angle themselves.'

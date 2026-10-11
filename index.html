@@ -1395,7 +1395,7 @@
       </div>
       <div class="cell shot">
         <div class="reel">
-          <video src="media/generative.mp4" autoplay muted loop playsinline preload="metadata" width="1200" height="675" aria-label="A title slide composed of coloured data bands"></video>
+          <video src="media/generative.mp4" poster="media/posters/generative.jpg" autoplay muted loop playsinline preload="metadata" width="1200" height="675" aria-label="A title slide composed of coloured data bands"></video>
           <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
         </div>
       </div>
@@ -1413,7 +1413,7 @@
       </div>
       <div class="cell shot">
         <div class="reel">
-          <video src="media/motion-explainer.mp4" autoplay muted loop playsinline preload="metadata" width="1600" height="869" aria-label="Data points gathering toward the cursor"></video>
+          <video src="media/motion-explainer.mp4" poster="media/posters/motion-explainer.jpg" autoplay muted loop playsinline preload="metadata" width="1600" height="869" aria-label="Data points gathering toward the cursor"></video>
           <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
         </div>
       </div>
@@ -1430,7 +1430,7 @@
       </div>
       <div class="cell shot">
         <div class="reel">
-          <video src="media/monell.mp4" autoplay muted loop playsinline preload="metadata" width="1600" height="900" aria-label="MoneLL brand and website in motion"></video>
+          <video src="media/monell.mp4" poster="media/posters/monell.jpg" autoplay muted loop playsinline preload="metadata" width="1600" height="900" aria-label="MoneLL brand and website in motion"></video>
           <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
         </div>
       </div>
@@ -1448,7 +1448,7 @@
       </div>
       <div class="cell shot">
         <div class="reel">
-          <video src="media/AI-companion.mp4" autoplay muted loop playsinline preload="metadata" width="1600" height="900" aria-label="AI companion opening a conversation during a shopping session"></video>
+          <video src="media/AI-companion.mp4" poster="media/posters/AI-companion.jpg" autoplay muted loop playsinline preload="metadata" width="1600" height="900" aria-label="AI companion opening a conversation during a shopping session"></video>
           <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
         </div>
       </div>
@@ -1466,7 +1466,7 @@
       </div>
       <div class="cell shot">
         <div class="reel">
-          <video src="media/line0.mp4" autoplay muted loop playsinline preload="metadata" width="1600" height="900" aria-label="Speculative metro car animation"></video>
+          <video src="media/line0.mp4" poster="media/posters/line0.jpg" autoplay muted loop playsinline preload="metadata" width="1600" height="900" aria-label="Speculative metro car animation"></video>
           <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
         </div>
       </div>
@@ -1501,7 +1501,7 @@
       </div>
       <div class="cell shot">
         <div class="reel">
-          <video src="media/slash.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Slash graduation identity, students posed at the angle of the marks"></video>
+          <video src="media/slash.mp4" poster="media/posters/slash.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Slash graduation identity, students posed at the angle of the marks"></video>
           <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
         </div>
       </div>
@@ -1688,6 +1688,7 @@
             font-size:clamp(1rem, 5cqi, 1.45rem); line-height:1.1; }
   .proj .body{ font-size:clamp(.82rem, 3cqi, .95rem); line-height:1.7; margin:0 0 .9rem; max-width:54ch; }
   .proj .body:last-child{ margin-bottom:0; }
+  .proj .hold .body + h3{ margin-top:calc(var(--pad) * 2); }   /* the second heading in a shared text column */
 
   .proj__hero .slot{ position:relative; width:100%; aspect-ratio:16/9; background:var(--shot-bg); }
   .proj__hero .slot > *{
@@ -1765,7 +1766,8 @@
      Look narrows the text column until the plates take the page; Read
      opens it until the writing leads and the longer passages appear. */
   .proj[data-mode="look"]{ --p-split:15%; --tscale:.78; }
-  .proj[data-mode="even"]{ --p-split:38%; --tscale:1; }
+  .proj[data-mode="even"]{ --p-split:31.25%; --tscale:1; }
+  .proj[data-mode="even"] .sec-text{ padding-right:calc(var(--pad) * 3); }   /* a wider gap between the text and its plates */
   .proj[data-mode="read"]{ --p-split:64%; --tscale:1.3; }
 
   /* ---- the rules appear only while the layout moves ---------------- */
@@ -1813,8 +1815,12 @@
   .proj .prow--open .pc{ border-right:0 !important; }
   .prow--head .pc{ padding-top:calc(var(--pad) * 3); padding-bottom:calc(var(--pad) * 2); }
   .prow--say{ border-bottom:var(--line) solid transparent !important; }
+  .proj[data-hot="true"] .prow--say{ border-bottom-color:var(--ink) !important; }   /* the rule above Context lights with the rest during a move */
+  /* same timing as the verticals: quick on, slow fade back */
+  .proj[data-hot="true"] .prow--say{ transition:border-color 90ms ease !important; }
+  .proj:not([data-hot="true"]) .prow--say{ transition:border-color 620ms ease !important; }
   .prow--say .pc{ padding-top:calc(var(--pad) * 1.5); padding-bottom:calc(var(--pad) * 7); }
-  .prow--say + .prow .pc{ padding-top:calc(var(--pad) * 3); }
+  .prow--say + .prow .pc{ padding-top:var(--pad); }   /* the rule above Context sits as close as the rules between sections */
   .proj .prow--head h2{ font-size:clamp(1.8rem, 7cqi, 3.4rem); line-height:1; }
 
   .proj .statement{
@@ -2197,9 +2203,12 @@
     left.className+=' sec-text';
     var hold=document.createElement('div');
     hold.className='hold';
-    hold.innerHTML='<h3>'+esc(sec.name)+'</h3>'+
-      (sec.body||[]).map(function(p){ return '<p class="body">'+esc(p)+'</p>'; }).join('')+
-      (sec.more||[]).map(function(p){ return '<p class="body more">'+esc(p)+'</p>'; }).join('');
+    /* `also` adds a second heading and text beside the same plates */
+    hold.innerHTML=[sec].concat(sec.also||[]).map(function(t){
+      return '<h3>'+esc(t.name)+'</h3>'+
+        (t.body||[]).map(function(p){ return '<p class="body">'+esc(p)+'</p>'; }).join('')+
+        (t.more||[]).map(function(p){ return '<p class="body more">'+esc(p)+'</p>'; }).join('');
+    }).join('');
     left.appendChild(hold);
 
     var right=cellEl([3,13],false);
@@ -2400,7 +2409,6 @@
     shots[i].dataset.zoomHidden='true';
     var target=rectOf(inner.querySelector('#projSlot'));
     flier.getBoundingClientRect();
-    if(window.__flyLines) window.__flyLines(startRect(i), target);
 
     /* the banner starts loading now, hidden under the flying still */
     var heroEl=inner.querySelector('#projSlot > img, #projSlot > video');
@@ -2418,7 +2426,10 @@
     later(function(){
       proj.dataset.settled='true';
       flier=null; busy=false;
-      whenReady(heroEl,function(){ dissolve(f,300); },1500);
+      /* the flier is fixed, so it must not outstay a scroll: fade it the moment the page moves */
+      var gone=false, out=function(){ if(gone) return; gone=true; proj.removeEventListener('scroll',out); dissolve(f,300); };
+      proj.addEventListener('scroll',out,{passive:true});
+      whenReady(heroEl,out,1500);
     }, 560);
 
     if(push){ try{ history.pushState({proj:i},'', '#'+name); }catch(e){} }
@@ -2437,7 +2448,6 @@
     flier=makeFlierFrom(ch0(i).banner ? shots[i] : (shown||shots[i]));
     place(flier, origin);
     flier.getBoundingClientRect();
-    if(window.__flyLines) window.__flyLines(origin, startRect(i));
 
     requestAnimationFrame(function(){
       proj.dataset.in='false';
@@ -2906,15 +2916,13 @@
     const later = () => { if (on && !off && !raf) raf = requestAnimationFrame(() => { raf = 0; refresh(); }); };
     // While the page scrolls, the drawn outlines are redrawn a frame behind the content,
     // so they shake. Hand back to the real rules (which scroll with the page, perfectly
-    // still) the moment scrolling starts, and bring the rounding back once it has stopped.
+    // still) the moment scrolling starts. The rounding only comes back when the cursor moves
+    // again, so a cursor resting where the scroll left it never rounds corners on its own.
     let scrolling = 0, lastAt = null;
     const onScroll = () => {
       if (on) stop(true);
       clearTimeout(scrolling);
-      scrolling = setTimeout(() => {
-        scrolling = 0;
-        if (lastAt && !blocked()) { at = lastAt; start(); shape(); }
-      }, 220);
+      scrolling = setTimeout(() => { scrolling = 0; }, 220);
     };
     addEventListener('scroll', onScroll, true);
     addEventListener('resize', later);

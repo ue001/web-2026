@@ -30,7 +30,7 @@ CHAPTERS['media/monell.mp4'] = {
     {name:'Photoshoot', body:[
       'The products appear where cosmetics don\u2019t usually belong, on plates and in baskets, styled with a vintage feel that stays modern. The unexpected setting gives mature packaging a playful, younger tone.'
     ], more:[], figures:[
-      {src:'media/03-monell/05-photo.png',         kind:'fig'},
+      {src:'media/03-monell/05-photo.webp',        kind:'fig', bg:'transparent'},   /* a cut-out: no frame behind it */
       {src:'media/03-monell/06-photo-small.jpg',   kind:'doc'}
     ]},
     {name:'Website', body:[
