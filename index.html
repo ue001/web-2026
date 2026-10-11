@@ -232,6 +232,19 @@
   .interlude__mark span:last-child{ font-variant-numeric:tabular-nums; }
   .interlude + .band--work{ border-top:var(--line) solid var(--rule); }
   .landing-frame{ position:absolute; inset:0; width:100%; height:100%; border:0; display:block; background:var(--paper); }
+  /* a small arrow at the foot of the landing: it scrolls, there is more below */
+  .landing__down{ position:absolute; left:50%; bottom:calc(var(--pad) * 1.2); translate:-50% 0; z-index:2; appearance:none; background:none; border:0; padding:.6rem; color:var(--ink); cursor:pointer; }
+  .landing__down:hover{ color:var(--ink); }
+  .landing__down svg{ display:block; width:16px; height:20px; fill:none; stroke:currentColor; stroke-width:1.5; animation:landing-down 1.8s cubic-bezier(.45,0,.2,1) infinite; }
+  @keyframes landing-down{ 0%,100%{ transform:translateY(-3px); opacity:.45; } 50%{ transform:translateY(5px); opacity:1; } }
+  @media (prefers-reduced-motion: reduce){ .landing__down svg{ animation:none; } }
+  /* it waits until the landing has opened its first panel */
+  .landing__down{ opacity:0; pointer-events:none; transition:opacity .8s ease; }
+  .landing-open .landing__down{ opacity:1; pointer-events:auto; }
+  /* shown once: it fades out after a few beats, or as soon as the page is scrolled */
+  .landing-hinted .landing__down{ opacity:0; pointer-events:none; transition:opacity 1.2s ease; }
+  .landing__down{ display:flex; flex-direction:column; align-items:center; gap:.5rem; font:inherit; font-size:13px; letter-spacing:.01em; }
+  .landing__hint{ white-space:nowrap; font-weight:500; }
 
   /* the section after the landing: the Jihae Cha panel, full width, with the work mark under it */
   .interlude--about{ min-height:100svh; padding:0; gap:0; }
@@ -1252,7 +1265,7 @@
       closeT = setTimeout(() =&gt; { stage.classList.remove(&#x27;closing-name&#x27;, &#x27;closing-des&#x27;); unlockLines(); }, 850);   // the (quicker) close time
     }
     clearTimeout(settleT);
-    if (s !== &#x27;s0&#x27;) settleT = setTimeout(() =&gt; { if (current === s) stage.classList.add(&#x27;settled&#x27;); }, 850);   // the heading&#x27;s size change is .8s
+    if (s !== &#x27;s0&#x27;) settleT = setTimeout(() =&gt; { if (current === s) { stage.classList.add(&#x27;settled&#x27;); window.parent.postMessage({ landingOpen: true }, &#x27;*&#x27;); } }, 850);   // the heading&#x27;s size change is .8s
   }
   let settleT = null, closeT = null;
   // The words after the name are wrapped one by one, so that on closing each can be kept on
@@ -1373,6 +1386,7 @@
 &lt;/body&gt;
 &lt;/html&gt;
 "></iframe>
+    <button class="landing__down" type="button" aria-label="See more"><span class="landing__hint">See more</span><svg viewBox="0 0 16 20" aria-hidden="true"><path d="M8 2v15M2 11l6 6 6-6"/></svg></button>
   </section>
 
   <!-- between the landing and the work: a held beat, closed by rules on both sides -->
@@ -2635,7 +2649,25 @@
     var scroller=document.querySelector('.content');
     addEventListener('message', function(e){
       var d=e.data; if(!d || typeof d.landingScroll!=='number') return;
-      if(scroller) scroller.scrollBy({ top:d.landingScroll, left:0 });
+      if(!scroller) return;
+      /* a flick on the landing stops at About: momentum sent from the landing never runs past it */
+      var dy=d.landingScroll, intro=document.querySelector('.intro');
+      if(dy>0 && intro){
+        var stop=scroller.scrollTop+intro.getBoundingClientRect().top-scroller.getBoundingClientRect().top;
+        dy=Math.min(dy, Math.max(0, stop-scroller.scrollTop));
+      }
+      if(dy) scroller.scrollBy({ top:dy, left:0 });
+    });
+    addEventListener('message', function(e){ if(e.data && e.data.landingOpen) root.classList.add('landing-open'); });
+    setTimeout(function(){ root.classList.add('landing-open'); setTimeout(function(){ root.classList.add('landing-hinted'); }, 4500); }, 8000);   /* in case the landing never reports */
+    var hintT=null, hinted=function(){ root.classList.add('landing-hinted'); };
+    addEventListener('message', function(e){ if(e.data && e.data.landingOpen && !hintT) hintT=setTimeout(hinted, 4500); });
+    if(scroller) scroller.addEventListener('scroll', function(){ if(scroller.scrollTop>40) hinted(); }, { passive:true });
+    /* the arrow on the landing: down to About */
+    var down=document.querySelector('.landing__down');
+    if(down) down.addEventListener('click', function(){
+      var t=document.querySelector('.intro'); if(!t||!scroller) return;
+      scroller.scrollTo({ top:scroller.scrollTop+t.getBoundingClientRect().top-scroller.getBoundingClientRect().top, behavior:'smooth' });
     });
     /* clicking an area in Designs: a quick run down to that project */
     var key=function(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,''); };
