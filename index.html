@@ -6,9 +6,10 @@
 <title>Jihae Cha</title>
 <!-- tab icon: a square drawn as a line, like the site's grid, its corners slightly rounded. Dark on light tabs, light on dark ones -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cstyle%3Erect%7Bfill:none;stroke:%23121211%7D@media (prefers-color-scheme:dark)%7Brect%7Bstroke:%23f2f2f0%7D%7D%3C/style%3E%3Crect x='4' y='4' width='24' height='24' rx='4' stroke-width='2.5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=switzer@300,400,500&display=swap">
 <link rel="stylesheet" href="subpage/lock.css">
 <style>
-  @import url("https://api.fontshare.com/v2/css?f[]=switzer@300,400,500&display=swap");
 
   :root{
     --rule:#e6e6e4;
@@ -1409,7 +1410,7 @@
       </div>
       <div class="cell shot">
         <div class="reel">
-          <video src="media/generative.mp4" poster="media/posters/generative.jpg" autoplay muted loop playsinline preload="metadata" width="1200" height="675" aria-label="A title slide composed of coloured data bands"></video>
+          <video src="media/generative.mp4" poster="media/posters/generative.jpg" muted loop playsinline preload="none" data-lazy width="1200" height="675" aria-label="A title slide composed of coloured data bands"></video>
           <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
         </div>
       </div>
@@ -1427,7 +1428,7 @@
       </div>
       <div class="cell shot">
         <div class="reel">
-          <video src="media/motion-explainer.mp4" poster="media/posters/motion-explainer.jpg" autoplay muted loop playsinline preload="metadata" width="1600" height="869" aria-label="Data points gathering toward the cursor"></video>
+          <video src="media/motion-explainer.mp4" poster="media/posters/motion-explainer.jpg" muted loop playsinline preload="none" data-lazy width="1600" height="869" aria-label="Data points gathering toward the cursor"></video>
           <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
         </div>
       </div>
@@ -1444,7 +1445,7 @@
       </div>
       <div class="cell shot">
         <div class="reel">
-          <video src="media/monell.mp4" poster="media/posters/monell.jpg" autoplay muted loop playsinline preload="metadata" width="1600" height="900" aria-label="MoneLL brand and website in motion"></video>
+          <video src="media/monell.mp4" poster="media/posters/monell.jpg" muted loop playsinline preload="none" data-lazy width="1600" height="900" aria-label="MoneLL brand and website in motion"></video>
           <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
         </div>
       </div>
@@ -1462,7 +1463,7 @@
       </div>
       <div class="cell shot">
         <div class="reel">
-          <video src="media/AI-companion.mp4" poster="media/posters/AI-companion.jpg" autoplay muted loop playsinline preload="metadata" width="1600" height="900" aria-label="AI companion opening a conversation during a shopping session"></video>
+          <video src="media/AI-companion.mp4" poster="media/posters/AI-companion.jpg" muted loop playsinline preload="none" data-lazy width="1600" height="900" aria-label="AI companion opening a conversation during a shopping session"></video>
           <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
         </div>
       </div>
@@ -1480,7 +1481,7 @@
       </div>
       <div class="cell shot">
         <div class="reel">
-          <video src="media/line0.mp4" poster="media/posters/line0.jpg" autoplay muted loop playsinline preload="metadata" width="1600" height="900" aria-label="Speculative metro car animation"></video>
+          <video src="media/line0.mp4" poster="media/posters/line0.jpg" muted loop playsinline preload="none" data-lazy width="1600" height="900" aria-label="Speculative metro car animation"></video>
           <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
         </div>
       </div>
@@ -1515,7 +1516,7 @@
       </div>
       <div class="cell shot">
         <div class="reel">
-          <video src="media/slash.mp4" poster="media/posters/slash.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Slash graduation identity, students posed at the angle of the marks"></video>
+          <video src="media/slash.mp4" poster="media/posters/slash.jpg" muted loop playsinline preload="none" data-lazy aria-label="Slash graduation identity, students posed at the angle of the marks"></video>
           <p class="meta shot-link"><a href="#">View more <span aria-hidden="true">&rarr;</span></a></p>
         </div>
       </div>
@@ -1979,6 +1980,18 @@
 
 <!-- PROJECT CONTENT — one file per project. Order here is load
      order only; the running order is each chapter's `next`. -->
+<script>
+/* landing videos: fetch and play only near the viewport, pause when off-screen */
+(function(){
+  var vids=document.querySelectorAll('video[data-lazy]');
+  if(!('IntersectionObserver' in window)){ vids.forEach(function(v){ v.preload='auto'; v.play().catch(function(){}); }); return; }
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ var v=e.target;
+      if(e.isIntersecting){ v.preload='auto'; v.play().catch(function(){}); } else v.pause(); });
+  },{rootMargin:'300px 0px'});
+  vids.forEach(function(v){ io.observe(v); });
+})();
+</script>
 <script>window.CHAPTERS = {};</script>
 <script src="content/01-generative.js"></script>
 <script src="content/02-motion-explainer.js"></script>
