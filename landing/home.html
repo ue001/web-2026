@@ -23,7 +23,7 @@
     --head: clamp(32px, 4.4vw, 84px);
     --pad: clamp(14px, 1.6vw, 28px);
     --ease: cubic-bezier(.7, 0, .15, 1);
-    --t: .8s;   /* opening and closing a section, both quick */
+    --t: .6s;   /* opening and closing a section, both quick */
     color-scheme: dark;
   }
 
@@ -141,7 +141,7 @@
   .s1 .tgrid { opacity: 1; }
   /* while the open heading is still growing (and wrapping), its grid stays hidden, so it
      never shows sliding down under the name; it fades in once the name has settled */
-  .s2 #dgrid { transition: opacity .45s ease .45s; }   /* comes up on the same beat as "that move" */
+  .s2 #dgrid { transition: opacity .3s ease .2s; }   /* comes up on the same beat as "that move" */
   /* the name's grid is not held back for the heading to settle: it comes up on the same
      beat as ", based in the Netherlands", so the sentence and the study arrive together */
   .s1 #tgrid { transition: opacity .45s ease .45s; }
@@ -214,7 +214,7 @@
   /* "that move" belongs to the open Designs panel only */
   /* &quot;that move&quot; appears a beat after the panel opens: no rise, no fade, it is simply there */
   .designs .head .reveal { display: inline-block; margin-left: .25em; transform: none; transition: none; }   /* the word space, kept even when it lifts out of the line */
-  .s2 .designs .head .reveal { transform: none; transition: opacity 0s linear .45s; }
+  .s2 .designs .head .reveal { transform: none; transition: opacity 0s linear .2s; }
   .stage:not(.s2) .designs .head .reveal { position: absolute; }
   .stage.closing-des:not(.s2) .designs .head .reveal { transform: translateX(2.5vw);
     transition: opacity var(--t) var(--ease), transform var(--t) var(--ease); }   /* "that move" goes with its line too */
@@ -227,7 +227,8 @@
   .dgrid .m { position: absolute; inset: 0; overflow: hidden; }   /* clipped by the cell's own rounded edge, so the picture meets the line exactly */
   .dgrid .m video, .dgrid .m img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
     opacity: .1; transition: opacity var(--tdur) var(--tease); }   /* at rest every reel shows faintly, at 10%, behind its name */
-  .dgrid .lead .m video, .dgrid .lead .m img { opacity: 1; }   /* the cell taking the space shows its reel fully */
+  .dgrid .lead .m video, .dgrid .lead .m img { opacity: 1; }
+  .dgrid .m .fit { object-fit: contain; background: #0b0b0a; }   /* Line 0 shown whole, dark around it */   /* the cell taking the space shows its reel fully */
   .dgrid .m > :not(.cur) { display: none; }   /* an area with several projects shows one at a time */
   .dgrid .m .ph { position: absolute; inset: 0; opacity: .3; background: repeating-linear-gradient(115deg, var(--rule) 0 1px, transparent 1px 16px); }
   /* the area's name, large and centred in its cell */
@@ -378,6 +379,7 @@
       const el = document.createElement(/\.(mp4|mov|webm)$/i.test(src) ? 'video' : 'img');
       if (el.tagName === 'VIDEO') { el.muted = true; el.loop = true; el.playsInline = true; el.preload = 'metadata'; } else el.alt = '';
       el.addEventListener('error', () => { const p = ph(); p.className = el.className + ' ph'; el.replaceWith(p); });
+      if (/line0-/.test(src)) el.classList.add('fit');
       el.src = src; return el;
     }
     const cells = D.map(([name, ex, src]) => {
@@ -460,7 +462,7 @@
     if (window.ResizeObserver) new ResizeObserver(place).observe(desHead);
     reset();
     return {
-      start() { reset(); play(true); if (!still) timer = setTimeout(step, 450 + 150); },   // the first area moves in right away
+      start() { reset(); play(true); if (!still) timer = setTimeout(step, 200 + 150); },   // the first area moves in right away
       stop() { reset(); play(false); }
     };
   })();
@@ -676,10 +678,10 @@
     clearTimeout(closeT);
     if (was && was !== s) {
       stage.classList.add(was === 's1' ? 'closing-name' : 'closing-des');
-      closeT = setTimeout(() => { stage.classList.remove('closing-name', 'closing-des'); unlockLines(); }, 850);   // the (quicker) close time
+      closeT = setTimeout(() => { stage.classList.remove('closing-name', 'closing-des'); unlockLines(); }, 650);   // the (quicker) close time
     }
     clearTimeout(settleT);
-    if (s !== 's0') settleT = setTimeout(() => { if (current === s) { stage.classList.add('settled'); window.parent.postMessage({ landingOpen: true }, '*'); } }, 850);   // the heading's size change is .8s
+    if (s !== 's0') settleT = setTimeout(() => { if (current === s) { stage.classList.add('settled'); window.parent.postMessage({ landingOpen: true }, '*'); } }, 650);   // the heading's size change is .6s
   }
   let settleT = null, closeT = null;
   // The words after the name are wrapped one by one, so that on closing each can be kept on

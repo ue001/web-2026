@@ -621,7 +621,7 @@
     --head: clamp(32px, 4.4vw, 84px);
     --pad: clamp(14px, 1.6vw, 28px);
     --ease: cubic-bezier(.7, 0, .15, 1);
-    --t: .8s;   /* opening and closing a section, both quick */
+    --t: .6s;   /* opening and closing a section, both quick */
     color-scheme: dark;
   }
 
@@ -739,7 +739,7 @@
   .s1 .tgrid { opacity: 1; }
   /* while the open heading is still growing (and wrapping), its grid stays hidden, so it
      never shows sliding down under the name; it fades in once the name has settled */
-  .s2 #dgrid { transition: opacity .45s ease .45s; }   /* comes up on the same beat as &quot;that move&quot; */
+  .s2 #dgrid { transition: opacity .3s ease .2s; }   /* comes up on the same beat as &quot;that move&quot; */
   /* the name&#x27;s grid is not held back for the heading to settle: it comes up on the same
      beat as &quot;, based in the Netherlands&quot;, so the sentence and the study arrive together */
   .s1 #tgrid { transition: opacity .45s ease .45s; }
@@ -812,7 +812,7 @@
   /* &quot;that move&quot; belongs to the open Designs panel only */
   /* &amp;quot;that move&amp;quot; appears a beat after the panel opens: no rise, no fade, it is simply there */
   .designs .head .reveal { display: inline-block; margin-left: .25em; transform: none; transition: none; }   /* the word space, kept even when it lifts out of the line */
-  .s2 .designs .head .reveal { transform: none; transition: opacity 0s linear .45s; }
+  .s2 .designs .head .reveal { transform: none; transition: opacity 0s linear .2s; }
   .stage:not(.s2) .designs .head .reveal { position: absolute; }
   .stage.closing-des:not(.s2) .designs .head .reveal { transform: translateX(2.5vw);
     transition: opacity var(--t) var(--ease), transform var(--t) var(--ease); }   /* &quot;that move&quot; goes with its line too */
@@ -864,6 +864,7 @@
   .dgrid .w { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
     opacity: 0; transition: opacity .9s ease; }
   .dgrid .w.cur { opacity: 1; }
+  .dgrid .w.fit { object-fit: contain; background: #0b0b0a; }
   .dgrid .wk, .dgrid .wn { position: absolute; bottom: 14px; z-index: 2; font-size: var(--size); color: #fff; mix-blend-mode: difference; }
   .dgrid .wk { left: 2.2%; } .dgrid .wn { right: 2.2%; opacity: .5; font-variant-numeric: tabular-nums; }
   .s2 .dgrid { pointer-events: auto; cursor: pointer; }
@@ -972,7 +973,7 @@
     const items = W.map(([name, src]) =&gt; {
       const el = document.createElement(/\.(mp4|mov|webm)$/i.test(src) ? &#x27;video&#x27; : &#x27;img&#x27;);
       if (el.tagName === &#x27;VIDEO&#x27;) { el.muted = true; el.loop = true; el.playsInline = true; el.preload = &#x27;metadata&#x27;; } else el.alt = &#x27;&#x27;;
-      el.src = src; el.className = &#x27;w&#x27;; box.appendChild(el); return el;
+      el.src = src; el.className = /line0-/.test(src) ? &#x27;w fit&#x27; : &#x27;w&#x27;; box.appendChild(el); return el;
     });
     const k = document.createElement(&#x27;span&#x27;); k.className = &#x27;wk&#x27;;
     const n = document.createElement(&#x27;span&#x27;); n.className = &#x27;wn&#x27;;
@@ -1209,10 +1210,10 @@
     clearTimeout(closeT);
     if (was &amp;&amp; was !== s) {
       stage.classList.add(was === &#x27;s1&#x27; ? &#x27;closing-name&#x27; : &#x27;closing-des&#x27;);
-      closeT = setTimeout(() =&gt; { stage.classList.remove(&#x27;closing-name&#x27;, &#x27;closing-des&#x27;); unlockLines(); }, 850);   // the (quicker) close time
+      closeT = setTimeout(() =&gt; { stage.classList.remove(&#x27;closing-name&#x27;, &#x27;closing-des&#x27;); unlockLines(); }, 650);   // the (quicker) close time
     }
     clearTimeout(settleT);
-    if (s !== &#x27;s0&#x27;) settleT = setTimeout(() =&gt; { if (current === s) { stage.classList.add(&#x27;settled&#x27;); window.parent.postMessage({ landingOpen: true }, &#x27;*&#x27;); } }, 850);   // the heading&#x27;s size change is .8s
+    if (s !== &#x27;s0&#x27;) settleT = setTimeout(() =&gt; { if (current === s) { stage.classList.add(&#x27;settled&#x27;); window.parent.postMessage({ landingOpen: true }, &#x27;*&#x27;); } }, 650);   // the heading&#x27;s size change is .6s
   }
   let settleT = null, closeT = null;
   // The words after the name are wrapped one by one, so that on closing each can be kept on
