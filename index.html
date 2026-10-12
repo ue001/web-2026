@@ -1329,6 +1329,8 @@
       var f=document.currentScript.previousElementSibling, b=/[?&]landing=home\b/.test(location.search);
       try{ if(b) sessionStorage.setItem('jihae-landing','home'); else b=sessionStorage.getItem('jihae-landing')==='home'; }catch(e){}
       if(b){ f.removeAttribute('srcdoc'); f.src='landing/home.html'; }
+      /* show /home, not ?landing=home; with no trailing slash, relative paths still resolve from the root */
+      if(/[?&]landing=home\b/.test(location.search) && history.replaceState) history.replaceState(null,'','/home'+location.hash);
     })();
     </script>
     <button class="landing__down" type="button" aria-label="See more"><span class="landing__hint">See more</span><svg viewBox="0 0 16 20" aria-hidden="true"><path d="M8 2v15M2 11l6 6 6-6"/></svg></button>
