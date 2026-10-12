@@ -849,6 +849,13 @@
   @property --grid { syntax: &quot;&lt;color&gt;&quot;; inherits: true; initial-value: #2b2b29; }
   .stage { transition: grid-template-columns var(--t) var(--ease), grid-template-rows var(--t) var(--ease), --grid .6s ease; }
   .stage.s1 { --grid: var(--fg); }
+
+  .dgrid .w { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+    opacity: 0; transition: opacity .9s ease; }
+  .dgrid .w.cur { opacity: 1; }
+  .dgrid .wk, .dgrid .wn { position: absolute; bottom: 14px; z-index: 2; font-size: var(--size); color: #fff; mix-blend-mode: difference; }
+  .dgrid .wk { left: 2.2%; } .dgrid .wn { right: 2.2%; opacity: .5; font-variant-numeric: tabular-nums; }
+  .s2 .dgrid { pointer-events: auto; cursor: pointer; }
 &lt;/style&gt;
 &lt;/head&gt;
 &lt;body&gt;
@@ -944,111 +951,39 @@
   // seconds a random one grows into the space, the corners touching it soften, and
   // its example projects appear once it has grown. Runs only while Designs is open.
   const dg = (() =&gt; {
-    const box = document.getElementById(&#x27;dgrid&#x27;), PER = [2, 2], ROWS = PER.length;   // two areas on top, two below
-    const D = [
-      // name,              example projects shown when it grows,   reel (in the media folder)
-      [&#x27;3D&#x27;,                &#x27;Line 0&#x27;,                                &#x27;media/line0-.mp4&#x27;],
-      [&#x27;Interaction&#x27;,       &#x27;Motion Explainer&#x27;,                      &#x27;media/motion-explainer.mp4&#x27;],
-      [&#x27;UX/UI&#x27;,             [&#x27;AI Companion&#x27;, &#x27;Monell&#x27;],              [&#x27;media/AI-companion.mp4&#x27;, &#x27;media/monell.mp4&#x27;]],
-      // an area can hold several projects: each time it takes the space it shows the next one
-      [&#x27;Visual systems&#x27;,    [&#x27;Generative Title Slide&#x27;, &#x27;Slash&#x27;, &#x27;Bodiless Spacing&#x27;],     [&#x27;media/generative.mp4&#x27;, &#x27;media/slash.mp4&#x27;, &#x27;media/bodiless.jpg&#x27;]]
+    const box = document.getElementById(&#x27;dgrid&#x27;);
+    const W = [
+      [&#x27;Generative Title Slide&#x27;, &#x27;media/generative.mp4&#x27;], [&#x27;Motion Explainer&#x27;, &#x27;media/motion-explainer.mp4&#x27;],
+      [&#x27;Monell&#x27;, &#x27;media/monell.mp4&#x27;], [&#x27;AI Companion&#x27;, &#x27;media/AI-companion.mp4&#x27;], [&#x27;Line 0&#x27;, &#x27;media/line0-.mp4&#x27;],
+      [&#x27;Bodiless Spacing&#x27;, &#x27;media/bodiless.jpg&#x27;], [&#x27;Slash&#x27;, &#x27;media/slash.mp4&#x27;]
     ];
-    const GROW = { col: 2.4, row: 3 };     // how much an area grows: tall, its row takes three quarters of the height
-    const SOFTEN = 0.55;                 // corners touching it round about halfway
-    const FAR = 0.16;                    // all other corners: a light softening
-    const HOLD = 2400;                   // time between moves (ms)
-    const SHOW = 800;                    // when the examples appear, once it has grown (ms)
-    // a reel, an image, or the striped placeholder when the file is missing
-    function media(src) {
-      const ph = () =&gt; { const p = document.createElement(&#x27;div&#x27;); p.className = &#x27;ph&#x27;; return p; };
-      if (!src) return ph();
+    const HOLD = 3200;
+    const items = W.map(([name, src]) =&gt; {
       const el = document.createElement(/\.(mp4|mov|webm)$/i.test(src) ? &#x27;video&#x27; : &#x27;img&#x27;);
       if (el.tagName === &#x27;VIDEO&#x27;) { el.muted = true; el.loop = true; el.playsInline = true; el.preload = &#x27;metadata&#x27;; } else el.alt = &#x27;&#x27;;
-      el.addEventListener(&#x27;error&#x27;, () =&gt; { const p = ph(); p.className = el.className + &#x27; ph&#x27;; el.replaceWith(p); });
-      el.src = src; return el;
-    }
-    const cells = D.map(([name, ex, src]) =&gt; {
-      const exs = [].concat(ex), srcs = [].concat(src);
-      const c = document.createElement(&#x27;div&#x27;); c.className = &#x27;ring&#x27;;
-      const m = document.createElement(&#x27;div&#x27;); m.className = &#x27;m&#x27;;
-      const items = srcs.map((s, i) =&gt; { const el = media(s); if (i === 0) el.classList.add(&#x27;cur&#x27;); m.appendChild(el); return el; });
-      const t = document.createElement(&#x27;span&#x27;); t.className = &#x27;t&#x27;; t.textContent = name;
-      const k = document.createElement(&#x27;span&#x27;); k.className = &#x27;k&#x27;; k.textContent = exs[0];
-      c.append(m, t, k); box.appendChild(c);
-      // show project i: its reel and its name
-      c.show = i =&gt; { [...m.children].forEach((el, j) =&gt; el.classList.toggle(&#x27;cur&#x27;, j === i)); k.textContent = exs[i] || exs[0]; };
-      c.n = srcs.length; c.next = 0;
-      // clicking an area takes the page down to the project it is showing
-      c.addEventListener(&#x27;click&#x27;, e =&gt; {
-        if (!document.getElementById(&#x27;stage&#x27;).classList.contains(&#x27;s2&#x27;) || window.parent === window) return;
-        e.stopPropagation(); window.parent.postMessage({ landingWork: k.textContent }, &#x27;*&#x27;);
-      });
-      return c;
+      el.src = src; el.className = &#x27;w&#x27;; box.appendChild(el); return el;
     });
-    const pct = w =&gt; { const t = w.reduce((a, b) =&gt; a + b, 0); return w.map(x =&gt; x / t * 100); };
-    let lead = -1, timer = null, showT = null;
-    function place() { if (!document.getElementById(&#x27;stage&#x27;).classList.contains(&#x27;s2&#x27;)) return; box.style.setProperty(&#x27;--tg-top&#x27;, (desHead.offsetTop + desHead.offsetHeight) + &#x27;px&#x27;); }   // frozen while closing
-    function layout() {
-      place();
-      const L = parseFloat(getComputedStyle(box).getPropertyValue(&#x27;--line&#x27;)) || 1;
-      const rowH = Array(ROWS).fill(1), rowCols = PER.map(n =&gt; Array(n).fill(1));
-      if (lead &gt;= 0) { let r = 0, c = lead; while (c &gt;= PER[r]) c -= PER[r++]; rowCols[r][c] = GROW.col; rowH[r] = GROW.row; }
-      const R = pct(rowH), ry = [0], boxes = []; R.forEach((h, i) =&gt; ry.push(ry[i] + h));
-      for (let r = 0; r &lt; ROWS; r++) {
-        const C = pct(rowCols[r]), cx = [0]; C.forEach((w, i) =&gt; cx.push(cx[i] + w));
-        for (let c = 0; c &lt; PER[r]; c++) boxes.push({ l: cx[c], r: cx[c + 1], t: ry[r], b: ry[r + 1] });
-      }
-      const W = box.clientWidth, H = box.clientHeight, Lb = lead &gt;= 0 ? boxes[lead] : null, e = .05;
-      const touch = (x, y) =&gt; Lb &amp;&amp; x &gt;= Lb.l - e &amp;&amp; x &lt;= Lb.r + e &amp;&amp; y &gt;= Lb.t - e &amp;&amp; y &lt;= Lb.b + e;
-      const ov = (a0, a1, b0, b1) =&gt; Math.min(a1, b1) - Math.max(a0, b0) &gt; e;
-      boxes.forEach((b, i) =&gt; {
-        const d = cells[i], oL = b.l &lt;= e ? L : 0, oT = b.t &lt;= e ? L : 0, oR = L, oB = L;   // every edge tucks under its neighbour or the grid&#x27;s own frame, so the bottom line is drawn once
-        Object.assign(d.style, { left: `calc(${b.l}% - ${oL}px)`, top: `calc(${b.t}% - ${oT}px)`,
-          width: `calc(${b.r - b.l}% + ${oL + oR}px)`, height: `calc(${b.b - b.t}% + ${oT + oB}px)` });
-        const short = Math.min((b.r - b.l) / 100 * W, (b.b - b.t) / 100 * H), cw = (b.r - b.l) / 100 * W;
-        let rad = [0, 0, 0, 0];   // top left, top right, bottom right, bottom left
-        if (Lb &amp;&amp; i !== lead) {
-          const side = { t: Math.abs(b.t - Lb.b) &lt; e &amp;&amp; ov(b.l, b.r, Lb.l, Lb.r), b: Math.abs(b.b - Lb.t) &lt; e &amp;&amp; ov(b.l, b.r, Lb.l, Lb.r),
-                         l: Math.abs(b.l - Lb.r) &lt; e &amp;&amp; ov(b.t, b.b, Lb.t, Lb.b), r: Math.abs(b.r - Lb.l) &lt; e &amp;&amp; ov(b.t, b.b, Lb.t, Lb.b) };
-          const k = (x, y, s1, s2) =&gt; (touch(x, y) || side[s1] || side[s2]) ? short / 2 * SOFTEN : short * FAR;
-          rad = [k(b.l, b.t, &#x27;t&#x27;, &#x27;l&#x27;), k(b.r, b.t, &#x27;t&#x27;, &#x27;r&#x27;), k(b.r, b.b, &#x27;b&#x27;, &#x27;r&#x27;), k(b.l, b.b, &#x27;b&#x27;, &#x27;l&#x27;)];
-        }
-        d.style.borderRadius = rad.map(r =&gt; r.toFixed(1) + &#x27;px&#x27;).join(&#x27; &#x27;);
-        d.classList.toggle(&#x27;lead&#x27;, i === lead);   // its reel rises as it grows
-        d.classList.toggle(&#x27;crowd&#x27;, lead &gt;= 0 &amp;&amp; i !== lead);   // the others&#x27; names shrink with their cells
-        // text steps in from each rounded corner, so it never sits on a curve
-        const t = d.querySelector(&#x27;.t&#x27;), kk = d.querySelector(&#x27;.k&#x27;), m = d.querySelector(&#x27;.m&#x27;);
-        Object.assign(kk.style, { left: (12 + rad[3] * .32) + &#x27;px&#x27;, bottom: (12 + rad[3] * .32) + &#x27;px&#x27; });
-        t.style.letterSpacing = lead &lt; 0 || i === lead ? &#x27;-0.02em&#x27; : (cw &lt; 140 ? &#x27;-0.1em&#x27; : &#x27;-0.05em&#x27;);
-      });
+    const k = document.createElement(&#x27;span&#x27;); k.className = &#x27;wk&#x27;;
+    const n = document.createElement(&#x27;span&#x27;); n.className = &#x27;wn&#x27;;
+    box.append(k, n);
+    let i = 0, timer = null;
+    function show(j) {
+      i = j; items.forEach((el, x) =&gt; el.classList.toggle(&#x27;cur&#x27;, x === i));
+      k.textContent = W[i][0]; n.textContent = String(i + 1).padStart(2, &#x27;0&#x27;) + &#x27; / &#x27; + String(W.length).padStart(2, &#x27;0&#x27;);
     }
-    // shuffled turns: every area takes the space once, in a random order, before any
-    // area comes back; a new round never starts with the area that just had it
-    let bag = [];
-    const pick = () =&gt; {
-      if (!bag.length) {
-        bag = D.map((_, i) =&gt; i);
-        for (let i = bag.length - 1; i &gt; 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [bag[i], bag[j]] = [bag[j], bag[i]]; }
-        if (bag[0] === lead) bag.push(bag.shift());
-      }
-      return bag.shift();
-    };
-    function step() {
-      clearTimeout(showT); cells.forEach(c =&gt; c.classList.remove(&#x27;on&#x27;));
-      lead = pick();
-      const L = cells[lead]; if (L.n &gt; 1) { L.show(L.next); L.next = (L.next + 1) % L.n; }   // next project in this area
-      layout();
-      const me = lead; showT = setTimeout(() =&gt; { if (lead === me) cells[me].classList.add(&#x27;on&#x27;); }, SHOW);
-      timer = setTimeout(step, HOLD);
-    }
+    function place() { if (!document.getElementById(&#x27;stage&#x27;).classList.contains(&#x27;s2&#x27;)) return; box.style.setProperty(&#x27;--tg-top&#x27;, (desHead.offsetTop + desHead.offsetHeight) + &#x27;px&#x27;); }
+    box.addEventListener(&#x27;click&#x27;, e =&gt; {
+      if (!document.getElementById(&#x27;stage&#x27;).classList.contains(&#x27;s2&#x27;) || window.parent === window) return;
+      e.stopPropagation(); window.parent.postMessage({ landingWork: W[i][0] }, &#x27;*&#x27;);
+    });
+    function next() { show((i + 1) % W.length); timer = setTimeout(next, HOLD); }
     function play(on) { box.querySelectorAll(&#x27;video&#x27;).forEach(v =&gt; on ? v.play().catch(() =&gt; {}) : v.pause()); }
-    function reset() { clearTimeout(timer); clearTimeout(showT); lead = -1; cells.forEach(c =&gt; c.classList.remove(&#x27;on&#x27;)); layout(); }
-    addEventListener(&#x27;resize&#x27;, layout);
+    addEventListener(&#x27;resize&#x27;, place);
     if (window.ResizeObserver) new ResizeObserver(place).observe(desHead);
-    reset();
+    show(0);
     return {
-      start() { reset(); play(true); if (!still) timer = setTimeout(step, 450 + 150); },   // the first area moves in right away
-      stop() { reset(); play(false); }
+      start() { clearTimeout(timer); place(); show(0); play(true); if (!still) timer = setTimeout(next, HOLD); },
+      stop() { clearTimeout(timer); play(false); }
     };
   })();
 
@@ -1387,6 +1322,15 @@
 &lt;/body&gt;
 &lt;/html&gt;
 "></iframe>
+    <script>
+    /* /home sends here with ?landing=home: the earlier landing, from its own file. The choice
+       holds for the visit, so coming back from a project keeps the same landing */
+    (function(){
+      var f=document.currentScript.previousElementSibling, b=/[?&]landing=home\b/.test(location.search);
+      try{ if(b) sessionStorage.setItem('jihae-landing','home'); else b=sessionStorage.getItem('jihae-landing')==='home'; }catch(e){}
+      if(b){ f.removeAttribute('srcdoc'); f.src='landing/home.html'; }
+    })();
+    </script>
     <button class="landing__down" type="button" aria-label="See more"><span class="landing__hint">See more</span><svg viewBox="0 0 16 20" aria-hidden="true"><path d="M8 2v15M2 11l6 6 6-6"/></svg></button>
   </section>
 
@@ -1796,6 +1740,12 @@
     transition:grid-template-columns var(--move), border-color 620ms ease;
   }
   html.nofx .proj .prow, html.nofx .proj .pc--rule{ transition:none !important; }
+
+  /* at rest the verticals and the one rule under the statement stay, quietly;
+     the sections themselves carry no horizontal rules */
+  .proj:not([data-hot="true"]) .pc--rule{ border-right-color:var(--rule-idle); }
+  .proj:not([data-hot="true"]) .prow--say{ border-bottom-color:var(--rule-idle) !important; }
+  .proj .prow:not(.prow--say){ border-bottom-color:transparent !important; }
 
   .proj h3{ font-size:calc(clamp(1rem, 5cqi, 1.45rem) * var(--tscale)); }
   .proj .body{ font-size:calc(clamp(.82rem, 3cqi, .95rem) * var(--tscale)); }
@@ -3254,7 +3204,10 @@
   var prev=null, ours=false;
   function press(m){ var b=document.querySelector('.ratio button[data-mode="'+m+'"]'); if(b){ ours=true; b.click(); ours=false; } }
   function chapterMode(){
-    var c=isOpen() && window.CHAPTERS && CHAPTERS[proj.dataset.chapter];
+    /* chapters are keyed by file (media/x.mp4) but the subpage carries the bare name (media/x) */
+    var k=proj.dataset.chapter, c=null;
+    if(isOpen() && window.CHAPTERS) Object.keys(CHAPTERS).forEach(function(f){
+      if(f.split(/[?#]/)[0].replace(/\.[a-z0-9]+$/i,'').split('/').slice(-2).join('/')===k) c=CHAPTERS[f]; });
     var want=c && MODES[c.mode] ? c.mode : null;
     if(want){ if(prev===null) prev=root.dataset.mode; if(root.dataset.mode!==want) press(want); }
     else if(prev!==null){ var p=prev; prev=null; if(root.dataset.mode!==p) press(p); }
@@ -3264,6 +3217,7 @@
   new MutationObserver(function(){ chapterMode(); follow(false); pastHero(); })
     .observe(proj,{attributes:true,attributeFilter:['data-open','data-chapter']});
   proj.addEventListener('scroll', pastHero, {passive:true});
+  chapterMode();   /* a chapter opened from the address (#motion-explainer) opened before this ran */
 })();
 </script>
 <script>

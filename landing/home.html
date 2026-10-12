@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="en">
+<head>
+<base href="../">   <!-- one folder down: media paths are from the site root -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jihae Cha (small)</title>
+<link href="https://api.fontshare.com/v2/css?f[]=switzer@300,400&display=swap" rel="stylesheet">
+<style>
+  /* two panels, name | designs; the dividing line travels as each one takes over the screen */
+  :root {
+    --line: 2px;  /* the weight of every grid line */
+    --bg: #0b0b0a;
+    --fg: #f2f2f0;
+    --muted: #8a8a85;
+    --rule: #3a3a38;
+    --grid: #2b2b29;   /* the grid lines: as quiet as the lines in the works below */
+    --stripe: #1c1c1a;
+    --font: "Switzer", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --size: clamp(12px, 0.95vw, 16px);
+    --lede: clamp(14px, 1.3vw, 22px);
+    --big: clamp(72px, 15.5vw, 340px);
+    --head: clamp(32px, 4.4vw, 84px);
+    --pad: clamp(14px, 1.6vw, 28px);
+    --ease: cubic-bezier(.7, 0, .15, 1);
+    --t: .8s;   /* opening and closing a section, both quick */
+    color-scheme: dark;
+  }
+
+  /* light mode, switched from the portfolio page */
+  :root[data-theme="light"] {
+    --bg: #ffffff;
+    --fg: #121211;
+    --muted: #8e8e89;
+    --rule: #e6e6e4;
+    --grid: #e6e6e4;
+    --stripe: #efefed;
+    color-scheme: light;
+  }
+
+  html, body { height: 100%; }
+  body {
+    margin: 0; font-weight: 300; overflow: hidden;
+    background: var(--bg); color: var(--fg);
+    font-family: var(--font); -webkit-font-smoothing: antialiased;
+  }
+
+  .stage {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    transition: grid-template-columns var(--t) var(--ease), grid-template-rows var(--t) var(--ease);
+  }
+  .stage.s1 { grid-template-columns: 7fr 1fr; }
+  .stage.s2 { grid-template-columns: 1fr 7fr; }
+
+  .panel {
+    position: relative; min-width: 0; min-height: 0; overflow: hidden;
+    display: flex; flex-direction: column;
+    cursor: pointer; outline: none;
+  }
+  /* every panel and grid cell carries its own full outline, so each can round on
+     its own. The outer edges sit 1px past the screen and are cut off until a
+     corner rounds in; shared edges overlap so they still read as one hairline. */
+  .stage { overflow: hidden; }
+  /* a panel's outline is drawn on a layer above it, so rounding never cuts into its content */
+  /* ---- arrival: the dividing line draws itself from top to bottom ----------------
+     While it draws, the panels' own outlines are held back; once it reaches the
+     bottom they take over and the drawn line is removed. */
+  .drawline { position: fixed; z-index: 5; pointer-events: none; background: var(--grid);
+    /* sits exactly where the panels' own dividing line is (set from the layout on load),
+       so nothing shifts when they take over */
+    left: calc(50% - var(--line)); top: 0; width: var(--line); height: 100%; transform: scaleY(0); transform-origin: top;
+    animation: draw-down .55s cubic-bezier(.65, 0, .35, 1) .1s forwards; }
+  @keyframes draw-down { to { transform: scaleY(1); } }
+  .arriving .panel::after { border-color: transparent; }
+  @media (max-aspect-ratio: 4/5) {   /* stacked panels: the line runs across, left to right */
+    .drawline { left: 0; top: calc(50% - var(--line)); width: 100%; height: var(--line); transform: scaleX(0); transform-origin: left;
+      animation-name: draw-across; }
+    @keyframes draw-across { to { transform: scaleX(1); } }
+  }
+  @media (prefers-reduced-motion: reduce) { .drawline { display: none; } .arriving .panel::after { border-color: var(--grid); } }
+  .panel::after {
+    content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    border: var(--line) solid var(--grid);
+    border-radius: var(--r, 0px);
+    transition: border-radius .5s cubic-bezier(.7, 0, .15, 1);
+  }
+  .panel.name { margin: calc(-1 * var(--line)) 0 calc(-1 * var(--line)) calc(-1 * var(--line)); }
+  .panel.designs { margin: calc(-1 * var(--line)); }
+  /* keyboard focus marker: only while someone is actually using the keyboard, so a
+     click (or the page focusing a panel itself) never leaves a line under the name */
+  .kbd .panel:focus-visible .head { text-decoration: underline; text-underline-offset: .12em; text-decoration-thickness: 1px; }
+
+  .head {
+    margin: 0; padding: var(--pad);
+    font-weight: 300; font-size: var(--fs, var(--head));
+    line-height: .95; letter-spacing: -0.035em;
+    white-space: nowrap;
+    /* the larger heading is raised so the tops of its capitals line up with the smaller one's,
+       which stays where it always was */
+    padding-top: max(0px, calc(var(--pad) + var(--nudge, 0px)));
+    transition: font-size var(--t) var(--ease), padding-top var(--t) var(--ease);
+  }
+
+  /* things that only exist in one state */
+  .reveal { opacity: 0; transform: translateY(12px); transition: opacity .35s, transform .35s; }
+  .s1 .name .reveal, .s2 .designs .reveal {
+    opacity: 1; transform: none;
+    transition: opacity .7s ease, transform .9s var(--ease);
+    transition-delay: var(--d, .8s);
+  }
+
+  /* name panel: subtext is there immediately, no fade */
+  .name .reveal, .s1 .name .reveal { transform: none; transition: none; }
+
+  .lede {
+    margin: auto 0 0; padding: 0 var(--pad) var(--pad);
+    font-size: var(--lede); font-weight: 300; line-height: 1.1; letter-spacing: -0.02em;
+    max-width: 30ch; color: var(--muted);
+  }
+  /* the six-cell study under the name: squares round, return, then a random cell
+     shoves in and spreads while the corners of the cells it touches curve away.
+     It sits right under the name and fills the rest of the panel. */
+  /* the study is drawn in the text colour: full white in dark mode, black in light */
+  .tgrid {
+    /* starts right under the name and fills the rest of the panel, behind the words.
+       Its top edge is a line under the name; its right edge is the dividing line in
+       the middle; left and bottom run off the screen. Its top is set from the name's height. */
+    position: absolute; left: 0; right: 0; bottom: var(--tg-gap, 0px); top: var(--tg-top, 30%);
+    z-index: 0; overflow: hidden; pointer-events: none; box-sizing: border-box;
+    border-top: var(--line) solid var(--grid);   /* the line under the heading, always straight */
+    /* no bottom line of its own: the page's white line under the landing closes it */
+    opacity: 0;
+    /* it now comes up while the heading is still growing, so its top edge rides the
+       heading's own curve rather than snapping to each measured height */
+    transition: opacity .6s ease, top var(--t) var(--ease);
+    --tdur: 1.2s; --tease: cubic-bezier(.65, 0, .35, 1); --xease: var(--tease);
+  }
+  .panel.name > .head, .panel.name > .lede { position: relative; z-index: 1; }
+  .s1 .tgrid { opacity: 1; }
+  /* while the open heading is still growing (and wrapping), its grid stays hidden, so it
+     never shows sliding down under the name; it fades in once the name has settled */
+  .s2 #dgrid { transition: opacity .45s ease .45s; }   /* comes up on the same beat as "that move" */
+  /* the name's grid is not held back for the heading to settle: it comes up on the same
+     beat as ", based in the Netherlands", so the sentence and the study arrive together */
+  .s1 #tgrid { transition: opacity .45s ease .45s; }
+
+  /* ", based in the Netherlands" continues the name when its panel opens, at the same size,
+     the way "that move" continues Designs: it appears a beat later, no rise, no fade */
+  .name .head .reveal { transform: none; transition: none; }
+  .s1 .name .head .reveal { transition: opacity 0s linear .45s; }
+  .stage:not(.s1) .name .head .reveal { position: absolute; }
+  .s1 .name .head { white-space: nowrap; }   /* the sentence stays on one line inside the open panel */
+  @media (max-aspect-ratio: 4/5) { .s1 .name .head { white-space: normal; } }   /* stacked phones: it may wrap */
+  .s1 .name .head .reveal { position: relative; left: 0; }   /* a starting point for the slide back on close */
+  /* closing: the words stay where they are, wrapped as they were, and fade softly while
+     the panel closes; only once they're gone does the heading drop back to one line */
+  .stage.closing-name .name .head { white-space: nowrap; }   /* lines locked with <br>s while it fades */
+  .stage.closing-name:not(.s1) .name .head .reveal { position: relative; left: calc(var(--fs, 60px) * -0.22);
+    transition: opacity var(--t) var(--ease), left var(--t) var(--ease); }   /* drawn back with the line, same curve */
+  /* the comma fades together with the words but stays where it is, so it never touches "Cha";
+     the words travel only about a word space, so they end where the space was */
+  .name .head .reveal .cm { position: relative; left: 0; }
+  .stage.closing-name:not(.s1) .name .head .reveal .cm { left: calc(var(--fs, 60px) * 0.22);
+    transition: left var(--t) var(--ease); }
+  /* the Jihae grid sits right under the name (its top is set from the name's height),
+     with a straight line along its top and a closing line lifted off the bottom edge */
+  /* the Jihae grid carries no text: only the lines and their movement */
+  #tgrid .tx, #tgrid .say { display: none; }
+  /* two lines about Jihae under the name. They roll up one line at a time as the grid
+     moves: the top line slides out, the next slides in underneath. No fading. */
+  .about {
+    position: relative; z-index: 1; margin: 0 var(--pad) calc(var(--pad) * .9);
+    --row: 1.3em; height: calc(2 * var(--row)); overflow: hidden;
+    font-size: var(--lede); font-weight: 300; letter-spacing: -0.015em; color: var(--muted);
+    opacity: 0; transition: opacity .5s ease;
+  }
+  .s1 .about { opacity: 1; }
+  /* in this version the bio is read inside the grid; the lines under the name stay
+     only for screen readers */
+  .about.sr { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip: rect(0 0 0 0); }
+  /* the line inside the cell that has taken the space: no travelling, no fading. It is
+     placed where the cell ends up and simply appears once the cell has grown. */
+  .tgrid .say { position: absolute; z-index: 2; color: var(--fg); font-size: clamp(16px, 1.7vw, 28px); font-weight: 300;
+    line-height: 1.2; letter-spacing: -0.02em; visibility: hidden; }
+  .tgrid .say.on { visibility: visible; }
+  .about .roll { transition: transform .9s cubic-bezier(.65, 0, .35, 1); }
+  .about .roll.jump { transition: none; }
+  .about p { margin: 0; height: var(--row); line-height: var(--row); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  @media (max-width: 600px) {   /* narrow screens: each line may wrap onto a second row */
+    .about { height: calc(4 * var(--row)); }
+    .about p { height: calc(2 * var(--row)); white-space: normal; }
+  }
+  /* the word in each cell: it relaxes when its cell takes the space, and gets
+     squeezed, letters pressed together and wrapping, when its cell is crowded */
+  #tgrid .ring { overflow: hidden; font-style: normal; }   /* the cells are <i> elements; keep their words upright */
+  .tgrid .tx { position: absolute; color: var(--fg); font-size: var(--lede); font-weight: 300; line-height: 1.1;
+    overflow-wrap: anywhere;
+    /* the words move with their cells, on the same timing but without the bounce */
+    transition: left var(--tdur) var(--xease), top var(--tdur) var(--xease), width var(--tdur) var(--xease), letter-spacing var(--tdur) var(--xease); }   /* no fade: a word gives way to the bio line at once */
+  .tgrid .ln { position: absolute; background: var(--grid); opacity: 0;
+    transition: left var(--tdur) var(--tease), top var(--tdur) var(--tease), height var(--tdur) var(--tease), opacity .8s ease; }
+  .tgrid.keep .ln { opacity: 1; }
+  .tgrid .ln.v { width: var(--line); }
+  .tgrid .ln.h { left: -4px; right: -4px; height: var(--line); }
+  .tgrid .ring { position: absolute; box-sizing: border-box; border: var(--line) solid var(--grid);
+    transition: left var(--tdur) var(--tease), top var(--tdur) var(--tease), width var(--tdur) var(--tease), height var(--tdur) var(--tease), border-radius var(--tdur) var(--tease), border-color .9s ease; }
+  .lede { --d: 1s; }
+
+  /* designs panel: the same six-cell grid as the name panel, but calm. A discipline
+     grows smoothly into the space, the others shrink without being crushed, and the
+     corners that touch it soften. Its example projects appear once it has grown. */
+  /* "that move" belongs to the open Designs panel only */
+  /* &quot;that move&quot; appears a beat after the panel opens: no rise, no fade, it is simply there */
+  .designs .head .reveal { display: inline-block; margin-left: .25em; transform: none; transition: none; }   /* the word space, kept even when it lifts out of the line */
+  .s2 .designs .head .reveal { transform: none; transition: opacity 0s linear .45s; }
+  .stage:not(.s2) .designs .head .reveal { position: absolute; }
+  .stage.closing-des:not(.s2) .designs .head .reveal { transform: translateX(2.5vw);
+    transition: opacity var(--t) var(--ease), transform var(--t) var(--ease); }   /* "that move" goes with its line too */
+  .s1 .dgrid { opacity: 0; }
+  .s2 .dgrid { opacity: 1; }
+  .dgrid { --tdur: 1s; --tease: cubic-bezier(.45, 0, .2, 1); }
+  .dgrid .ring { overflow: hidden; }
+  .s2 .dgrid .ring { pointer-events: auto; cursor: pointer; }   /* once Designs is open, each area is a way into its project */
+  /* the reel fills the whole cell, cut by its outline; the text sits on top of it */
+  .dgrid .m { position: absolute; inset: 0; overflow: hidden; }   /* clipped by the cell's own rounded edge, so the picture meets the line exactly */
+  .dgrid .m video, .dgrid .m img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+    opacity: .1; transition: opacity var(--tdur) var(--tease); }   /* at rest every reel shows faintly, at 10%, behind its name */
+  .dgrid .lead .m video, .dgrid .lead .m img { opacity: 1; }   /* the cell taking the space shows its reel fully */
+  .dgrid .m > :not(.cur) { display: none; }   /* an area with several projects shows one at a time */
+  .dgrid .m .ph { position: absolute; inset: 0; opacity: .3; background: repeating-linear-gradient(115deg, var(--rule) 0 1px, transparent 1px 16px); }
+  /* the area's name, large and centred in its cell */
+  .dgrid .t { position: absolute; z-index: 2; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    max-width: 88%; text-align: center; color: var(--fg); font-size: clamp(15px, 1.6vw, 28px); font-weight: 300;
+    line-height: 1.05; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden;
+    transition: letter-spacing var(--tdur) var(--tease), font-size var(--tdur) var(--tease); }
+  .dgrid .crowd .t { font-size: clamp(11px, 1.1vw, 19px); }   /* while another area takes the space, the others' names shrink */
+  .dgrid .k { position: absolute; left: 12px; bottom: 14px; z-index: 2; font-size: var(--size); color: var(--fg);
+    visibility: hidden; max-width: calc(100% - 30px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dgrid .on .k { visibility: visible; }
+  /* over a reel at full strength the names invert against the picture, so they read on light and dark alike */
+  .dgrid .lead .t, .dgrid .lead .k { color: #fff; mix-blend-mode: difference; }
+
+  /* phone: stack the panels, the horizontal line travels instead */
+  @media (max-aspect-ratio: 4/5) {
+    :root { --size: clamp(12px, 3.3vw, 14px); --big: clamp(56px, 20vw, 120px); --head: clamp(30px, 10vw, 54px); --lede: clamp(14px, 3.8vw, 17px); }
+    .stage, .stage.s1, .stage.s2 { grid-template-columns: 1fr; }
+    .stage { grid-template-rows: 1fr 1fr; }
+    .stage.s1 { grid-template-rows: 6fr 1fr; }
+    .stage.s2 { grid-template-rows: var(--s2rows, 1fr 6fr); }   /* the name's row is just tall enough for the name: set in fit() */
+    .panel.name { margin: calc(-1 * var(--line)) calc(-1 * var(--line)) 0 calc(-1 * var(--line)); }
+    .panel.designs { margin: calc(-1 * var(--line)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before { transition-duration: 0s !important; transition-delay: 0s !important; animation: none !important; }
+  }
+
+  /* opening the Jihae Cha panel brings every line up to full strength: the grid, its outline,
+     the line under the heading and the dividing line. --grid is registered so it can fade. */
+  @property --grid { syntax: "<color>"; inherits: true; initial-value: #2b2b29; }
+  .stage { transition: grid-template-columns var(--t) var(--ease), grid-template-rows var(--t) var(--ease), --grid .6s ease; }
+  .stage.s1 { --grid: var(--fg); }
+</style>
+</head>
+<body>
+<main class="stage arriving" id="stage">
+  <i class="drawline" id="drawline" aria-hidden="true"></i>
+  <section class="panel name" data-state="s1" tabindex="0" role="button" aria-label="About Jihae Cha">
+    <h1 class="head">Jihae Cha<span class="reveal">, based in the&nbsp;Netherlands</span></h1>
+    <div class="about sr" id="about"><div class="roll" id="roll"></div></div>
+    <div class="tgrid" id="tgrid" aria-hidden="true"></div>
+  </section>
+
+  <section class="panel designs" data-state="s2" tabindex="0" role="button" aria-label="Designs that move: 3D, interaction, UX/UI, visual systems">
+    <h2 class="head">Designs<span class="reveal">that move</span></h2>
+    <!-- four areas. Each cell shows a reel from the media folder next to this page;
+         a cell with no file shows a striped placeholder instead. -->
+    <div class="tgrid dgrid" id="dgrid" aria-hidden="true"></div>
+  </section>
+</main>
+
+<script>
+  const stage = document.getElementById('stage');
+
+  // size each heading so it spans its panel's width in the state being entered
+  const meas = document.createElement('span');
+  meas.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font-size:100px;font-weight:300;letter-spacing:-0.035em;font-family:var(--font)';
+  document.body.appendChild(meas);
+  const nameHead = document.querySelector('.name .head');
+  const desHead = document.querySelector('.designs .head');
+  const phone = matchMedia('(max-aspect-ratio: 4/5)');
+  const FR = { s0: [.5, .5], s1: [7/8, 1/8], s2: [1/8, 7/8] };
+  let current = 's0';
+  // Both headings follow one rule: an open panel's heading is the same size whichever
+  // panel is open, and so is a closed one's. Each size is the largest that still fits
+  // the longer of the two headings, so neither ever overflows its panel.
+  function fit(s) {
+    const W = stage.clientWidth;
+    const width = (h, text, f) => {
+      const pad = parseFloat(getComputedStyle(h).paddingLeft) * 2;
+      meas.textContent = text;
+      return Math.max((W * f - pad - 2) / meas.getBoundingClientRect().width * 100, 10);
+    };
+    const SCALE = 0.55;   // this version sets the headings at a fraction of the full width
+    let n, d;
+    if (phone.matches) {
+      // stacked: both panels are full width, so both headings simply share one size
+      n = d = Math.min(width(nameHead, 'Jihae Cha', 1), width(desHead, s === 's2' ? 'Designs that move' : 'Designs', 1));
+    } else if (s === 's0') {
+      n = d = Math.min(width(nameHead, 'Jihae Cha', .5), width(desHead, 'Designs', .5));
+    } else {
+      const open = Math.min(width(nameHead, 'Jihae Cha', 7 / 8), width(desHead, 'Designs that move', 7 / 8));
+      const closed = Math.min(width(nameHead, 'Jihae Cha', 1 / 8), width(desHead, 'Designs', 1 / 8));
+      [n, d] = s === 's1' ? [open, closed] : [closed, open];
+      // open, the name reads "Jihae Cha, based in the Netherlands" on one line, so it is sized to fit that whole sentence
+      if (s === 's1') n = Math.min(n, width(nameHead, 'Jihae Cha, based in the Netherlands', 7 / 8) / SCALE);
+    }
+    nameHead.style.setProperty('--fs', (n * SCALE).toFixed(1) + 'px');
+    desHead.style.setProperty('--fs', (d * SCALE).toFixed(1) + 'px');
+    // stacked, with Designs open: the name's row holds the name and an even gap above and below it,
+    // so Designs that move sits right under it rather than a seventh of the screen down
+    if (phone.matches) {
+      const pad = parseFloat(getComputedStyle(nameHead).paddingLeft), L = 2;
+      const need = Math.round(pad * 2 + n * SCALE * .95 + L), H = stage.clientHeight;
+      if (H > need) stage.style.setProperty('--s2rows', need + 'fr ' + (H - need) + 'fr');
+    } else stage.style.removeProperty('--s2rows');
+    // line the two headings up along the top of their capitals: the smaller one stays put and
+    // the larger one moves up by the difference in where each size puts its cap tops in its line
+    const c = capTop(), small = Math.min(n, d) * SCALE;
+    nameHead.style.setProperty('--nudge', (-c * (n * SCALE - small)).toFixed(1) + 'px');
+    desHead.style.setProperty('--nudge', (-c * (d * SCALE - small)).toFixed(1) + 'px');
+  }
+  // where the top of a capital sits below the top of the line box, per pixel of font size
+  function capTop() {
+    const h = nameHead, cs = getComputedStyle(h), x = document.createElement('canvas').getContext('2d');
+    x.font = '300 100px ' + cs.fontFamily;
+    const m = x.measureText('H'), asc = m.fontBoundingBoxAscent, des = m.fontBoundingBoxDescent;
+    if (!asc || !m.actualBoundingBoxAscent) return 0.2;
+    return ((95 - (asc + des)) / 2 + asc - m.actualBoundingBoxAscent) / 100;   // line-height is .95
+  }
+
+  // resizing and the first sizing snap into place; only state changes animate
+  function snap(s) {
+    [nameHead, desHead].forEach(h => h.style.transition = 'none');
+    fit(s);
+    nameHead.offsetWidth;
+    requestAnimationFrame(() => [nameHead, desHead].forEach(h => h.style.transition = ''));
+  }
+  addEventListener('resize', () => snap(current));
+  document.fonts && document.fonts.ready.then(() => snap(current));
+  snap('s0');
+
+  // ---- the designs grid --------------------------------------------------------
+  // Four areas in the same grid as the name panel, moving calmly: every few
+  // seconds a random one grows into the space, the corners touching it soften, and
+  // its example projects appear once it has grown. Runs only while Designs is open.
+  const dg = (() => {
+    const box = document.getElementById('dgrid'), PER = [2, 2], ROWS = PER.length;   // two areas on top, two below
+    const D = [
+      // name,              example projects shown when it grows,   reel (in the media folder)
+      ['3D',                'Line 0',                                'media/line0-.mp4'],
+      ['Interaction',       'Motion Explainer',                      'media/motion-explainer.mp4'],
+      ['UX/UI',             ['AI Companion', 'Monell'],              ['media/AI-companion.mp4', 'media/monell.mp4']],
+      // an area can hold several projects: each time it takes the space it shows the next one
+      ['Visual systems',    ['Generative Title Slide', 'Slash', 'Bodiless Spacing'],     ['media/generative.mp4', 'media/slash.mp4', 'media/bodiless.jpg']]
+    ];
+    const GROW = { col: 2.4, row: 3 };     // how much an area grows: tall, its row takes three quarters of the height
+    const SOFTEN = 0.55;                 // corners touching it round about halfway
+    const FAR = 0.16;                    // all other corners: a light softening
+    const HOLD = 2400;                   // time between moves (ms)
+    const SHOW = 800;                    // when the examples appear, once it has grown (ms)
+    // a reel, an image, or the striped placeholder when the file is missing
+    function media(src) {
+      const ph = () => { const p = document.createElement('div'); p.className = 'ph'; return p; };
+      if (!src) return ph();
+      const el = document.createElement(/\.(mp4|mov|webm)$/i.test(src) ? 'video' : 'img');
+      if (el.tagName === 'VIDEO') { el.muted = true; el.loop = true; el.playsInline = true; el.preload = 'metadata'; } else el.alt = '';
+      el.addEventListener('error', () => { const p = ph(); p.className = el.className + ' ph'; el.replaceWith(p); });
+      el.src = src; return el;
+    }
+    const cells = D.map(([name, ex, src]) => {
+      const exs = [].concat(ex), srcs = [].concat(src);
+      const c = document.createElement('div'); c.className = 'ring';
+      const m = document.createElement('div'); m.className = 'm';
+      const items = srcs.map((s, i) => { const el = media(s); if (i === 0) el.classList.add('cur'); m.appendChild(el); return el; });
+      const t = document.createElement('span'); t.className = 't'; t.textContent = name;
+      const k = document.createElement('span'); k.className = 'k'; k.textContent = exs[0];
+      c.append(m, t, k); box.appendChild(c);
+      // show project i: its reel and its name
+      c.show = i => { [...m.children].forEach((el, j) => el.classList.toggle('cur', j === i)); k.textContent = exs[i] || exs[0]; };
+      c.n = srcs.length; c.next = 0;
+      // clicking an area takes the page down to the project it is showing
+      c.addEventListener('click', e => {
+        if (!document.getElementById('stage').classList.contains('s2') || window.parent === window) return;
+        e.stopPropagation(); window.parent.postMessage({ landingWork: k.textContent }, '*');
+      });
+      return c;
+    });
+    const pct = w => { const t = w.reduce((a, b) => a + b, 0); return w.map(x => x / t * 100); };
+    let lead = -1, timer = null, showT = null;
+    function place() { if (!document.getElementById('stage').classList.contains('s2')) return; box.style.setProperty('--tg-top', (desHead.offsetTop + desHead.offsetHeight) + 'px'); }   // frozen while closing
+    function layout() {
+      place();
+      const L = parseFloat(getComputedStyle(box).getPropertyValue('--line')) || 1;
+      const rowH = Array(ROWS).fill(1), rowCols = PER.map(n => Array(n).fill(1));
+      if (lead >= 0) { let r = 0, c = lead; while (c >= PER[r]) c -= PER[r++]; rowCols[r][c] = GROW.col; rowH[r] = GROW.row; }
+      const R = pct(rowH), ry = [0], boxes = []; R.forEach((h, i) => ry.push(ry[i] + h));
+      for (let r = 0; r < ROWS; r++) {
+        const C = pct(rowCols[r]), cx = [0]; C.forEach((w, i) => cx.push(cx[i] + w));
+        for (let c = 0; c < PER[r]; c++) boxes.push({ l: cx[c], r: cx[c + 1], t: ry[r], b: ry[r + 1] });
+      }
+      const W = box.clientWidth, H = box.clientHeight, Lb = lead >= 0 ? boxes[lead] : null, e = .05;
+      const touch = (x, y) => Lb && x >= Lb.l - e && x <= Lb.r + e && y >= Lb.t - e && y <= Lb.b + e;
+      const ov = (a0, a1, b0, b1) => Math.min(a1, b1) - Math.max(a0, b0) > e;
+      boxes.forEach((b, i) => {
+        const d = cells[i], oL = b.l <= e ? L : 0, oT = b.t <= e ? L : 0, oR = L, oB = L;   // every edge tucks under its neighbour or the grid's own frame, so the bottom line is drawn once
+        Object.assign(d.style, { left: `calc(${b.l}% - ${oL}px)`, top: `calc(${b.t}% - ${oT}px)`,
+          width: `calc(${b.r - b.l}% + ${oL + oR}px)`, height: `calc(${b.b - b.t}% + ${oT + oB}px)` });
+        const short = Math.min((b.r - b.l) / 100 * W, (b.b - b.t) / 100 * H), cw = (b.r - b.l) / 100 * W;
+        let rad = [0, 0, 0, 0];   // top left, top right, bottom right, bottom left
+        if (Lb && i !== lead) {
+          const side = { t: Math.abs(b.t - Lb.b) < e && ov(b.l, b.r, Lb.l, Lb.r), b: Math.abs(b.b - Lb.t) < e && ov(b.l, b.r, Lb.l, Lb.r),
+                         l: Math.abs(b.l - Lb.r) < e && ov(b.t, b.b, Lb.t, Lb.b), r: Math.abs(b.r - Lb.l) < e && ov(b.t, b.b, Lb.t, Lb.b) };
+          const k = (x, y, s1, s2) => (touch(x, y) || side[s1] || side[s2]) ? short / 2 * SOFTEN : short * FAR;
+          rad = [k(b.l, b.t, 't', 'l'), k(b.r, b.t, 't', 'r'), k(b.r, b.b, 'b', 'r'), k(b.l, b.b, 'b', 'l')];
+        }
+        d.style.borderRadius = rad.map(r => r.toFixed(1) + 'px').join(' ');
+        d.classList.toggle('lead', i === lead);   // its reel rises as it grows
+        d.classList.toggle('crowd', lead >= 0 && i !== lead);   // the others' names shrink with their cells
+        // text steps in from each rounded corner, so it never sits on a curve
+        const t = d.querySelector('.t'), kk = d.querySelector('.k'), m = d.querySelector('.m');
+        Object.assign(kk.style, { left: (12 + rad[3] * .32) + 'px', bottom: (12 + rad[3] * .32) + 'px' });
+        t.style.letterSpacing = lead < 0 || i === lead ? '-0.02em' : (cw < 140 ? '-0.1em' : '-0.05em');
+      });
+    }
+    // shuffled turns: every area takes the space once, in a random order, before any
+    // area comes back; a new round never starts with the area that just had it
+    let bag = [];
+    const pick = () => {
+      if (!bag.length) {
+        bag = D.map((_, i) => i);
+        for (let i = bag.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [bag[i], bag[j]] = [bag[j], bag[i]]; }
+        if (bag[0] === lead) bag.push(bag.shift());
+      }
+      return bag.shift();
+    };
+    function step() {
+      clearTimeout(showT); cells.forEach(c => c.classList.remove('on'));
+      lead = pick();
+      const L = cells[lead]; if (L.n > 1) { L.show(L.next); L.next = (L.next + 1) % L.n; }   // next project in this area
+      layout();
+      const me = lead; showT = setTimeout(() => { if (lead === me) cells[me].classList.add('on'); }, SHOW);
+      timer = setTimeout(step, HOLD);
+    }
+    function play(on) { box.querySelectorAll('video').forEach(v => on ? v.play().catch(() => {}) : v.pause()); }
+    function reset() { clearTimeout(timer); clearTimeout(showT); lead = -1; cells.forEach(c => c.classList.remove('on')); layout(); }
+    addEventListener('resize', layout);
+    if (window.ResizeObserver) new ResizeObserver(place).observe(desHead);
+    reset();
+    return {
+      start() { reset(); play(true); if (!still) timer = setTimeout(step, 450 + 150); },   // the first area moves in right away
+      stop() { reset(); play(false); }
+    };
+  })();
+
+  // ---- the six-cell study under the name ------------------------------------
+  // Loop: six squares → all round their corners (the grid shown behind) → squares
+  // again → a random cell shoves in hard and keeps spreading, squeezing the others
+  // thin, a random number of times → equal again. Corners that touch the big cell,
+  // or whose side runs along it, round fully; the rest soften slightly. Runs only
+  // while the name panel is open.
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  addEventListener('keydown', e => { if (e.key === 'Tab') document.documentElement.classList.add('kbd'); });
+  addEventListener('pointerdown', () => document.documentElement.classList.remove('kbd'));
+  const tg = (() => {
+    const box = document.getElementById('tgrid'), COLS = 3, ROWS = 2;
+    const SOFT = 0.42;  // how round the corners get in the all-round stage
+    const FAR = 0.16;   // corners that don't touch the big cell: a light softening only
+    const SHOVE = { col: 7, row: 2.9, dur: '.42s', ease: 'cubic-bezier(.2,1.9,.4,1)', calm: 'cubic-bezier(.25,1,.45,1)' };  // the sudden shove, hard and overshooting
+    // the gentle one: still a push, never a merge, but slow and modest, and the others give way calmly
+    const GENTLE = { col: 3.4, row: 1.8, dur: '2.4s', ease: 'cubic-bezier(.45,0,.25,1)' };
+    const GENTLE_ODDS = 0.25;   // about one takeover in four is gentle; the rest are aggressive
+    const SPREAD = { col: 11, row: 3.6, dur: '1.8s', ease: 'cubic-bezier(.4,0,.2,1)' };   // then it keeps claiming more
+    const CALM = { dur: '.8s', ease: 'cubic-bezier(.65,0,.35,1)' };
+    const rings = [...Array(6)].map(() => { const d = document.createElement('i'); d.className = 'ring'; box.appendChild(d); return d; });
+    const vls = [...Array(4)].map(() => { const d = document.createElement('b'); d.className = 'ln v'; box.appendChild(d); return d; });
+    const hl = document.createElement('b'); hl.className = 'ln h'; box.appendChild(hl);
+    const pct = w => { const t = w.reduce((a, b) => a + b, 0); return w.map(x => x / t * 100); };
+    let last = [];   // where each cell is heading, for finding the cell under the cursor
+    let pair = null;   // no longer used for merging; kept so resets stay simple
+    let lead = -1, roundAll = false, size = SHOVE, timer = null, sub = null, stage = 'equal', left = 0, done = null;
+    // --xease is the same move without overshoot: the text follows the cells on it, so it never bounces
+    const motion = m => { box.style.setProperty('--tdur', m.dur); box.style.setProperty('--tease', m.ease); box.style.setProperty('--xease', m.calm || m.ease); };
+    const head = box.parentElement.querySelector('.head');
+    const about = document.getElementById('about');
+    // the grid starts right under the line about Jihae
+    // the grid starts right under the name
+    function place() { if (!document.getElementById('stage').classList.contains('s1')) return; box.style.setProperty('--tg-top', (head.offsetTop + head.offsetHeight) + 'px'); }   // frozen while closing
+
+    // ---- the words ---------------------------------------------------------------
+    // WORDS sit in the six cells. The bio is told in short LINES under the name:
+    // the first shows with the rounded stage, and each takeover moves to the next.
+    const WORDS = ['people', 'elements', 'technology', 'things', 'culture', 'you'];
+    const LINES = [
+      'Korean-born designer based in the Netherlands.',
+      'Working with space as something negotiated, not given.',
+      'Moving between cultures.',
+      'Looking at how personal space is claimed, shared and violated',
+      'in a crowded metro, in the gap between two letters,',
+      'and in a digital world with no physical distance at all.',
+      'Small shifts in spacing, across interaction, motion and 3D.'
+    ];
+    const tx = WORDS.map(t => { const w = document.createElement('span'); w.className = 'tx'; w.textContent = t; box.appendChild(w); return w; });
+    const roll = document.getElementById('roll');
+    LINES.forEach(t => { const p = document.createElement('p'); p.textContent = t; roll.appendChild(p); });
+    let li = 0;
+    const big = document.createElement('span'); big.className = 'say'; box.appendChild(big);
+    let host = -1, showT = null;   // the cell carrying the line
+    // the bio line sits inside the cell carrying it, like the words
+    function place_say(cell, pl, pt, width) {
+      if (big.parentNode !== cell) cell.appendChild(big);
+      big.style.left = pl + 'px'; big.style.top = pt + 'px';
+      big.style.width = Math.min(width, 520) + 'px';
+    }
+    function hideSay() { clearTimeout(showT); big.classList.remove('on'); }
+    function showSay(text) { big.textContent = text; big.classList.add('on'); }
+    // show lines li and li+1: move the stack up by li rows
+    function rollTo(i, now) {
+      li = i;
+      roll.classList.toggle('jump', !!(now || still));
+      const row = roll.firstElementChild ? roll.firstElementChild.offsetHeight : 0;
+      roll.style.transform = `translateY(${-i * row}px)`;
+      if (now || still) { void roll.offsetWidth; roll.classList.remove('jump'); }
+    }
+    function layout() {
+      place();
+      const L = parseFloat(getComputedStyle(box).getPropertyValue('--line')) || 1;
+      box.classList.toggle('keep', roundAll);
+      const rowH = [1, 1], rowCols = [[1, 1, 1], [1, 1, 1]];
+      if (lead >= 0) { const r = Math.floor(lead / COLS), c = lead % COLS; rowCols[r][c] = size.col; rowH[r] = size.row; }
+      const R = pct(rowH), ry = [0, R[0], 100], boxes = [];
+      for (let r = 0; r < ROWS; r++) {
+        const C = pct(rowCols[r]), cx = [0]; C.forEach((w, i) => cx.push(cx[i] + w));
+        for (let c = 0; c < COLS; c++) boxes.push({ l: cx[c], r: cx[c + 1], t: ry[r], b: ry[r + 1] });
+        for (let k = 1; k < COLS; k++) {
+          const ln = vls[r * 2 + k - 1], top = r ? ry[1] : -2, bot = r ? 102 : ry[1];
+          Object.assign(ln.style, { left: cx[k] + '%', top: `calc(${top}% - ${r ? L : 0}px)`, height: `calc(${bot - top}% + ${2 * L}px)` });
+        }
+      }
+      hl.style.top = ry[1] + '%';
+      last = boxes;
+      const W = box.clientWidth, H = box.clientHeight, Lb = lead >= 0 ? boxes[lead] : null, e = .05;
+      const touch = (x, y) => Lb && x >= Lb.l - e && x <= Lb.r + e && y >= Lb.t - e && y <= Lb.b + e;
+      const ov = (a0, a1, b0, b1) => Math.min(a1, b1) - Math.max(a0, b0) > e;
+      boxes.forEach((b, i) => {
+        // outer edges sit under the frame, inner edges overlap their neighbour's
+        // the top row's top edge tucks under the fixed line under the name
+        // the top and bottom rows tuck their outer edges under the fixed top and bottom lines
+        // every outer edge tucks under the panel's edge; inner edges overlap their neighbour's
+        const d = rings[i], oL = b.l <= e ? L : 0, oT = b.t <= e ? L : 0, oR = L, oB = L;
+        Object.assign(d.style, { left: `calc(${b.l}% - ${oL}px)`, top: `calc(${b.t}% - ${oT}px)`,
+          width: `calc(${b.r - b.l}% + ${oL + oR}px)`, height: `calc(${b.b - b.t}% + ${oT + oB}px)` });
+        const short = Math.min((b.r - b.l) / 100 * W, (b.b - b.t) / 100 * H);
+        let rad = [0, 0, 0, 0];   // top left, top right, bottom right, bottom left
+        if (roundAll) rad = [1, 1, 1, 1].map(() => short * SOFT);
+        else if (Lb && i !== lead) {
+          const side = { t: Math.abs(b.t - Lb.b) < e && ov(b.l, b.r, Lb.l, Lb.r), b: Math.abs(b.b - Lb.t) < e && ov(b.l, b.r, Lb.l, Lb.r),
+                         l: Math.abs(b.l - Lb.r) < e && ov(b.t, b.b, Lb.t, Lb.b), r: Math.abs(b.r - Lb.l) < e && ov(b.t, b.b, Lb.t, Lb.b) };
+          const k = (x, y, s1, s2) => (touch(x, y) || side[s1] || side[s2]) ? short / 2 : short * FAR;
+          rad = [k(b.l, b.t, 't', 'l'), k(b.r, b.t, 't', 'r'), k(b.r, b.b, 'b', 'r'), k(b.l, b.b, 'b', 'l')];
+        }
+        d.style.borderRadius = rad.map(r => r.toFixed(1) + 'px').join(' ');
+        // the cell's word sits inside the cell (clipped by its outline, so it can never
+        // cross a line) and steps in from the rounded corners
+        const w = tx[i], cw = (b.r - b.l) / 100 * W;
+        if (w.parentNode !== d) d.appendChild(w);
+        const pl = 12 + rad[0] * .32, pt = 10 + rad[0] * .32, pr = 10 + rad[1] * .32;
+        const pad = pl;
+        w.style.left = pl + 'px'; w.style.top = pt + 'px';
+        w.style.width = Math.max(cw - pl - pr, 4) + 'px';
+        w.style.overflowWrap = Lb && i !== lead ? 'anywhere' : 'normal';   // only crowded words break apart
+        w.style.opacity = i === host && big.classList.contains('on') ? 0 : 1;   // the cell showing the line gives up its word
+        if (i === host) place_say(d, pl, pt, Math.max(cw - pl - pr, 60));
+        w.style.letterSpacing = lead < 0 ? '0em' : i === lead ? '0.14em' : (cw < 90 ? '-0.12em' : '-0.06em');
+      });
+    }
+    const pick = () => { let n; do { n = Math.floor(Math.random() * 6); } while (n === lead); return n; };
+    let gentle = false;
+    function step() {
+      if (stage === 'equal') { stage = 'round'; motion(CALM); roundAll = true; lead = -1; pair = null; if (li) rollTo(0, true); host = 0; showSay(LINES[0]); layout(); timer = setTimeout(step, 1700); return; }
+      if (stage === 'round') { stage = 'square'; motion(CALM); roundAll = false; lead = -1; pair = null; layout(); left = LINES.length - 1; timer = setTimeout(step, 900); return; }   // one takeover per line, so the whole bio plays
+      if (left > 0) {
+        intro = true;   // the opening (round, then square) has played: the visitor can intrude now
+        left--; stage = 'lead'; roundAll = false;
+        // cells never merge: every takeover pushes into the others. Mostly hard, now and
+        // then slow and soft (never twice in a row)
+        pair = null; lead = pick();
+        gentle = !gentle && Math.random() < GENTLE_ODDS;
+        if (gentle) {
+          const n = Math.min(li + 1, LINES.length - 1); rollTo(Math.min(n, LINES.length - 2)); li = n;
+          hideSay(); host = lead; motion(GENTLE); size = GENTLE; layout();
+          showT = setTimeout(() => { showSay(LINES[n]); layout(); }, 1800);
+          timer = setTimeout(step, 4200); return;
+        }
+        // the line leaves at once as the shove starts, and the next one simply appears in the
+        // big cell once it has pushed in and starts to spread, already where it will stay
+        const n = Math.min(li + 1, LINES.length - 1); rollTo(Math.min(n, LINES.length - 2)); li = n;
+        hideSay(); host = lead;
+        motion(SHOVE); size = SHOVE; layout();
+        sub = setTimeout(() => {
+          motion(SPREAD); size = SPREAD; layout();
+          showT = setTimeout(() => { showSay(LINES[n]); layout(); }, 350);
+        }, 620);
+        timer = setTimeout(step, 3500); return;   // long enough to read each line
+      }
+      stage = 'equal'; motion(CALM); lead = -1; pair = null; hideSay(); layout(); timer = setTimeout(step, 1800);
+      if (done) { const d = done; done = null; d(); }   // the bio has played through once
+    }
+    function reset() { clearTimeout(timer); clearTimeout(sub); stage = 'equal'; lead = -1; pair = null; roundAll = false; rollTo(0, true); hideSay(); host = 0; showSay(LINES[0]); motion(CALM); layout(); }
+    addEventListener('resize', layout);
+    // the name grows and shrinks as the panels open and close; keep the grid right under it
+    head.addEventListener('transitionend', place);
+    if (window.ResizeObserver) { const ro = new ResizeObserver(place); ro.observe(head); ro.observe(about); }
+    reset();
+
+    // ---- the visitor as the intruder --------------------------------------------
+    // Once the opening has played, the cell under the cursor shoves in and crowds the
+    // others. Moving the cursor stops the loop; after a few still seconds it carries on.
+    const FOLLOW = { col: SPREAD.col, row: SPREAD.row, dur: '.75s', ease: 'cubic-bezier(.25,1.45,.45,1)', calm: 'cubic-bezier(.25,1,.45,1)' };
+    const IDLE = 3000;
+    let intro = false, follow = false, idleT = null, on = false;
+    // the cell under the cursor pushes into the others. A normal or quick move shoves hard;
+    // only a deliberately slow approach makes it push in gently. Never a merge.
+    const SLOW = 0.45;   // px per ms
+    let px = null, pt = 0, speed = 1;
+    function point(e) {
+      const now = performance.now();
+      if (px) speed = speed * .6 + Math.hypot(e.clientX - px[0], e.clientY - px[1]) / Math.max(now - pt, 1) * .4;
+      px = [e.clientX, e.clientY]; pt = now;
+      if (still || !on || !intro) return;
+      if (!follow) { follow = true; clearTimeout(timer); clearTimeout(sub); hideSay(); roundAll = false; }
+      clearTimeout(idleT);
+      idleT = setTimeout(() => {   // still for a while: the takeovers carry on from here
+        follow = false; stage = 'square'; left = LINES.length - 1; timer = setTimeout(step, 600);
+      }, IDLE);
+      const r = box.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width * 100, y = (e.clientY - r.top) / r.height * 100;
+      if (x < 0 || x > 100 || y < 0 || y > 100) return;   // over the name: nothing moves
+      const i = last.findIndex(b => x >= b.l && x <= b.r && y >= b.t && y <= b.b);
+      if (i < 0) return;
+      if (i === lead) return;
+      const m = speed < SLOW ? GENTLE : FOLLOW;
+      lead = i; pair = null; host = -1; size = m; motion(m); layout();
+    }
+    box.parentElement.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') point(e); });
+    const off = () => { on = false; intro = false; follow = false; pair = null; clearTimeout(idleT); };
+    return {
+      start() { off(); reset(); on = true; if (still) return; timer = setTimeout(step, 450); },   // starts on the same beat as ", based in the Netherlands": the sentence and the study arrive together
+      stop() { off(); reset(); },
+      whenDone(f) { done = f; }
+    };
+  })();
+
+  function go(s) {
+    current = s;
+    arrived();   // opening a panel before the line has finished drawing ends the arrival at once
+    if (s === 's1') tg.start(); else tg.stop();
+    if (s === 's2') dg.start(); else dg.stop();
+    fit(s);
+    const was = stage.classList.contains('s1') ? 's1' : stage.classList.contains('s2') ? 's2' : null;
+    if (was === 's1' && s !== 's1') lockLines(); else unlockLines();   // measured before anything changes
+    stage.className = 'stage ' + s;
+    // the panel that just closed keeps its words in place while they fade out
+    clearTimeout(closeT);
+    if (was && was !== s) {
+      stage.classList.add(was === 's1' ? 'closing-name' : 'closing-des');
+      closeT = setTimeout(() => { stage.classList.remove('closing-name', 'closing-des'); unlockLines(); }, 850);   // the (quicker) close time
+    }
+    clearTimeout(settleT);
+    if (s !== 's0') settleT = setTimeout(() => { if (current === s) { stage.classList.add('settled'); window.parent.postMessage({ landingOpen: true }, '*'); } }, 850);   // the heading's size change is .8s
+  }
+  let settleT = null, closeT = null;
+  // The words after the name are wrapped one by one, so that on closing each can be kept on
+  // the line it was on: breaks go in where the lines broke, and the heading stops wrapping.
+  // As the name shrinks the words then move only sideways, never up a line.
+  const nameReveal = document.querySelector('.name .head .reveal');
+  nameReveal.innerHTML = nameReveal.textContent.split(' ').map(w => `<span class="w${w === ',' ? ' cm' : ''}">${w}</span>`).join(' ');
+  function lockLines() {
+    unlockLines();
+    const ws = [...nameReveal.querySelectorAll('.w')];
+    let top = ws.length ? ws[0].getBoundingClientRect().top : 0;
+    ws.forEach((w, k) => {
+      const t = w.getBoundingClientRect().top;
+      if (k && t > top + 2) { const br = document.createElement('br'); br.className = 'lock'; w.before(br); top = t; }
+    });
+  }
+  function unlockLines() { nameReveal.querySelectorAll('br.lock').forEach(b => b.remove()); }
+
+  // the arrival line: when it has drawn to the bottom, the panels' own outlines take over
+  const drawline = document.getElementById('drawline');
+  // line it up with the real divider to the pixel: the designs panel's own leading edge
+  {
+    const g = document.querySelector('.panel.designs').getBoundingClientRect();
+    if (phone.matches) drawline.style.top = g.top + 'px'; else drawline.style.left = g.left + 'px';
+  }
+  // after the arrival the page opens Designs and stays there: it is the home state
+  const HOME = 's2';
+  let touched = false;   // once the visitor has clicked, the page no longer opens anything by itself
+  function arrived() {
+    if (!drawline.isConnected) return; drawline.remove(); stage.classList.remove('arriving');
+    setTimeout(() => { if (!touched && current !== HOME) go(HOME); }, 250);
+  }
+  drawline.addEventListener('animationend', arrived);
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) arrived();
+
+  // ---- how the panels open ----------------------------------------------------
+  // The page rests on the first screen, both halves equal. Clicking a panel opens it,
+  // clicking the other panel switches to it, and clicking the open one again returns to
+  // the equal halves. After the arrival, Designs opens by itself and stays; that is home.
+  const hover = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  let hoverT = null;
+  function want(s) {
+    clearTimeout(hoverT);
+    // a short pause, so sweeping across the dividing line doesn't flicker
+    hoverT = setTimeout(() => { if (current !== s) go(s); }, 120);
+  }
+  document.querySelectorAll('.panel').forEach(p => {
+    // clicking Jihae Cha opens its own content; clicking it again (or Designs) goes back to Designs
+    const pick = () => { touched = true; clearTimeout(hoverT); const s = p.dataset.state;
+      go(current === s ? HOME : s); };
+    p.addEventListener('click', pick);
+    p.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+  });
+</script>
+
+<script>
+  /* ---- rounding by proximity ---------------------------------------
+     The corners of the panels and of the small grid under the name round
+     as the cursor comes near them: the closer it is to a corner, the
+     rounder that corner, up to a full curve (half the cell's shorter side).
+     Only the corners around the cursor move, never a whole cell at once. Mouse and trackpad only;
+     touch and reduced motion keep the square grid. */
+  (function () {
+    if (!matchMedia('(hover: hover) and (pointer: fine)').matches ||
+        matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const REACH = 240;   // how close the cursor has to be to a corner for that corner to start rounding (px)
+    const PANEL_MAX = 180; // the most the big panels round (px)
+    const cells = [...document.querySelectorAll('.panel')];
+    let at = null, tick = null;
+    function apply() {
+      cells.forEach(c => {
+        if (!at) { c.style.setProperty('--r', '0px'); return; }
+        // only the corners near the cursor round, each by how close the cursor is to it
+        const r = c.getBoundingClientRect(), x = at[0], y = at[1];
+        let full = Math.min(r.width, r.height) / 2;
+        const head = c.querySelector('.head'), headPad = head ? parseFloat(getComputedStyle(head).paddingTop) || 16 : 0;
+        if (c.classList.contains('panel')) full = Math.min(full, PANEL_MAX);
+        const radii = [[r.left, r.top], [r.right, r.top], [r.right, r.bottom], [r.left, r.bottom]]
+          // eased, so the corner right by the cursor rounds fully and corners further off barely move
+          .map(([cx, cy], k) => {
+            let r = full * Math.max(0, 1 - Math.hypot(x - cx, y - cy) / REACH) ** 2;
+            // the top corners sit next to the heading: a curve wider than about 3.4x the padding
+            // would cut into the letters, so those corners stop short of the text
+            if (k < 2 && head) r = Math.min(r, headPad * 3.2);
+            return r.toFixed(1) + 'px';
+          });
+        c.style.setProperty('--r', radii.join(' '));
+      });
+    }
+    addEventListener('pointermove', e => {
+      at = [e.clientX, e.clientY]; apply();
+      // the grid keeps shifting under a still cursor, so keep it updated while the cursor is here
+      if (!tick) tick = setInterval(apply, 250);
+    }, { passive: true });
+    document.documentElement.addEventListener('pointerleave', () => {
+      at = null; apply(); clearInterval(tick); tick = null;
+    });
+  })();
+</script>
+
+<script>
+  /* inside the portfolio page: a scroll over the landing moves the page underneath */
+  addEventListener('message', e => { const o = e.data && e.data.landingOpen; if (o === 's1' || o === 's2') { touched = true; go(o); } });
+  if (window.parent !== window) {
+    addEventListener('message', e => {
+      const t = e.data && e.data.landingTheme;
+      if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+    });
+    try { const t = window.parent.document.documentElement.dataset.theme; if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+    const send = dy => window.parent.postMessage({ landingScroll: dy }, '*');
+    addEventListener('wheel', e => send(e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1)), { passive: true });
+    let ty = null;
+    addEventListener('touchstart', e => { ty = e.touches[0].clientY; }, { passive: true });
+    addEventListener('touchmove', e => { if (ty === null) return; const y = e.touches[0].clientY; send(ty - y); ty = y; }, { passive: true });
+    addEventListener('touchend', () => { ty = null; }, { passive: true });
+  }
+</script>
+</body>
+</html>
