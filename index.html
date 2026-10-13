@@ -851,6 +851,7 @@
     .stage.s2 { grid-template-rows: var(--s2rows, 14% 86%); }   /* the name&#x27;s row is just tall enough for the name: set in fit() */
     .panel.name { margin: calc(-1 * var(--line)) calc(-1 * var(--line)) 0 calc(-1 * var(--line)); }
     .panel.designs { margin: calc(-1 * var(--line)); }
+    .s1 .panel.designs { visibility: hidden; transition: visibility 0s linear var(--t); }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -940,7 +941,7 @@
 &lt;main class=&quot;stage arriving&quot; id=&quot;stage&quot;&gt;
   &lt;i class=&quot;drawline&quot; id=&quot;drawline&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;
   &lt;section class=&quot;panel name&quot; data-state=&quot;s1&quot; tabindex=&quot;0&quot; role=&quot;button&quot; aria-label=&quot;About Jihae Cha&quot;&gt;
-    &lt;h1 class=&quot;head&quot;&gt;Jihae Cha&lt;span class=&quot;reveal&quot;&gt;, based in the&amp;nbsp;Netherlands&lt;/span&gt;&lt;/h1&gt;
+    &lt;h1 class=&quot;head&quot;&gt;Jihae Cha&lt;span class=&quot;reveal&quot;&gt;, based&amp;nbsp;in the&amp;nbsp;Netherlands&lt;/span&gt;&lt;/h1&gt;
     &lt;div class=&quot;about sr&quot; id=&quot;about&quot;&gt;&lt;div class=&quot;roll&quot; id=&quot;roll&quot;&gt;&lt;/div&gt;&lt;/div&gt;
     &lt;div class=&quot;ab&quot; id=&quot;ab&quot;&gt;
       &lt;div class=&quot;modes&quot; role=&quot;group&quot; aria-label=&quot;View&quot;&gt;
@@ -1001,6 +1002,13 @@
     if (phone.matches) {
       // stacked: both panels are full width, so both headings simply share one size
       n = d = Math.min(width(nameHead, &#x27;Jihae Cha&#x27;, 1), width(desHead, s === &#x27;s2&#x27; ? &#x27;Designs that move&#x27; : &#x27;Designs&#x27;, 1));
+      if (s === &#x27;s1&#x27;) {   // open, Jihae Cha has the screen to itself: the sentence reads larger, as large as its longest line allows
+        const t = document.createElement(&#x27;span&#x27;); t.textContent = &#x27;the\u00a0Netherlands&#x27;;   // kept on one line
+        Object.assign(t.style, { position: &#x27;absolute&#x27;, visibility: &#x27;hidden&#x27;, whiteSpace: &#x27;nowrap&#x27;, fontSize: &#x27;100px&#x27;, transition: &#x27;none&#x27; });
+        nameHead.appendChild(t); const word = t.getBoundingClientRect().width / 100; t.remove();   // its width per pixel of size
+        const room = W - parseFloat(getComputedStyle(nameHead).paddingLeft) * 2 - 4;
+        n = Math.min(room / word * .96, width(nameHead, &#x27;Jihae Cha&#x27;, 1) * .78) / SCALE;
+      }
     } else if (s === &#x27;s0&#x27;) {
       n = d = Math.min(width(nameHead, &#x27;Jihae Cha&#x27;, .5), width(desHead, &#x27;Designs&#x27;, .5));
     } else {
@@ -1020,7 +1028,7 @@
       stage.style.setProperty(&#x27;--s2rows&#x27;, need + &#x27;px calc(100% - &#x27; + need + &#x27;px)&#x27;);
       // and the other way round: with Jihae Cha open, Designs&#x27; row holds just Designs
       const needD = Math.round(pad * 2 + d * SCALE * .95 + L);
-      stage.style.setProperty(&#x27;--s1rows&#x27;, &#x27;calc(100% - &#x27; + needD + &#x27;px) &#x27; + needD + &#x27;px&#x27;);
+      stage.style.setProperty(&#x27;--s1rows&#x27;, &#x27;100% 0px&#x27;);   // with Jihae Cha open, Designs moves off the screen and the name fills it
       stage.dataset.desH = needD;   // read when the landing grows on phones
     } else { stage.style.removeProperty(&#x27;--s2rows&#x27;); stage.style.removeProperty(&#x27;--s1rows&#x27;); }
     // line the two headings up along the top of their capitals: the smaller one stays put and
@@ -1701,7 +1709,8 @@
         text.style.setProperty(&#x27;--fit&#x27;, lo + &#x27;px&#x27;);
       });
     }
-    new MutationObserver(check).observe(stage, { attributes: true, attributeFilter: [&#x27;class&#x27;] });
+    let late = null;
+    new MutationObserver(() =&gt; { check(); clearTimeout(late); late = setTimeout(check, 750); }).observe(stage, { attributes: true, attributeFilter: [&#x27;class&#x27;] });   // again once the rows have finished moving
     let w = innerWidth, h = innerHeight;
     addEventListener(&#x27;resize&#x27;, () =&gt; { if (innerWidth !== w || Math.abs(innerHeight - h) &gt; 100) { w = innerWidth; h = innerHeight; check(); } });
   })();
@@ -3012,6 +3021,20 @@
       }
       if(dy) scroller.scrollBy({ top:dy, left:0 });
     });
+    /* touch screens: the page scrolls natively over the landing (a frame never hands a swipe on
+       smoothly), and a tap is passed into the landing at the same spot */
+    var frame=document.querySelector('.landing-frame'), band=document.querySelector('.band--landing');
+    if(frame && band && matchMedia('(hover: none)').matches){
+      frame.style.pointerEvents='none';
+      band.addEventListener('click', function(e){
+        if(e.target.closest('button, a') && e.target!==band) return;   // the page's own controls over the landing
+        var w=frame.contentWindow, d=frame.contentDocument; if(!w||!d) return;
+        var r=frame.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top, el=d.elementFromPoint(x,y);
+        if(!el) return;
+        var a=el.closest('a[target="_blank"]'); if(a){ window.open(a.href,'_blank','noopener'); return; }
+        el.dispatchEvent(new w.MouseEvent('click',{ bubbles:true, cancelable:true, view:w, clientX:x, clientY:y }));
+      });
+    }
     addEventListener('message', function(e){ if(e.data && e.data.landingOpen) root.classList.add('landing-open'); });
     addEventListener('message', function(e){ if(e.data && typeof e.data.landingName==='boolean') root.classList.toggle('jihae-open', e.data.landingName); });
     addEventListener('message', function(e){ if(!e.data || typeof e.data.landingGrow!=='number') return; var b=document.querySelector('.band--landing'); if(b) b.style.height=e.data.landingGrow ? 'calc(100svh + '+e.data.landingGrow+'px)' : ''; });   // phones: the landing grows so the whole bio shows

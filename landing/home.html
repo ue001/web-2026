@@ -252,6 +252,7 @@
     .stage.s2 { grid-template-rows: var(--s2rows, 14% 86%); }   /* the name's row is just tall enough for the name: set in fit() */
     .panel.name { margin: calc(-1 * var(--line)) calc(-1 * var(--line)) 0 calc(-1 * var(--line)); }
     .panel.designs { margin: calc(-1 * var(--line)); }
+    .s1 .panel.designs { visibility: hidden; transition: visibility 0s linear var(--t); }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -333,7 +334,7 @@
 <main class="stage arriving" id="stage">
   <i class="drawline" id="drawline" aria-hidden="true"></i>
   <section class="panel name" data-state="s1" tabindex="0" role="button" aria-label="About Jihae Cha">
-    <h1 class="head">Jihae Cha<span class="reveal">, based in the&nbsp;Netherlands</span></h1>
+    <h1 class="head">Jihae Cha<span class="reveal">, based&nbsp;in the&nbsp;Netherlands</span></h1>
     <div class="about sr" id="about"><div class="roll" id="roll"></div></div>
     <div class="ab" id="ab">
       <div class="modes" role="group" aria-label="View">
@@ -394,6 +395,13 @@
     if (phone.matches) {
       // stacked: both panels are full width, so both headings simply share one size
       n = d = Math.min(width(nameHead, 'Jihae Cha', 1), width(desHead, s === 's2' ? 'Designs that move' : 'Designs', 1));
+      if (s === 's1') {   // open, Jihae Cha has the screen to itself: the sentence reads larger, as large as its longest line allows
+        const t = document.createElement('span'); t.textContent = 'the\u00a0Netherlands';   // kept on one line
+        Object.assign(t.style, { position: 'absolute', visibility: 'hidden', whiteSpace: 'nowrap', fontSize: '100px', transition: 'none' });
+        nameHead.appendChild(t); const word = t.getBoundingClientRect().width / 100; t.remove();   // its width per pixel of size
+        const room = W - parseFloat(getComputedStyle(nameHead).paddingLeft) * 2 - 4;
+        n = Math.min(room / word * .96, width(nameHead, 'Jihae Cha', 1) * .78) / SCALE;
+      }
     } else if (s === 's0') {
       n = d = Math.min(width(nameHead, 'Jihae Cha', .5), width(desHead, 'Designs', .5));
     } else {
@@ -413,7 +421,7 @@
       stage.style.setProperty('--s2rows', need + 'px calc(100% - ' + need + 'px)');
       // and the other way round: with Jihae Cha open, Designs' row holds just Designs
       const needD = Math.round(pad * 2 + d * SCALE * .95 + L);
-      stage.style.setProperty('--s1rows', 'calc(100% - ' + needD + 'px) ' + needD + 'px');
+      stage.style.setProperty('--s1rows', '100% 0px');   // with Jihae Cha open, Designs moves off the screen and the name fills it
       stage.dataset.desH = needD;   // read when the landing grows on phones
     } else { stage.style.removeProperty('--s2rows'); stage.style.removeProperty('--s1rows'); }
     // line the two headings up along the top of their capitals: the smaller one stays put and
@@ -1167,7 +1175,8 @@
         text.style.setProperty('--fit', lo + 'px');
       });
     }
-    new MutationObserver(check).observe(stage, { attributes: true, attributeFilter: ['class'] });
+    let late = null;
+    new MutationObserver(() => { check(); clearTimeout(late); late = setTimeout(check, 750); }).observe(stage, { attributes: true, attributeFilter: ['class'] });   // again once the rows have finished moving
     let w = innerWidth, h = innerHeight;
     addEventListener('resize', () => { if (innerWidth !== w || Math.abs(innerHeight - h) > 100) { w = innerWidth; h = innerHeight; check(); } });
   })();
