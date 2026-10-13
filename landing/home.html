@@ -248,7 +248,7 @@
     :root { --size: clamp(12px, 3.3vw, 14px); --big: clamp(56px, 20vw, 120px); --head: clamp(30px, 10vw, 54px); --lede: clamp(14px, 3.8vw, 17px); }
     .stage, .stage.s1, .stage.s2 { grid-template-columns: 1fr; }
     .stage { grid-template-rows: 1fr 1fr; }
-    .stage.s1 { grid-template-rows: 6fr 1fr; }
+    .stage.s1 { grid-template-rows: var(--s1rows, 6fr 1fr); }   /* Designs' row is just tall enough for Designs: set in fit() */
     .stage.s2 { grid-template-rows: var(--s2rows, 1fr 6fr); }   /* the name's row is just tall enough for the name: set in fit() */
     .panel.name { margin: calc(-1 * var(--line)) calc(-1 * var(--line)) 0 calc(-1 * var(--line)); }
     .panel.designs { margin: calc(-1 * var(--line)); }
@@ -410,7 +410,11 @@
       const pad = parseFloat(getComputedStyle(nameHead).paddingLeft), L = 2;
       const need = Math.round(pad * 2 + n * SCALE * .95 + L), H = stage.clientHeight;
       if (H > need) stage.style.setProperty('--s2rows', need + 'fr ' + (H - need) + 'fr');
-    } else stage.style.removeProperty('--s2rows');
+      // and the other way round: with Jihae Cha open, Designs' row holds just Designs
+      const needD = Math.round(pad * 2 + d * SCALE * .95 + L);
+      if (H > needD) stage.style.setProperty('--s1rows', (H - needD) + 'fr ' + needD + 'fr');
+      stage.dataset.desH = needD;   // read when the landing grows on phones
+    } else { stage.style.removeProperty('--s2rows'); stage.style.removeProperty('--s1rows'); }
     // line the two headings up along the top of their capitals: the smaller one stays put and
     // the larger one moves up by the difference in where each size puts its cap tops in its line
     const c = capTop(), small = Math.min(n, d) * SCALE;
@@ -1114,16 +1118,18 @@
     function check() {
       clearTimeout(t);
       if (!phone.matches || !stage.classList.contains('s1') || window.parent === window) { send(0); return; }
-      // once the panel has opened, grow by what the text is short of; the name's row is 6 of 7 parts
+      // once the panel has opened, grow by what the text is short of
       t = setTimeout(() => {
         // the text's own height plus everything above it in the panel (heading, buttons, line)
         const name = stage.querySelector('.panel.name'), need = name.offsetHeight - text.clientHeight + text.scrollHeight;
         const base = innerHeight - grow;   // the landing's height before it grew
-        send(Math.max(0, Math.ceil(need * 7 / 6 - base)));
+        const des = +stage.dataset.desH || stage.querySelector('.panel.designs').offsetHeight;   // Designs' row keeps its own height
+        send(Math.max(0, Math.ceil(need + des - base)));
       }, 1100);
     }
     new MutationObserver(check).observe(stage, { attributes: true, attributeFilter: ['class'] });
-    addEventListener('resize', () => { send(0); check(); });
+    let w = innerWidth;   // its own growing resizes it too: only a new width measures again
+    addEventListener('resize', () => { if (innerWidth !== w) { w = innerWidth; check(); } });
   })();
 </script>
 </body>

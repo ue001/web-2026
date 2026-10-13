@@ -258,6 +258,7 @@
   .landing-open .landing__down{ opacity:1; pointer-events:auto; }
   /* shown once: it fades out after a few beats, or as soon as the page is scrolled */
   .landing-hinted .landing__down{ opacity:0; pointer-events:none; transition:opacity 1.2s ease; }
+  @media (max-aspect-ratio:4/5){ .jihae-open .landing__down{ opacity:0; pointer-events:none; transition:opacity .3s ease; } }   /* phones: with Jihae Cha open, Designs' row is too short to hold the hint */
   .landing__down{ display:flex; flex-direction:column; align-items:center; gap:.5rem; font:inherit; font-size:13px; letter-spacing:.01em; }
   .landing__hint{ white-space:nowrap; font-weight:500; }
 
@@ -448,7 +449,7 @@
     html[data-mode="look"] .band--work .cell:first-child > .tags{ margin:.5rem 0 0; }
     html[data-mode="look"] .band--work .cell > .meta.push,
     html[data-mode="look"] .band--work .cell > .meta.role{ display:block; margin:0; }
-    html[data-mode="look"] .band--work .cell > .meta.push::after{ content:",\00a0"; }
+    html[data-mode="look"] .band--work .cell > .meta.push:has(+ .meta.role)::after{ content:",\00a0"; }   /* only when a second line follows: a lone year (Monell, Slash) takes no comma */
     html[data-mode="look"] .band--work .cell:first-child > .tags,
     html[data-mode="look"] .band--work .cell > .meta.push,
     html[data-mode="look"] .band--work .cell > .meta.role{ font-size:14px; line-height:1.4; color:var(--ink-soft); }   /* Image would scale these to about 10px here */
@@ -846,7 +847,7 @@
     :root { --size: clamp(12px, 3.3vw, 14px); --big: clamp(56px, 20vw, 120px); --head: clamp(30px, 10vw, 54px); --lede: clamp(14px, 3.8vw, 17px); }
     .stage, .stage.s1, .stage.s2 { grid-template-columns: 1fr; }
     .stage { grid-template-rows: 1fr 1fr; }
-    .stage.s1 { grid-template-rows: 6fr 1fr; }
+    .stage.s1 { grid-template-rows: var(--s1rows, 6fr 1fr); }   /* Designs&#x27; row is just tall enough for Designs: set in fit() */
     .stage.s2 { grid-template-rows: var(--s2rows, 1fr 6fr); }   /* the name&#x27;s row is just tall enough for the name: set in fit() */
     .panel.name { margin: calc(-1 * var(--line)) calc(-1 * var(--line)) 0 calc(-1 * var(--line)); }
     .panel.designs { margin: calc(-1 * var(--line)); }
@@ -1016,7 +1017,11 @@
       const pad = parseFloat(getComputedStyle(nameHead).paddingLeft), L = 2;
       const need = Math.round(pad * 2 + n * SCALE * .95 + L), H = stage.clientHeight;
       if (H &gt; need) stage.style.setProperty(&#x27;--s2rows&#x27;, need + &#x27;fr &#x27; + (H - need) + &#x27;fr&#x27;);
-    } else stage.style.removeProperty(&#x27;--s2rows&#x27;);
+      // and the other way round: with Jihae Cha open, Designs&#x27; row holds just Designs
+      const needD = Math.round(pad * 2 + d * SCALE * .95 + L);
+      if (H &gt; needD) stage.style.setProperty(&#x27;--s1rows&#x27;, (H - needD) + &#x27;fr &#x27; + needD + &#x27;fr&#x27;);
+      stage.dataset.desH = needD;   // read when the landing grows on phones
+    } else { stage.style.removeProperty(&#x27;--s2rows&#x27;); stage.style.removeProperty(&#x27;--s1rows&#x27;); }
     // line the two headings up along the top of their capitals: the smaller one stays put and
     // the larger one moves up by the difference in where each size puts its cap tops in its line
     const c = capTop(), small = Math.min(n, d) * SCALE;
@@ -1647,16 +1652,18 @@
     function check() {
       clearTimeout(t);
       if (!phone.matches || !stage.classList.contains(&#x27;s1&#x27;) || window.parent === window) { send(0); return; }
-      // once the panel has opened, grow by what the text is short of; the name&#x27;s row is 6 of 7 parts
+      // once the panel has opened, grow by what the text is short of
       t = setTimeout(() =&gt; {
         // the text&#x27;s own height plus everything above it in the panel (heading, buttons, line)
         const name = stage.querySelector(&#x27;.panel.name&#x27;), need = name.offsetHeight - text.clientHeight + text.scrollHeight;
         const base = innerHeight - grow;   // the landing&#x27;s height before it grew
-        send(Math.max(0, Math.ceil(need * 7 / 6 - base)));
+        const des = +stage.dataset.desH || stage.querySelector(&#x27;.panel.designs&#x27;).offsetHeight;   // Designs&#x27; row keeps its own height
+        send(Math.max(0, Math.ceil(need + des - base)));
       }, 1100);
     }
     new MutationObserver(check).observe(stage, { attributes: true, attributeFilter: [&#x27;class&#x27;] });
-    addEventListener(&#x27;resize&#x27;, () =&gt; { send(0); check(); });
+    let w = innerWidth;   // its own growing resizes it too: only a new width measures again
+    addEventListener(&#x27;resize&#x27;, () =&gt; { if (innerWidth !== w) { w = innerWidth; check(); } });
   })();
 &lt;/script&gt;
 &lt;/body&gt;
