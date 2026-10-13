@@ -263,6 +263,69 @@
   @property --grid { syntax: "<color>"; inherits: true; initial-value: #2b2b29; }
   .stage { transition: grid-template-columns var(--t) var(--ease), grid-template-rows var(--t) var(--ease), --grid .6s ease; }
   .stage.s1 { --grid: var(--fg); }
+
+  /* ---- about Jihae: read the text, or step into the grid (from about-read-experience) ---- */
+  /* the bio, told by the grid. Every cell carries words: small and faint at the top of the
+     cell, until it is that cell's turn, when its line grows to fill the cell and comes fully
+     up. An intrusion grows its words fast with a jolt; closeness grows them slowly. */
+  #tgrid .ct { position: absolute; left: 50%; top: 14px; transform: translate(-50%, 0); z-index: 2;
+    width: max-content; max-width: calc(100% - 28px); text-align: center; pointer-events: none;
+    color: var(--fg);
+    font-weight: 300; font-size: clamp(10px, .82vw, 13px); line-height: 1.35; letter-spacing: -0.01em;
+    opacity: 0;   /* only the cell whose turn it is shows its line */
+    transition: font-size var(--ctd, .9s) var(--cte, ease), top var(--ctd, .9s) var(--cte, ease),
+      transform var(--ctd, .9s) var(--cte, ease), line-height var(--ctd, .9s) var(--cte, ease), opacity .6s ease; }
+  /* a big line never runs longer than about 20 characters; it wraps into balanced lines instead */
+  #tgrid .ct.big { max-width: min(calc(100% - 28px), 20ch); text-wrap: balance; top: 50%; transform: translate(-50%, -50%); opacity: 1; line-height: 1.04; letter-spacing: -0.025em; }
+  #tgrid .ct.tiny { opacity: 0; }
+  #tgrid .ct.inv { max-width: none; line-height: .92; }   /* intrusion: no line limit, it fills its whole cell */
+  /* intrusion: the letters arrive crushed and slammed in; closeness: they drift together */
+  #tgrid .ct.jolt { animation: ctJolt .7s cubic-bezier(.2, 0, .2, 1) both; }
+  #tgrid .ct.drift { animation: ctDrift 1.4s cubic-bezier(.25, .1, .25, 1) both; }
+  /* intrusion: slammed in oversized and crushed, knocked side to side, then it settles */
+  @keyframes ctJolt {
+    0%   { letter-spacing: -0.3em; transform: translate(-50%, -50%) scale(1.6) skewX(-8deg); opacity: 0; }
+    12%  { letter-spacing: -0.22em; transform: translate(calc(-50% - 18px), -50%) scale(1.3) skewX(6deg); opacity: 1; }
+    26%  { transform: translate(calc(-50% + 14px), -50%) scale(.92) skewX(-4deg); }
+    40%  { transform: translate(calc(-50% - 8px), -50%) scale(1.06); }
+    55%  { transform: translate(calc(-50% + 4px), -50%) scale(.98); }
+    100% { letter-spacing: -0.025em; transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+  /* closeness: small, slow, letters easing in toward each other */
+  @keyframes ctDrift { from { letter-spacing: 0.12em; opacity: 0; filter: blur(2px); } to { letter-spacing: -0.01em; opacity: 1; filter: blur(0); } }
+  /* the whole grid takes the hit of an intrusion */
+  #tgrid.shake { animation: gridShake .55s cubic-bezier(.3, 0, .3, 1); }
+  @keyframes gridShake { 0% { transform: translate(0); } 12% { transform: translate(16px, -3px); } 28% { transform: translate(-12px, 2px); } 46% { transform: translate(8px, -1px); } 64% { transform: translate(-4px); } 82% { transform: translate(2px); } 100% { transform: translate(0); } }
+  @media (prefers-reduced-motion: reduce) { #tgrid .ct.jolt, #tgrid .ct.drift, #tgrid.shake { animation: none; } }   /* a cell squeezed too thin to hold words */
+  #tgrid .ct-measure { position: absolute; left: -9999px; top: 0; visibility: hidden; font-weight: 300;
+    line-height: 1.04; letter-spacing: -0.025em; text-align: center; max-width: 20ch; text-wrap: balance; }
+  /* ---- the end: three cells lead on ---- */
+  .tgrid .go { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 3; pointer-events: auto;
+    color: var(--fg); text-decoration: none; white-space: nowrap; font-size: clamp(16px, 1.7vw, 28px); font-weight: 300;
+    letter-spacing: -0.02em; border-bottom: 1px solid currentColor; padding-bottom: 2px; opacity: 0; animation: goIn .6s ease .5s forwards; }
+  .tgrid .go { transition: font-size .6s cubic-bezier(.25,1,.45,1), letter-spacing .6s ease, opacity .3s ease; }
+  .tgrid .go:hover, .tgrid .go:focus-visible { font-size: clamp(22px, 2.6vw, 44px); letter-spacing: -0.03em; }   /* the link grows with its cell */
+  @keyframes goIn { to { opacity: 1; } }
+  /* Experience: the about grid from landing-about-20261012, inside the stage under the pills */
+  .ab .stg > #tgrid { display: block; top: 0 !important; bottom: 0; border-top: 0; opacity: 0; transition: opacity .5s ease; }
+  .ab .stg.in > #tgrid { opacity: 1; }
+  .ab #sumrow, .ab #readall { display: none !important; }
+  .ab { position: relative; z-index: 1; flex: 1; min-height: 0; display: flex; flex-direction: column; cursor: default;
+    opacity: 0; pointer-events: none; transition: opacity .35s ease; --shove: cubic-bezier(.2,1.6,.4,1); }
+  .s1 .ab { opacity: 1; pointer-events: auto; transition: opacity .35s ease .45s; }   /* on the same beat as ", based in the Netherlands" */
+  .ab .modes { align-self: flex-end; display: flex; gap: 8px; padding: 0 var(--pad) var(--pad); }
+  .ab .mode { font: inherit; font-weight: 400; font-size: clamp(12px, .95vw, 16px); color: var(--fg); background: none;
+    border: 1.5px solid var(--fg); border-radius: 999px; padding: 6px 12px; cursor: pointer; transition: background .2s, color .2s; }
+  .ab .mode:hover, .ab .mode[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+  .ab .mode[aria-pressed="true"] { cursor: default; }
+  .ab .stg { position: relative; flex: 1; overflow: hidden; border-top: var(--line) solid var(--grid); }
+  .ab .text { position: absolute; inset: 0; padding: var(--pad) var(--pad) var(--pad) calc(var(--pad) * 1.5);   /* close under the line, a little in from the left */ overflow: auto; transition: opacity .45s ease; }
+  .ab .text p { margin: 0 0 1em; max-width: 34em; font-size: clamp(15px, 1.4vw, 23px); line-height: 1.32; letter-spacing: -.012em; text-wrap: pretty; }   /* no orphans: the last line never holds a single word */
+  .ab .text .w { display: inline-block; transition: transform .45s cubic-bezier(.25,1,.45,1); }
+  .ab .stg.in .text { opacity: 0; pointer-events: none; }
+  .ab .links { display: flex; flex-direction: column; align-items: flex-start; gap: .2em; margin-top: 2em; font-size: clamp(15px, 1.4vw, 23px); letter-spacing: -.012em; }
+  .ab .links a { color: color-mix(in srgb, var(--fg) 50%, var(--bg)); text-decoration: none; display: inline-flex; gap: .5em; padding: .15em 0; transition: padding .3s cubic-bezier(.25,1,.45,1), color .3s ease; }   /* soft at rest, like "More about Jihae" */
+  .ab .links a:hover, .ab .links a:focus-visible { padding-left: .5em; outline: 0; color: var(--fg); }   /* the whole link is pushed aside */
+  @media (prefers-reduced-motion: reduce) { .ab * { transition-duration: 0s !important; animation: none !important; } }
 </style>
 </head>
 <body>
@@ -271,7 +334,28 @@
   <section class="panel name" data-state="s1" tabindex="0" role="button" aria-label="About Jihae Cha">
     <h1 class="head">Jihae Cha<span class="reveal">, based in the&nbsp;Netherlands</span></h1>
     <div class="about sr" id="about"><div class="roll" id="roll"></div></div>
-    <div class="tgrid" id="tgrid" aria-hidden="true"></div>
+    <div class="ab" id="ab">
+      <div class="modes" role="group" aria-label="View">
+        <button class="mode" id="readB" type="button" aria-pressed="true">Read</button>
+        <button class="mode" id="expB" type="button" aria-pressed="false">Experience</button>
+      </div>
+      <div class="stg" id="abStage">
+        <div class="text" id="abText">
+          <p>Jihae loves technology, motion and conceptual design, and her work lives where the three meet.</p>
+          <p>She is a digital designer from South Korea, based in The Hague. During and after her Interactive Media Design studies at KABK, she followed her curiosity through studios in Berlin, Amsterdam and Utrecht, exploring AR/VR, 3D, photogrammetry, UX/UI, interaction and motion.</p>
+          <p>Along the way, she found what she loves most, design that moves and interacts with intention. In whatever digital form, she pictures where each element comes in and leaves, and asks why it moves and what story it tells.</p>
+          <p>Living between cultures, she noticed how differently people keep their space. In her work, she uses proxemics both as a subject and as a design method.</p>
+          <nav class="links" aria-label="More">
+            <a role="link" tabindex="0" style="cursor:pointer" onclick="parent.postMessage({ landingWorks: true }, '*')" onkeydown="if (event.key === 'Enter') this.click()">Works <span aria-hidden="true">→</span></a>
+            <a href="mailto:jihae.cha9@gmail.com" target="_top">Email <span aria-hidden="true">→</span></a>
+            <a href="https://www.linkedin.com/in/jihae-cha" target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">→</span></a>
+          </nav>
+        </div>
+        <div class="tgrid" id="tgrid" aria-hidden="true"></div>
+        <div id="sumrow"><div id="ctrl"><span id="cnt" hidden></span><button type="button" id="replayB" hidden></button><button type="button" id="allB" hidden></button></div></div>
+        <div class="readall" id="readall"></div>
+      </div>
+    </div>
   </section>
 
   <section class="panel designs" data-state="s2" tabindex="0" role="button" aria-label="Designs that move: 3D, interaction, UX/UI, visual systems">
@@ -480,13 +564,125 @@
     const box = document.getElementById('tgrid'), COLS = 3, ROWS = 2;
     const SOFT = 0.42;  // how round the corners get in the all-round stage
     const FAR = 0.16;   // corners that don't touch the big cell: a light softening only
-    const SHOVE = { col: 7, row: 2.9, dur: '.42s', ease: 'cubic-bezier(.2,1.9,.4,1)', calm: 'cubic-bezier(.25,1,.45,1)' };  // the sudden shove, hard and overshooting
+    const SHOVE = { col: 10, row: 4.5, dur: '.42s', ease: 'cubic-bezier(.2,1.9,.4,1)', calm: 'cubic-bezier(.25,1,.45,1)' };  // the sudden shove, hard and overshooting
     // the gentle one: still a push, never a merge, but slow and modest, and the others give way calmly
-    const GENTLE = { col: 3.4, row: 1.8, dur: '2.4s', ease: 'cubic-bezier(.45,0,.25,1)' };
+    const GENTLE = { col: 5, row: 2.6, dur: '2.4s', ease: 'cubic-bezier(.45,0,.25,1)' };
+    // the two lines that name the two kinds of closeness get their own motion:
+    // intrusion is harder, faster and goes further than any other push, then keeps pressing;
+    // closeness is the slowest and most modest move in the loop
+    const INVADE = { col: 13, row: 5.2, dur: '.3s', ease: 'cubic-bezier(.2,2.4,.35,1)', calm: 'cubic-bezier(.25,1,.45,1)' };
+    const INVADE_ON = { col: 24, row: 8, dur: '1.1s', ease: 'cubic-bezier(.3,0,.2,1)' };
+    const TENDER = { col: 2.6, row: 1.5, dur: '1.3s', ease: 'cubic-bezier(.25,.1,.25,1)' };
     const GENTLE_ODDS = 0.25;   // about one takeover in four is gentle; the rest are aggressive
-    const SPREAD = { col: 11, row: 3.6, dur: '1.8s', ease: 'cubic-bezier(.4,0,.2,1)' };   // then it keeps claiming more
+    const SPREAD = { col: 16, row: 6, dur: '1.8s', ease: 'cubic-bezier(.4,0,.2,1)' };   // then it keeps claiming more
     const CALM = { dur: '.8s', ease: 'cubic-bezier(.65,0,.35,1)' };
     const rings = [...Array(6)].map(() => { const d = document.createElement('i'); d.className = 'ring'; box.appendChild(d); return d; });
+    rings.forEach(d => { d.ct = document.createElement('span'); d.ct.className = 'ct'; d.appendChild(d.ct); });
+    // ---- the bio, in the order it is told ----------------------------------------------
+    // "what she does" now comes second, so a skimming reader still gets it
+    const T = [
+      'Jihae is a designer living between cultures, where she noticed how differently people keep their distance.',
+      'In her work, she uses proxemics both as a subject and as a design method.',
+      'We seem to get equal space, but it\u2019s always moving.',
+      'When one takes more, another shrinks.',
+      'Sometimes that\u2019s an intrusion',
+      'Sometimes a sign of closeness',
+      'and online it happens without any physical distance'
+    ];
+    const INV = T[4], TEN = T[5];
+    // each step: how the grid moves, which line it carries, and how long it holds (ms).
+    // About 20 seconds in all, then it stops on three ways in. No loop.
+    const SEQ = [
+      { kind: 'push',   text: T[0], hold: 3800 },
+      { kind: 'push',   text: T[1], hold: 3800 },
+      { kind: 'even',   text: T[2], hold: 2200 },
+      { kind: 'round',  text: T[3], hold: 2200 },
+      { kind: 'invade', text: T[4], hold: 2600 },
+      { kind: 'tender', text: T[5], hold: 3200 },
+      { kind: 'push',   text: T[6], hold: 3000 },
+      { kind: 'end' }
+    ];
+    const LINKS = [[0, 'Closer to her designs', '#works', 'Her designs'], [2, 'Closer to Jihae', 'mailto:jihae.cha9@gmail.com', 'Contact'], [4, 'Closer to her experiments', '#experiments', 'Experiments']];   // [cell, in the grid, where, in read mode]
+    const cnt = document.getElementById('cnt'), readall = document.getElementById('readall'), allB = document.getElementById('allB');
+    let si = 0, ended = false, paused = false, shook = false;
+    // links work inside the portfolio page (moves the page itself) and on their own
+    function link(a, h) {
+      if (h === '#works') { a.setAttribute('role', 'link'); a.tabIndex = 0; a.style.cursor = 'pointer'; a.addEventListener('keydown', e => { if (e.key === 'Enter') a.click(); }); } else a.href = h;   // an in-page move: no address shown at the bottom of the browser
+      if (h.startsWith('mailto:')) { a.target = '_top'; a.addEventListener('click', e => e.stopPropagation()); return a; }   // an email opens the mail app
+      a.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); if (h === '#works') { window.parent.postMessage({ landingWorks: true }, '*'); return; } try { window.top.location.hash = h; } catch (_) { location.hash = h; } });
+      return a;
+    }
+    function clearGo() { box.querySelectorAll('.go').forEach(a => a.remove()); box.classList.remove('golead'); rings.forEach(d => d.classList.remove('on')); }
+    function showGo() {
+      LINKS.forEach(([i, t, h]) => { const a = link(document.createElement('a'), h); a.className = 'go'; a.textContent = t; rings[i].appendChild(a); });
+    }
+    // read all: every line as plain text, plus the three ways in
+    // read mode: the same lines, set as two running paragraphs (about her, then the idea)
+    const para = ts => ts.map(t => /[.,]$/.test(t) ? t : t + '.').join(' ')
+      .replace('intrusion. Sometimes', 'intrusion, sometimes').replace('closeness. and', 'closeness, and');
+    readall.innerHTML = `<p>${para(T.slice(0, 2))}</p><p>${para(T.slice(2))}</p>` + '<div class="links"></div>';
+    LINKS.forEach(([, , h, t]) => { const a = link(document.createElement('a'), h); a.innerHTML = t + '<span aria-hidden="true">\u2192</span>'; readall.querySelector('.links').appendChild(a); });
+    readall.addEventListener('click', e => e.stopPropagation());
+    // Each cell holds words. One cell at a time is 'featured': its line is large, sized to
+    // fill the cell. Every other cell shows the line before it, small and faint.
+    const MOTION_T = { hard: ['.5s', 'cubic-bezier(.2,1.6,.4,1)'], soft: ['2.2s', 'cubic-bezier(.45,0,.25,1)'], calm: ['1s', 'cubic-bezier(.65,0,.35,1)'],
+      invade: ['.32s', 'cubic-bezier(.2,2.4,.35,1)'], tender: ['1.3s', 'cubic-bezier(.25,.1,.25,1)'] };
+    const meas = document.createElement('span'); meas.className = 'ct-measure'; box.appendChild(meas);
+    let featured = -1, featKind = '', curLine = '', prevLine = '', lineAt = 0;
+    function fitFs(text, w, h) {
+      meas.innerHTML = text; meas.style.width = w + 'px';
+      let lo = 12, hi = Math.min(400, h);
+      for (let k = 0; k < 14; k++) {
+        const mid = (lo + hi) / 2; meas.style.fontSize = mid + 'px';
+        if (meas.scrollHeight <= h && meas.scrollWidth <= w + 1) lo = mid; else hi = mid;
+      }
+      return lo;
+    }
+    function render() {
+      const W = box.clientWidth, H = box.clientHeight;
+      meas.style.maxWidth = featKind === 'invade' ? 'none' : ''; meas.style.lineHeight = featKind === 'invade' ? '.92' : '';
+      rings.forEach((d, k) => {
+        const c = d.ct, b = last[k];
+        c.classList.toggle('inv', k === featured && featKind === 'invade');
+        c.classList.toggle('ten', k === featured && featKind === 'tender');
+        const cw = b ? (b.r - b.l) / 100 * W : 0, ch = b ? (b.b - b.t) / 100 * H : 0;
+        if (k === featured) {
+          // break where the sentence pauses: after a comma, and closeness on two lines
+          const line = (featKind === 'tender' ? curLine.replace(' of ', '<br>of ') : curLine).replace(/, /g, ',<br>');
+          if (c.dataset.t !== line) { c.innerHTML = line; c.dataset.t = line; }
+          c.classList.add('big'); c.classList.remove('tiny');
+          const inv = featKind === 'invade';   // intrusion fills its cell almost edge to edge
+          const fw = Math.max(cw - (inv ? 24 : 56), 60), fs = fitFs(line, fw, ch * (inv ? .94 : .8));
+          c.style.width = fw + 'px';   // the same box it was measured in, so it wraps the same and never overflows
+          // every line takes all the room its cell has, even outgrowing the name; only closeness
+          // stays quieter, at under half the name's size 
+          const cap = parseFloat(getComputedStyle(nameHead).fontSize) * .45;
+          // the second line steps down after the opening, so the sizes rise and fall instead of always shouting
+          const quiet = curLine === T[1] ? .55 : 1;
+          c.style.fontSize = (featKind === 'tender' ? Math.min(fs, cap) : fs * quiet).toFixed(1) + 'px';
+        } else {
+          const t = featured < 0 ? curLine : prevLine;
+          if (c.dataset.t !== t) { c.innerHTML = t; c.dataset.t = t; }
+          c.classList.remove('big'); c.style.fontSize = ''; c.style.width = '';
+          c.classList.toggle('tiny', cw < 110 || ch < 60);
+        }
+      });
+    }
+    // re-fit once the fonts have loaded, so sizes aren't measured with a fallback
+    if (document.fonts) document.fonts.ready.then(render);
+    // a new line comes up in cell i (or no cell, i = -1: every cell then holds it small)
+    function feature(i, text, kind) {
+      const fresh = text !== curLine;   // the same line moving to another cell doesn't play its entrance again
+      if (fresh) { prevLine = curLine || text; curLine = text; lineAt = performance.now(); }
+      featured = i; featKind = kind;
+      const [dur, ease] = MOTION_T[kind] || MOTION_T.calm;
+      rings.forEach(d => { d.ct.style.setProperty('--ctd', dur); d.ct.style.setProperty('--cte', ease); d.ct.classList.remove('jolt', 'drift'); });
+      render();
+      if (fresh && i >= 0 && (kind === 'invade' || kind === 'tender')) {
+        const c = rings[i].ct; void c.offsetWidth; c.classList.add(kind === 'invade' ? 'jolt' : 'drift');
+      }
+      if (kind === 'invade' && !shook) { shook = true; box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake'); }   // the whole grid takes the hit, once
+    }
     const vls = [...Array(4)].map(() => { const d = document.createElement('b'); d.className = 'ln v'; box.appendChild(d); return d; });
     const hl = document.createElement('b'); hl.className = 'ln h'; box.appendChild(hl);
     const pct = w => { const t = w.reduce((a, b) => a + b, 0); return w.map(x => x / t * 100); };
@@ -495,25 +691,21 @@
     let lead = -1, roundAll = false, size = SHOVE, timer = null, sub = null, stage = 'equal', left = 0, done = null;
     // --xease is the same move without overshoot: the text follows the cells on it, so it never bounces
     const motion = m => { box.style.setProperty('--tdur', m.dur); box.style.setProperty('--tease', m.ease); box.style.setProperty('--xease', m.calm || m.ease); };
-    const head = box.parentElement.querySelector('.head');
+    const head = document.querySelector('.name .head');
     const about = document.getElementById('about');
-    // the grid starts right under the line about Jihae
     // the grid starts right under the name
-    function place() { if (!document.getElementById('stage').classList.contains('s1')) return; box.style.setProperty('--tg-top', (head.offsetTop + head.offsetHeight) + 'px'); }   // frozen while closing
+    const sumrow = document.getElementById('sumrow');
+    function place() {   // the grid starts under the controls; frozen while closing
+      if (!document.getElementById('stage').classList.contains('s1')) return;
+      const top = (sumrow.offsetHeight ? sumrow.offsetTop + sumrow.offsetHeight : head.offsetTop + head.offsetHeight) + 'px';
+      box.style.setProperty('--tg-top', top); readall.style.top = top;
+    }
 
     // ---- the words ---------------------------------------------------------------
     // WORDS sit in the six cells. The bio is told in short LINES under the name:
     // the first shows with the rounded stage, and each takeover moves to the next.
     const WORDS = ['people', 'elements', 'technology', 'things', 'culture', 'you'];
-    const LINES = [
-      'Korean-born designer based in the Netherlands.',
-      'Working with space as something negotiated, not given.',
-      'Moving between cultures.',
-      'Looking at how personal space is claimed, shared and violated',
-      'in a crowded metro, in the gap between two letters,',
-      'and in a digital world with no physical distance at all.',
-      'Small shifts in spacing, across interaction, motion and 3D.'
-    ];
+    const LINES = T;   // the same text as the sequence
     const tx = WORDS.map(t => { const w = document.createElement('span'); w.className = 'tx'; w.textContent = t; box.appendChild(w); return w; });
     const roll = document.getElementById('roll');
     LINES.forEach(t => { const p = document.createElement('p'); p.textContent = t; roll.appendChild(p); });
@@ -589,42 +781,65 @@
       });
     }
     const pick = () => { let n; do { n = Math.floor(Math.random() * 6); } while (n === lead); return n; };
-    let gentle = false;
     function step() {
-      if (stage === 'equal') { stage = 'round'; motion(CALM); roundAll = true; lead = -1; pair = null; if (li) rollTo(0, true); host = 0; showSay(LINES[0]); layout(); timer = setTimeout(step, 1700); return; }
-      if (stage === 'round') { stage = 'square'; motion(CALM); roundAll = false; lead = -1; pair = null; layout(); left = LINES.length - 1; timer = setTimeout(step, 900); return; }   // one takeover per line, so the whole bio plays
-      if (left > 0) {
-        intro = true;   // the opening (round, then square) has played: the visitor can intrude now
-        left--; stage = 'lead'; roundAll = false;
-        // cells never merge: every takeover pushes into the others. Mostly hard, now and
-        // then slow and soft (never twice in a row)
-        pair = null; lead = pick();
-        gentle = !gentle && Math.random() < GENTLE_ODDS;
-        if (gentle) {
-          const n = Math.min(li + 1, LINES.length - 1); rollTo(Math.min(n, LINES.length - 2)); li = n;
-          hideSay(); host = lead; motion(GENTLE); size = GENTLE; layout();
-          showT = setTimeout(() => { showSay(LINES[n]); layout(); }, 1800);
-          timer = setTimeout(step, 4200); return;
-        }
-        // the line leaves at once as the shove starts, and the next one simply appears in the
-        // big cell once it has pushed in and starts to spread, already where it will stay
-        const n = Math.min(li + 1, LINES.length - 1); rollTo(Math.min(n, LINES.length - 2)); li = n;
-        hideSay(); host = lead;
-        motion(SHOVE); size = SHOVE; layout();
-        sub = setTimeout(() => {
-          motion(SPREAD); size = SPREAD; layout();
-          showT = setTimeout(() => { showSay(LINES[n]); layout(); }, 350);
-        }, 620);
-        timer = setTimeout(step, 3500); return;   // long enough to read each line
+      if (paused || si >= SEQ.length) return;
+      const S = SEQ[si];
+      cnt.textContent = (si + 1) + ' / ' + SEQ.length;
+      si++;
+      intro = true;   // the visitor can intrude from the first move on
+      clearTimeout(sub); clearGo();
+      if (S.kind === 'end') {   // settle into equal space and offer three ways in
+        ended = true; stage = 'equal'; motion(CALM); roundAll = false; lead = -1; layout();
+        featured = -1; curLine = prevLine = ''; render(); showGo(); return;
       }
-      stage = 'equal'; motion(CALM); lead = -1; pair = null; hideSay(); layout(); timer = setTimeout(step, 1800);
-      if (done) { const d = done; done = null; d(); }   // the bio has played through once
+      ended = false;
+      if (S.kind === 'even') { stage = 'equal'; motion(CALM); roundAll = false; lead = -1; pair = null; layout(); feature(Math.floor(Math.random() * 6), S.text, 'calm'); }
+      else if (S.kind === 'round') { stage = 'round'; motion(CALM); roundAll = true; lead = -1; layout(); feature(pick(), S.text, 'calm'); }
+      else if (S.kind === 'square') { stage = 'square'; motion(CALM); roundAll = false; lead = -1; layout(); feature(-1, curLine, 'calm'); }
+      else if (S.kind === 'invade') {   // intrusion: the hardest shove, a jolt through the grid, then it keeps pressing
+        stage = 'lead'; roundAll = false; pair = null; lead = pick(); motion(INVADE); size = INVADE; layout(); feature(lead, S.text, 'invade');
+        sub = setTimeout(() => { motion(INVADE_ON); size = INVADE_ON; layout(); render(); }, 380);
+      }
+      else if (S.kind === 'tender') {   // closeness: the slowest, smallest move; the words drift together
+        stage = 'lead'; roundAll = false; pair = null; lead = pick(); motion(TENDER); size = TENDER; layout(); feature(lead, S.text, 'tender');
+      }
+      else if (S.kind === 'gentle') {   // closeness: slow, modest, the line drifts in
+        stage = 'lead'; roundAll = false; pair = null; lead = pick(); motion(GENTLE); size = GENTLE; layout(); feature(lead, S.text, 'soft');
+      } else {                           // intrusion: a hard shove, then it keeps claiming more
+        stage = 'lead'; roundAll = false; pair = null; lead = pick(); motion(SHOVE); size = SHOVE; layout(); feature(lead, S.text, 'hard');
+        sub = setTimeout(() => { motion(SPREAD); size = SPREAD; layout(); render(); }, 620);   // its words grow on with it
+      }
+      timer = setTimeout(step, S.hold);
     }
-    function reset() { clearTimeout(timer); clearTimeout(sub); stage = 'equal'; lead = -1; pair = null; roundAll = false; rollTo(0, true); hideSay(); host = 0; showSay(LINES[0]); motion(CALM); layout(); }
-    addEventListener('resize', layout);
+    // step by hand: arrows and keys jump to a line; nothing is skipped by waiting
+    function goTo(n) {
+      clearTimeout(timer); clearTimeout(sub); clearTimeout(idleT); follow = false;
+      if (paused) toggleAll(false);
+      si = Math.max(0, Math.min(n, SEQ.length - 1)); step();
+    }
+    function toggleAll(open) {
+      // "Close" keeps exactly the width "Read all" had, so neither button moves
+      allB.style.width = open ? allB.getBoundingClientRect().width + 'px' : '';
+      paused = open; readall.classList.toggle('on', open); allB.setAttribute('aria-pressed', open);
+      allB.textContent = open ? 'Close' : 'Read all';
+      clearTimeout(timer); clearTimeout(sub); follow = false;
+      if (!open && on && !ended) timer = setTimeout(step, 400);
+    }
+    const ctl = (id, f) => { const b = document.getElementById(id);
+      b.addEventListener('click', e => { e.stopPropagation(); f(); });
+      b.addEventListener('keydown', e => e.stopPropagation()); };
+    ctl('replayB', () => goTo(0));   // from the first line again
+    ctl('allB', () => toggleAll(!paused));
+    addEventListener('keydown', e => {
+      if (!on) return;
+      if (e.key === 'ArrowRight') goTo(si); else if (e.key === 'ArrowLeft') goTo(si - 2);
+      else if (e.key === 'Escape' && paused) toggleAll(false);
+    });
+    function reset() { si = 0; ended = false; clearGo(); paused = false; readall.classList.remove('on'); allB.textContent = 'Read all'; allB.style.width = ''; allB.setAttribute('aria-pressed', false); cnt.textContent = '1 / ' + SEQ.length; featured = -1; curLine = prevLine = ''; render(); clearTimeout(timer); clearTimeout(sub); stage = 'equal'; lead = -1; pair = null; roundAll = false; rollTo(0, true); hideSay(); host = 0; showSay(LINES[0]); motion(CALM); layout(); }
+    addEventListener('resize', () => { layout(); render(); });
     // the name grows and shrinks as the panels open and close; keep the grid right under it
     head.addEventListener('transitionend', place);
-    if (window.ResizeObserver) { const ro = new ResizeObserver(place); ro.observe(head); ro.observe(about); }
+    if (window.ResizeObserver) { const ro = new ResizeObserver(place); ro.observe(head); ro.observe(about); ro.observe(sumrow); }
     reset();
 
     // ---- the visitor as the intruder --------------------------------------------
@@ -637,15 +852,30 @@
     // only a deliberately slow approach makes it push in gently. Never a merge.
     const SLOW = 0.45;   // px per ms
     let px = null, pt = 0, speed = 1;
+    // at the end, the three ways in answer the cursor: the cell of the link under it takes the space,
+    // the same push as the bio, and lets go again when the cursor leaves
+    const NUDGE = { col: 1.8, row: 1.4, dur: '.6s', ease: 'cubic-bezier(.25,1,.45,1)' };   // just a little more room, not a takeover
+    function endHover(e) {
+      const r = box.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width * 100, y = (e.clientY - r.top) / r.height * 100;
+      const i = x < 0 || x > 100 || y < 0 || y > 100 ? -1 : last.findIndex(b => x >= b.l && x <= b.r && y >= b.t && y <= b.b);
+      const to = LINKS.some(([k]) => k === i) ? i : -1;
+      if (to === lead) return;
+      lead = to; pair = null; roundAll = false;
+      box.classList.toggle('golead', to >= 0); rings.forEach((d, k) => d.classList.toggle('on', k === to));   // the squeezed links step aside
+      if (to < 0) { stage = 'equal'; motion(CALM); } else { stage = 'lead'; motion(NUDGE); size = NUDGE; }
+      layout();
+    }
     function point(e) {
       const now = performance.now();
       if (px) speed = speed * .6 + Math.hypot(e.clientX - px[0], e.clientY - px[1]) / Math.max(now - pt, 1) * .4;
       px = [e.clientX, e.clientY]; pt = now;
-      if (still || !on || !intro) return;
-      if (!follow) { follow = true; clearTimeout(timer); clearTimeout(sub); hideSay(); roundAll = false; }
+      if (ended && on && !still && !paused) { endHover(e); return; }
+      if (still || !on || !intro || ended || paused) return;
+      if (!follow) { follow = true; clearTimeout(timer); clearTimeout(sub); hideSay(); roundAll = false; }   // the script pauses where it is
       clearTimeout(idleT);
       idleT = setTimeout(() => {   // still for a while: the takeovers carry on from here
-        follow = false; stage = 'square'; left = LINES.length - 1; timer = setTimeout(step, 600);
+        follow = false; timer = setTimeout(step, 600);   // and carries on from the next line
       }, IDLE);
       const r = box.getBoundingClientRect();
       const x = (e.clientX - r.left) / r.width * 100, y = (e.clientY - r.top) / r.height * 100;
@@ -653,8 +883,28 @@
       const i = last.findIndex(b => x >= b.l && x <= b.r && y >= b.t && y <= b.b);
       if (i < 0) return;
       if (i === lead) return;
-      const m = speed < SLOW ? GENTLE : FOLLOW;
-      lead = i; pair = null; host = -1; size = m; motion(m); layout();
+      // every push the visitor makes carries the next line of the bio, in order. A line stays a
+      // moment before the next one replaces it, so a quick sweep doesn't flick through it unread.
+      const now2 = performance.now();
+      let line = curLine;
+      if (!curLine || now2 - lineAt > 600) {
+        const nx = T.indexOf(curLine) + 1;
+        if (nx >= T.length) { follow = false; clearTimeout(idleT); si = SEQ.length - 1; step(); return; }   // past the last line: no loop back, it settles and offers the ways in
+        line = T[nx]; lineAt = now2;
+        si = T.indexOf(line) + 1; cnt.textContent = si + ' / ' + SEQ.length;   // the script carries on after this line, not from where it paused
+      } else return;   // the line is still being read: it stays in its cell, so the same takeover never plays twice
+      // the line decides how the cell moves: intrusion invades, closeness is gentle; any other
+      // line follows the cursor's speed
+      lead = i; pair = null; host = -1; clearTimeout(sub);
+      if (line === INV) {
+        size = INVADE; motion(INVADE); layout(); feature(lead, line, 'invade');
+        sub = setTimeout(() => { motion(INVADE_ON); size = INVADE_ON; layout(); render(); }, 380);
+      } else if (line === TEN) {
+        size = TENDER; motion(TENDER); layout(); feature(lead, line, 'tender');
+      } else {
+        const m = speed < SLOW ? GENTLE : FOLLOW;
+        size = m; motion(m); layout(); feature(lead, line, m === GENTLE ? 'soft' : 'hard');
+      }
     }
     box.parentElement.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') point(e); });
     const off = () => { on = false; intro = false; follow = false; pair = null; clearTimeout(idleT); };
@@ -667,8 +917,9 @@
 
   function go(s) {
     current = s;
+    window.parent.postMessage({ landingName: s === 's1' }, '*');   // the page whitens its half of the bottom line
     arrived();   // opening a panel before the line has finished drawing ends the arrival at once
-    if (s === 's1') tg.start(); else tg.stop();
+    if (s !== 's1') tg.stop();   // the grid runs only while Experience is chosen
     if (s === 's2') dg.start(); else dg.stop();
     fit(s);
     const was = stage.classList.contains('s1') ? 's1' : stage.classList.contains('s2') ? 's2' : null;
@@ -798,6 +1049,60 @@
     addEventListener('touchmove', e => { if (ty === null) return; const y = e.touches[0].clientY; send(ty - y); ty = y; }, { passive: true });
     addEventListener('touchend', () => { ty = null; }, { passive: true });
   }
+</script>
+<script>
+(() => {
+  const stage = document.getElementById('abStage'), text = document.getElementById('abText'), readB = document.getElementById('readB'), expB = document.getElementById('expB');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- words keep their distance from the cursor ---- */
+  text.querySelectorAll('p').forEach(p => {
+    // the last two words of each paragraph are tied, so no word is left alone on the last line
+    const tail = [...p.childNodes].reverse().find(n => n.nodeType === 3 && / \S/.test(n.textContent));
+    // short words (a, in, at…) stay with the word after them, never hanging at a line end
+    p.childNodes.forEach(n => { if (n.nodeType === 3) n.textContent = n.textContent.replace(/(^|\s)(\S{1,2}) (?=\S)/g, '$1$2\u00a0').replace(/(^|\s)(\S{1,2}) (?=\S)/g, '$1$2\u00a0'); });
+    if (tail) tail.textContent = tail.textContent.replace(/ (\S+\s*)$/, '\u00a0$1');
+    const walk = n => [...n.childNodes].forEach(c => {
+      if (c.nodeType === 3) {
+        const f = document.createDocumentFragment();
+        c.textContent.split(/( +)/).forEach(s => {
+          if (!s) return;
+          if (/^ +$/.test(s)) f.append(s); else { const w = document.createElement('span'); w.className = 'w'; w.textContent = s; f.append(w); }
+        });
+        c.replaceWith(f);
+      } else if (c.nodeType === 1) walk(c);
+    });
+    walk(p);
+  });
+  const words = [...text.querySelectorAll('.w')];
+  let mx = -1e4, my = -1e4, raf = 0;
+  const R = 110, PUSH = 9;
+  function lean() {
+    raf = 0;
+    words.forEach(w => {
+      const r = w.getBoundingClientRect(), dx = r.left + r.width / 2 - mx, dy = r.top + r.height / 2 - my, d = Math.hypot(dx, dy);
+      if (d < R) { const f = (1 - d / R) ** 1.4 * PUSH; w.style.transform = `translate(${dx / d * f}px,${dy / d * f * .6}px)`; }
+      else if (w.style.transform) w.style.transform = '';
+    });
+  }
+  if (!still && matchMedia('(hover: hover)').matches) {
+    text.addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; if (!raf) raf = requestAnimationFrame(lean); });
+    text.addEventListener('pointerleave', () => { mx = my = -1e4; lean(); });
+  }
+  // two buttons switch between the views
+  function mode(exp) {
+    if ((expB.getAttribute('aria-pressed') === 'true') === exp) return;   // already there
+    readB.setAttribute('aria-pressed', !exp); expB.setAttribute('aria-pressed', exp);
+    if (exp) { stage.classList.add('in'); tg.start(); } else { tg.stop(); stage.classList.remove('in'); }
+  }
+  readB.addEventListener('click', () => mode(false));
+  expB.addEventListener('click', () => mode(true));
+  // clicks inside never open or close the panel
+  ['click','keydown'].forEach(t => document.getElementById('ab').addEventListener(t, e => e.stopPropagation()));
+  // each time the panel opens it starts on the text
+  new MutationObserver(() => { if (!document.getElementById('stage').classList.contains('s1')) mode(false); })
+    .observe(document.getElementById('stage'), { attributes: true, attributeFilter: ['class'] });
+})();
 </script>
 </body>
 </html>
