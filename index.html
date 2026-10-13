@@ -1001,6 +1001,7 @@
     if (phone.matches) {
       // stacked: both panels are full width, so both headings simply share one size
       n = d = Math.min(width(nameHead, &#x27;Jihae Cha&#x27;, 1), width(desHead, s === &#x27;s2&#x27; ? &#x27;Designs that move&#x27; : &#x27;Designs&#x27;, 1));
+      if (s === &#x27;s1&#x27;) d = Math.min(width(nameHead, &#x27;Jihae Cha&#x27;, 1), width(desHead, &#x27;Designs that move&#x27;, 1));   // closed, Designs takes the size Jihae Cha has while Designs is open
       if (s === &#x27;s1&#x27;) {   // open, Jihae Cha has the screen to itself: the sentence reads larger, as large as its longest line allows
         const t = document.createElement(&#x27;span&#x27;); t.textContent = &#x27;the\u00a0Netherlands&#x27;;   // kept on one line
         Object.assign(t.style, { position: &#x27;absolute&#x27;, visibility: &#x27;hidden&#x27;, whiteSpace: &#x27;nowrap&#x27;, fontSize: &#x27;100px&#x27;, transition: &#x27;none&#x27; });
