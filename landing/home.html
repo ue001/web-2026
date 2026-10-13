@@ -326,6 +326,7 @@
   .ab .links a { color: color-mix(in srgb, var(--fg) 50%, var(--bg)); text-decoration: none; display: inline-flex; gap: .5em; padding: .15em 0; transition: padding .3s cubic-bezier(.25,1,.45,1), color .3s ease; }   /* soft at rest, like "More about Jihae" */
   .ab .links a:hover, .ab .links a:focus-visible { padding-left: .5em; outline: 0; color: var(--fg); }   /* the whole link is pushed aside */
   @media (prefers-reduced-motion: reduce) { .ab * { transition-duration: 0s !important; animation: none !important; } }
+  @media (max-aspect-ratio: 4/5) { .ab .text p, .ab .links { font-size: clamp(17px, 4.6vw, 20px); } }   /* the bio a little larger on phones */
 </style>
 </head>
 <body>
@@ -1049,10 +1050,27 @@
     try { const t = window.parent.document.documentElement.dataset.theme; if (t) document.documentElement.dataset.theme = t; } catch (e) {}
     const send = dy => window.parent.postMessage({ landingScroll: dy }, '*');
     addEventListener('wheel', e => send(e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1)), { passive: true });
-    let ty = null;
-    addEventListener('touchstart', e => { ty = e.touches[0].clientY; }, { passive: true });
-    addEventListener('touchmove', e => { if (ty === null) return; const y = e.touches[0].clientY; send(ty - y); ty = y; }, { passive: true });
-    addEventListener('touchend', () => { ty = null; }, { passive: true });
+    // a swipe keeps gliding after the finger lifts, like a normal page scroll
+    let ty = null, lt = 0, v = 0, coast = 0;
+    addEventListener('touchstart', e => { cancelAnimationFrame(coast); ty = e.touches[0].clientY; lt = e.timeStamp; v = 0; }, { passive: true });
+    addEventListener('touchmove', e => {
+      if (ty === null) return;
+      const y = e.touches[0].clientY, dy = ty - y, dt = e.timeStamp - lt;
+      if (dt > 0) v = .8 * (dy / dt) + .2 * v;   // px per ms, smoothed
+      send(dy); ty = y; lt = e.timeStamp;
+    }, { passive: true });
+    addEventListener('touchend', e => {
+      ty = null;
+      if (e.timeStamp - lt > 100 || Math.abs(v) < .1) return;   // the finger stopped before lifting: no glide
+      let last = performance.now();
+      const glide = t => {
+        const dt = Math.min(t - last, 50); last = t;
+        v *= Math.pow(.95, dt / 16);
+        if (Math.abs(v) < .02) return;
+        send(v * dt); coast = requestAnimationFrame(glide);
+      };
+      coast = requestAnimationFrame(glide);
+    }, { passive: true });
   }
 </script>
 <script>
