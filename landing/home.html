@@ -1050,12 +1050,12 @@
     try { const t = window.parent.document.documentElement.dataset.theme; if (t) document.documentElement.dataset.theme = t; } catch (e) {}
     const send = dy => window.parent.postMessage({ landingScroll: dy }, '*');
     addEventListener('wheel', e => send(e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1)), { passive: true });
-    // a swipe keeps gliding after the finger lifts, like a normal page scroll
+    // a swipe keeps gliding after the finger lifts, like a normal page scroll; screenY, since the frame itself moves as the page scrolls
     let ty = null, lt = 0, v = 0, coast = 0;
-    addEventListener('touchstart', e => { cancelAnimationFrame(coast); ty = e.touches[0].clientY; lt = e.timeStamp; v = 0; }, { passive: true });
+    addEventListener('touchstart', e => { cancelAnimationFrame(coast); ty = e.touches[0].screenY; lt = e.timeStamp; v = 0; }, { passive: true });
     addEventListener('touchmove', e => {
       if (ty === null) return;
-      const y = e.touches[0].clientY, dy = ty - y, dt = e.timeStamp - lt;
+      const y = e.touches[0].screenY, dy = ty - y, dt = e.timeStamp - lt;
       if (dt > 0) v = .8 * (dy / dt) + .2 * v;   // px per ms, smoothed
       send(dy); ty = y; lt = e.timeStamp;
     }, { passive: true });
