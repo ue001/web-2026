@@ -8,8 +8,8 @@
      · on the index: window.__lockAsk(rect, href) shows the field over
        the reel that was clicked, then goes to the project page.
 
-   The right password is remembered until the browser tab is closed, so
-   it is asked once per visit, not once per project.
+   The right password is remembered per project until the browser tab is
+   closed: unlocking one project does not unlock the others.
 
    This is a polite gate, not real security: the site is static, so the
    content and media files can still be reached directly.
@@ -23,8 +23,10 @@
   var CONTACT='mailto:jihae.cha9@gmail.com?subject=Portfolio%20access';   /* where "contact me" leads */
   var KEY='jihae-unlocked';
 
-  function unlocked(){ try{ return sessionStorage.getItem(KEY)===HASH; }catch(e){ return false; } }
-  function remember(){ try{ sessionStorage.setItem(KEY,HASH); }catch(e){} }
+  /* id: the project's chapter key (data-chapter on its page, its key in CHAPTERS on the index) */
+  function slot(id){ return KEY+':'+String(id||'').replace(/\.[a-z0-9]+$/i,''); }   /* media/generative.mp4 and media/generative are the same */
+  function unlocked(id){ try{ return sessionStorage.getItem(slot(id))===HASH; }catch(e){ return false; } }
+  function remember(id){ try{ sessionStorage.setItem(slot(id),HASH); }catch(e){} }
   function sha(s){
     if(!(window.crypto&&crypto.subtle&&window.TextEncoder)) return Promise.resolve('');
     return crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)).then(function(b){
@@ -33,7 +35,7 @@
   }
 
   /* the note, the field and its message; calls ok() once the password is right */
-  function form(ok){
+  function form(id, ok){
     var f=document.createElement('form');
     f.className='lock-form';
     f.innerHTML=
@@ -45,7 +47,7 @@
     f.addEventListener('submit',function(e){
       e.preventDefault();
       sha(inp.value).then(function(h){
-        if(h===HASH){ remember(); msg.textContent=''; ok(); return; }
+        if(h===HASH){ remember(id); msg.textContent=''; ok(); return; }
         msg.textContent='Wrong password. Try again.';
         field.classList.remove('bad'); void field.offsetWidth; field.classList.add('bad');
         inp.select();
@@ -66,7 +68,8 @@
     };
     var go=body.getAttribute('data-go');   /* the project opens in the index overlay: send the visitor there once unlocked */
     var done=function(){ if(go) location.replace(go); else load(0); };
-    if(unlocked()){ done(); }
+    var id=body.getAttribute('data-chapter')||location.pathname;
+    if(unlocked(id)){ done(); }
     else {
       /* same rule as the index: dark unless the visitor chose light */
       var t=null; try{ t=localStorage.getItem('jihae-theme'); }catch(e){}
@@ -76,7 +79,7 @@
       page.innerHTML='<a class="lock-name" href="index.html">Jihae Cha</a><div class="lock-wrap"><h1></h1></div>';
       var wrap=page.querySelector('.lock-wrap');
       wrap.querySelector('h1').textContent=body.getAttribute('data-title')||'';
-      wrap.appendChild(form(function(){ if(!go) page.remove(); done(); }));
+      wrap.appendChild(form(id, function(){ if(!go) page.remove(); done(); }));
       var back=document.createElement('a'); back.className='lock-back'; back.href='index.html'; back.innerHTML='&larr; Back to all work';
       wrap.appendChild(back);
       body.insertBefore(page, body.firstChild);
@@ -98,15 +101,15 @@
   function onOut(e){ if(box && !box.contains(e.target)) shut(); }
   window.__lockUnlocked=unlocked;
   /* href is an address to go to, or a function to call once the password is right */
-  window.__lockAsk=function(r, href){
+  window.__lockAsk=function(r, href, id){
     var go=function(){ if(typeof href==='function') href(); else location.href=href; };
-    if(unlocked()){ go(); return; }
+    if(unlocked(id)){ go(); return; }
     shut();
     box=document.createElement('div');
     box.className='lock-box';
     box.style.left=r.left+'px'; box.style.top=r.top+'px';
     box.style.width=r.width+'px'; box.style.height=r.height+'px';
-    var f=form(function(){ shut(); go(); });
+    var f=form(id, function(){ shut(); go(); });
     box.appendChild(f);
     /* a second click on the reel, anywhere but the field, puts the reel back */
     box.addEventListener('click',function(e){ if(!f.contains(e.target)) shut(); });

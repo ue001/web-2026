@@ -2645,7 +2645,7 @@
     n.style.width=r.width+'px'; n.style.height=r.height+'px';
   }
   function ch0(i){ try{ return CHAPTERS[key(shots[i])]||{}; }catch(e){ return {}; } }
-  function locked(i){ var c=ch0(i); return !!c.locked && !(window.__lockUnlocked && window.__lockUnlocked()); }
+  function locked(i){ var c=ch0(i); return !!c.locked && !(window.__lockUnlocked && window.__lockUnlocked(key(shots[i]))); }
   /* ---- the flight between a tile and its chapter ----------------------
      Kept simple and light on purpose. The flying piece is a still picture of
      the frame on screen when it was clicked, so no second copy of the video
@@ -2725,7 +2725,7 @@
   function open(i,push){
     if(busy) return;
     if(locked(i)){   // a protected project asks for the password over its reel, then opens here like the rest
-      if(push && window.__lockAsk) window.__lockAsk(startRect(i), function(){ open(i,push); });
+      if(push && window.__lockAsk) window.__lockAsk(startRect(i), function(){ open(i,push); }, key(shots[i]));
       else if(ch0(i).file) location.href=ch0(i).file;   // a direct link: its own page asks, then comes back
       return;
     }
