@@ -913,6 +913,8 @@
       }
     }
     box.parentElement.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') point(e); });
+    // phones have no hover: a tap on a cell does what passing the cursor over it does
+    if (!matchMedia('(hover: hover)').matches) box.parentElement.addEventListener('click', e => { px = null; point(e); });
     const off = () => { on = false; intro = false; follow = false; pair = null; clearTimeout(idleT); };
     return {
       start() { off(); reset(); on = true; if (still) return; timer = setTimeout(step, 450); },   // starts on the same beat as ", based in the Netherlands": the sentence and the study arrive together
@@ -1002,8 +1004,8 @@
      Only the corners around the cursor move, never a whole cell at once. Mouse and trackpad only;
      touch and reduced motion keep the square grid. */
   (function () {
-    if (!matchMedia('(hover: hover) and (pointer: fine)').matches ||
-        matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const mouse = matchMedia('(hover: hover) and (pointer: fine)').matches;
     const REACH = 240;   // how close the cursor has to be to a corner for that corner to start rounding (px)
     const PANEL_MAX = 180; // the most the big panels round (px)
     const cells = [...document.querySelectorAll('.panel')];
@@ -1027,6 +1029,12 @@
           });
         c.style.setProperty('--r', radii.join(' '));
       });
+    }
+    // phones: a tap rounds the corners around the finger for a moment, then they square again
+    if (!mouse) {
+      let backT = null;
+      addEventListener('click', e => { at = [e.clientX, e.clientY]; apply(); clearTimeout(backT); backT = setTimeout(() => { at = null; apply(); }, 700); }, true);
+      return;
     }
     addEventListener('pointermove', e => {
       at = [e.clientX, e.clientY]; apply();
@@ -1107,6 +1115,11 @@
       if (d < R) { const f = (1 - d / R) ** 1.4 * PUSH; w.style.transform = `translate(${dx / d * f}px,${dy / d * f * .6}px)`; }
       else if (w.style.transform) w.style.transform = '';
     });
+  }
+  // phones: a tap on the bio nudges the words around the finger aside, and they drift back
+  if (!still && !matchMedia('(hover: hover)').matches) {
+    let backT = null;
+    text.addEventListener('click', e => { mx = e.clientX; my = e.clientY; lean(); clearTimeout(backT); backT = setTimeout(() => { mx = my = -1e4; lean(); }, 600); });
   }
   if (!still && matchMedia('(hover: hover)').matches) {
     text.addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; if (!raf) raf = requestAnimationFrame(lean); });
