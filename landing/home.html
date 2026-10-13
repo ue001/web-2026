@@ -247,9 +247,9 @@
   @media (max-aspect-ratio: 4/5) {
     :root { --size: clamp(12px, 3.3vw, 14px); --big: clamp(56px, 20vw, 120px); --head: clamp(30px, 10vw, 54px); --lede: clamp(14px, 3.8vw, 17px); }
     .stage, .stage.s1, .stage.s2 { grid-template-columns: 1fr; }
-    .stage { grid-template-rows: 1fr 1fr; }
-    .stage.s1 { grid-template-rows: var(--s1rows, 6fr 1fr); }   /* Designs' row is just tall enough for Designs: set in fit() */
-    .stage.s2 { grid-template-rows: var(--s2rows, 1fr 6fr); }   /* the name's row is just tall enough for the name: set in fit() */
+    .stage { grid-template-rows: 50% 50%; }   /* in % and px, not fr: the rows keep their sizes when the landing grows */
+    .stage.s1 { grid-template-rows: var(--s1rows, 86% 14%); }   /* Designs' row is just tall enough for Designs: set in fit() */
+    .stage.s2 { grid-template-rows: var(--s2rows, 14% 86%); }   /* the name's row is just tall enough for the name: set in fit() */
     .panel.name { margin: calc(-1 * var(--line)) calc(-1 * var(--line)) 0 calc(-1 * var(--line)); }
     .panel.designs { margin: calc(-1 * var(--line)); }
   }
@@ -409,10 +409,10 @@
     if (phone.matches) {
       const pad = parseFloat(getComputedStyle(nameHead).paddingLeft), L = 2;
       const need = Math.round(pad * 2 + n * SCALE * .95 + L), H = stage.clientHeight;
-      if (H > need) stage.style.setProperty('--s2rows', need + 'fr ' + (H - need) + 'fr');
+      stage.style.setProperty('--s2rows', need + 'px calc(100% - ' + need + 'px)');
       // and the other way round: with Jihae Cha open, Designs' row holds just Designs
       const needD = Math.round(pad * 2 + d * SCALE * .95 + L);
-      if (H > needD) stage.style.setProperty('--s1rows', (H - needD) + 'fr ' + needD + 'fr');
+      stage.style.setProperty('--s1rows', 'calc(100% - ' + needD + 'px) ' + needD + 'px');
       stage.dataset.desH = needD;   // read when the landing grows on phones
     } else { stage.style.removeProperty('--s2rows'); stage.style.removeProperty('--s1rows'); }
     // line the two headings up along the top of their capitals: the smaller one stays put and
@@ -437,7 +437,8 @@
     nameHead.offsetWidth;
     requestAnimationFrame(() => [nameHead, desHead].forEach(h => h.style.transition = ''));
   }
-  addEventListener('resize', () => snap(current));
+  let snapW = innerWidth;   // on phones a height-only resize (the landing growing, the address bar) leaves the sizes as they are
+  addEventListener('resize', () => { if (phone.matches && innerWidth === snapW) return; snapW = innerWidth; snap(current); });
   document.fonts && document.fonts.ready.then(() => snap(current));
   snap('s0');
 
@@ -1116,16 +1117,20 @@
     let grow = 0, t = null;
     const send = g => { if (g !== grow) { grow = g; window.parent.postMessage({ landingGrow: g }, '*'); } };
     function check() {
-      clearTimeout(t);
+      cancelAnimationFrame(t);
       if (!phone.matches || !stage.classList.contains('s1') || window.parent === window) { send(0); return; }
-      // once the panel has opened, grow by what the text is short of
-      t = setTimeout(() => {
-        // the text's own height plus everything above it in the panel (heading, buttons, line)
-        const name = stage.querySelector('.panel.name'), need = name.offsetHeight - text.clientHeight + text.scrollHeight;
+      // grow right as the panel opens, so Designs makes one move to its place
+      t = requestAnimationFrame(() => {
+        // the heading is still growing: a still copy of it gives its final height
+        const name = stage.querySelector('.panel.name'), head = name.querySelector('.head'), copy = head.cloneNode(true);
+        Object.assign(copy.style, { position: 'absolute', visibility: 'hidden', transition: 'none', width: head.offsetWidth + 'px' });
+        name.appendChild(copy); const headH = copy.offsetHeight; copy.remove();
+        // the full text, the heading, and what sits between them (buttons, line), which never changes
+        const need = name.offsetHeight - head.offsetHeight - text.clientHeight + headH + text.scrollHeight;
         const base = innerHeight - grow;   // the landing's height before it grew
-        const des = +stage.dataset.desH || stage.querySelector('.panel.designs').offsetHeight;   // Designs' row keeps its own height
+        const des = +stage.dataset.desH || 0;   // Designs' row keeps its own height
         send(Math.max(0, Math.ceil(need + des - base)));
-      }, 1100);
+      });
     }
     new MutationObserver(check).observe(stage, { attributes: true, attributeFilter: ['class'] });
     let w = innerWidth;   // its own growing resizes it too: only a new width measures again
