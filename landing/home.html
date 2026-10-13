@@ -326,7 +326,7 @@
   .ab .links a { color: color-mix(in srgb, var(--fg) 50%, var(--bg)); text-decoration: none; display: inline-flex; gap: .5em; padding: .15em 0; transition: padding .3s cubic-bezier(.25,1,.45,1), color .3s ease; }   /* soft at rest, like "More about Jihae" */
   .ab .links a:hover, .ab .links a:focus-visible { padding-left: .5em; outline: 0; color: var(--fg); }   /* the whole link is pushed aside */
   @media (prefers-reduced-motion: reduce) { .ab * { transition-duration: 0s !important; animation: none !important; } }
-  @media (max-aspect-ratio: 4/5) { .ab .text p, .ab .links { font-size: clamp(17px, 4.6vw, 20px); } }   /* the bio a little larger on phones */
+  @media (max-aspect-ratio: 4/5) { .ab .text p, .ab .links { font-size: var(--fit, clamp(17px, 4.6vw, 20px)); } .ab .links { margin-top: 1.2em; } }   /* phones: as large as fits, so the bio and its links share one screen */
 </style>
 </head>
 <body>
@@ -1141,32 +1141,35 @@
 })();
 </script>
 <script>
-  /* phones: the whole bio shows. When the Jihae Cha panel opens, the landing asks the page for
-     the extra height its text needs, so Designs moves down instead of the text scrolling */
+  /* phones: the whole bio and its links fit on one screen. When the Jihae Cha panel opens, the
+     text takes the largest size that fits under the heading, so nothing scrolls inside the landing */
   (() => {
     const phone = matchMedia('(max-aspect-ratio: 4/5)'), stage = document.getElementById('stage'), text = document.getElementById('abText');
-    let grow = 0, t = null;
-    const send = g => { if (g !== grow) { grow = g; window.parent.postMessage({ landingGrow: g }, '*'); } };
+    window.parent.postMessage({ landingGrow: 0 }, '*');
+    let t = null;
     function check() {
       cancelAnimationFrame(t);
-      if (!phone.matches || !stage.classList.contains('s1') || window.parent === window) { send(0); return; }
-      // grow right as the panel opens, so Designs makes one move to its place
+      if (!phone.matches) { text.style.removeProperty('--fit'); return; }
+      if (!stage.classList.contains('s1')) return;
       t = requestAnimationFrame(() => {
         // the heading is still growing: a still copy of it gives its final height
         const name = stage.querySelector('.panel.name'), head = name.querySelector('.head'), copy = head.cloneNode(true);
         Object.assign(copy.style, { position: 'absolute', visibility: 'hidden', transition: 'none', width: head.offsetWidth + 'px' });
         name.appendChild(copy); const headH = copy.offsetHeight; copy.remove();
-        // the full text, the heading, and what sits between them (buttons, line), which never changes
-        const need = name.offsetHeight - head.offsetHeight - text.clientHeight + headH + text.scrollHeight;
-        const base = innerHeight - grow;   // the landing's height before it grew
-        const des = +stage.dataset.desH || 0;   // Designs' row keeps its own height
-        // Jihae Cha fills the whole screen at least, so Designs starts below it, not half in view
-        send(Math.max(0, Math.ceil(Math.max(need, base) + des - base)));
+        const room = text.clientHeight + head.offsetHeight - headH;   // the text's height once the heading has settled
+        let lo = 11, hi = Math.min(20, Math.max(17, innerWidth * .046));
+        text.style.setProperty('--fit', hi + 'px');
+        if (text.scrollHeight <= room) return;
+        while (hi - lo > .25) {   // the largest size that still fits
+          const m = (lo + hi) / 2; text.style.setProperty('--fit', m + 'px');
+          if (text.scrollHeight <= room) lo = m; else hi = m;
+        }
+        text.style.setProperty('--fit', lo + 'px');
       });
     }
     new MutationObserver(check).observe(stage, { attributes: true, attributeFilter: ['class'] });
-    let w = innerWidth;   // its own growing resizes it too: only a new width measures again
-    addEventListener('resize', () => { if (innerWidth !== w) { w = innerWidth; check(); } });
+    let w = innerWidth, h = innerHeight;
+    addEventListener('resize', () => { if (innerWidth !== w || Math.abs(innerHeight - h) > 100) { w = innerWidth; h = innerHeight; check(); } });
   })();
 </script>
 </body>

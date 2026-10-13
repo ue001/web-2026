@@ -933,7 +933,7 @@
   .ab .links a { color: color-mix(in srgb, var(--fg) 50%, var(--bg)); text-decoration: none; display: inline-flex; gap: .5em; padding: .15em 0; transition: padding .3s cubic-bezier(.25,1,.45,1), color .3s ease; }   /* soft at rest, like &quot;More about Jihae&quot; */
   .ab .links a:hover, .ab .links a:focus-visible { padding-left: .5em; outline: 0; color: var(--fg); }   /* the whole link is pushed aside */
   @media (prefers-reduced-motion: reduce) { .ab * { transition-duration: 0s !important; animation: none !important; } }
-  @media (max-aspect-ratio: 4/5) { .ab .text p, .ab .links { font-size: clamp(17px, 4.6vw, 20px); } }   /* the bio a little larger on phones */
+  @media (max-aspect-ratio: 4/5) { .ab .text p, .ab .links { font-size: var(--fit, clamp(17px, 4.6vw, 20px)); } .ab .links { margin-top: 1.2em; } }   /* phones: as large as fits, so the bio and its links share one screen */
 &lt;/style&gt;
 &lt;/head&gt;
 &lt;body&gt;
@@ -1675,32 +1675,35 @@
 })();
 &lt;/script&gt;
 &lt;script&gt;
-  /* phones: the whole bio shows. When the Jihae Cha panel opens, the landing asks the page for
-     the extra height its text needs, so Designs moves down instead of the text scrolling */
+  /* phones: the whole bio and its links fit on one screen. When the Jihae Cha panel opens, the
+     text takes the largest size that fits under the heading, so nothing scrolls inside the landing */
   (() =&gt; {
     const phone = matchMedia(&#x27;(max-aspect-ratio: 4/5)&#x27;), stage = document.getElementById(&#x27;stage&#x27;), text = document.getElementById(&#x27;abText&#x27;);
-    let grow = 0, t = null;
-    const send = g =&gt; { if (g !== grow) { grow = g; window.parent.postMessage({ landingGrow: g }, &#x27;*&#x27;); } };
+    window.parent.postMessage({ landingGrow: 0 }, &#x27;*&#x27;);
+    let t = null;
     function check() {
       cancelAnimationFrame(t);
-      if (!phone.matches || !stage.classList.contains(&#x27;s1&#x27;) || window.parent === window) { send(0); return; }
-      // grow right as the panel opens, so Designs makes one move to its place
+      if (!phone.matches) { text.style.removeProperty(&#x27;--fit&#x27;); return; }
+      if (!stage.classList.contains(&#x27;s1&#x27;)) return;
       t = requestAnimationFrame(() =&gt; {
         // the heading is still growing: a still copy of it gives its final height
         const name = stage.querySelector(&#x27;.panel.name&#x27;), head = name.querySelector(&#x27;.head&#x27;), copy = head.cloneNode(true);
         Object.assign(copy.style, { position: &#x27;absolute&#x27;, visibility: &#x27;hidden&#x27;, transition: &#x27;none&#x27;, width: head.offsetWidth + &#x27;px&#x27; });
         name.appendChild(copy); const headH = copy.offsetHeight; copy.remove();
-        // the full text, the heading, and what sits between them (buttons, line), which never changes
-        const need = name.offsetHeight - head.offsetHeight - text.clientHeight + headH + text.scrollHeight;
-        const base = innerHeight - grow;   // the landing&#x27;s height before it grew
-        const des = +stage.dataset.desH || 0;   // Designs&#x27; row keeps its own height
-        // Jihae Cha fills the whole screen at least, so Designs starts below it, not half in view
-        send(Math.max(0, Math.ceil(Math.max(need, base) + des - base)));
+        const room = text.clientHeight + head.offsetHeight - headH;   // the text&#x27;s height once the heading has settled
+        let lo = 11, hi = Math.min(20, Math.max(17, innerWidth * .046));
+        text.style.setProperty(&#x27;--fit&#x27;, hi + &#x27;px&#x27;);
+        if (text.scrollHeight &lt;= room) return;
+        while (hi - lo &gt; .25) {   // the largest size that still fits
+          const m = (lo + hi) / 2; text.style.setProperty(&#x27;--fit&#x27;, m + &#x27;px&#x27;);
+          if (text.scrollHeight &lt;= room) lo = m; else hi = m;
+        }
+        text.style.setProperty(&#x27;--fit&#x27;, lo + &#x27;px&#x27;);
       });
     }
     new MutationObserver(check).observe(stage, { attributes: true, attributeFilter: [&#x27;class&#x27;] });
-    let w = innerWidth;   // its own growing resizes it too: only a new width measures again
-    addEventListener(&#x27;resize&#x27;, () =&gt; { if (innerWidth !== w) { w = innerWidth; check(); } });
+    let w = innerWidth, h = innerHeight;
+    addEventListener(&#x27;resize&#x27;, () =&gt; { if (innerWidth !== w || Math.abs(innerHeight - h) &gt; 100) { w = innerWidth; h = innerHeight; check(); } });
   })();
 &lt;/script&gt;
 &lt;/body&gt;
