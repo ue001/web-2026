@@ -851,7 +851,6 @@
     .stage.s2 { grid-template-rows: var(--s2rows, 14% 86%); }   /* the name&#x27;s row is just tall enough for the name: set in fit() */
     .panel.name { margin: calc(-1 * var(--line)) calc(-1 * var(--line)) 0 calc(-1 * var(--line)); }
     .panel.designs { margin: calc(-1 * var(--line)); }
-    .s1 .panel.designs { visibility: hidden; transition: visibility 0s linear var(--t); }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -1028,7 +1027,7 @@
       stage.style.setProperty(&#x27;--s2rows&#x27;, need + &#x27;px calc(100% - &#x27; + need + &#x27;px)&#x27;);
       // and the other way round: with Jihae Cha open, Designs&#x27; row holds just Designs
       const needD = Math.round(pad * 2 + d * SCALE * .95 + L);
-      stage.style.setProperty(&#x27;--s1rows&#x27;, &#x27;100% 0px&#x27;);   // with Jihae Cha open, Designs moves off the screen and the name fills it
+      stage.style.setProperty(&#x27;--s1rows&#x27;, &#x27;calc(100% - &#x27; + needD + &#x27;px) &#x27; + needD + &#x27;px&#x27;);   // with Jihae Cha open, Designs&#x27; row holds just Designs; the landing grows by it, so Designs waits just below the screen
       stage.dataset.desH = needD;   // read when the landing grows on phones
     } else { stage.style.removeProperty(&#x27;--s2rows&#x27;); stage.style.removeProperty(&#x27;--s1rows&#x27;); }
     // line the two headings up along the top of their capitals: the smaller one stays put and
@@ -1687,10 +1686,12 @@
      text takes the largest size that fits under the heading, so nothing scrolls inside the landing */
   (() =&gt; {
     const phone = matchMedia(&#x27;(max-aspect-ratio: 4/5)&#x27;), stage = document.getElementById(&#x27;stage&#x27;), text = document.getElementById(&#x27;abText&#x27;);
-    window.parent.postMessage({ landingGrow: 0 }, &#x27;*&#x27;);
-    let t = null;
+    let t = null, grow = -1;
+    const send = g =&gt; { if (g !== grow) { grow = g; window.parent.postMessage({ landingGrow: g }, &#x27;*&#x27;); } };
     function check() {
       cancelAnimationFrame(t);
+      // open on phones, Jihae Cha fills the screen and the landing grows by Designs&#x27; row, which sits just below
+      send(phone.matches &amp;&amp; stage.classList.contains(&#x27;s1&#x27;) &amp;&amp; window.parent !== window ? +stage.dataset.desH || 0 : 0);
       if (!phone.matches) { text.style.removeProperty(&#x27;--fit&#x27;); return; }
       if (!stage.classList.contains(&#x27;s1&#x27;)) return;
       t = requestAnimationFrame(() =&gt; {

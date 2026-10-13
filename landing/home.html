@@ -252,7 +252,6 @@
     .stage.s2 { grid-template-rows: var(--s2rows, 14% 86%); }   /* the name's row is just tall enough for the name: set in fit() */
     .panel.name { margin: calc(-1 * var(--line)) calc(-1 * var(--line)) 0 calc(-1 * var(--line)); }
     .panel.designs { margin: calc(-1 * var(--line)); }
-    .s1 .panel.designs { visibility: hidden; transition: visibility 0s linear var(--t); }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -421,7 +420,7 @@
       stage.style.setProperty('--s2rows', need + 'px calc(100% - ' + need + 'px)');
       // and the other way round: with Jihae Cha open, Designs' row holds just Designs
       const needD = Math.round(pad * 2 + d * SCALE * .95 + L);
-      stage.style.setProperty('--s1rows', '100% 0px');   // with Jihae Cha open, Designs moves off the screen and the name fills it
+      stage.style.setProperty('--s1rows', 'calc(100% - ' + needD + 'px) ' + needD + 'px');   // with Jihae Cha open, Designs' row holds just Designs; the landing grows by it, so Designs waits just below the screen
       stage.dataset.desH = needD;   // read when the landing grows on phones
     } else { stage.style.removeProperty('--s2rows'); stage.style.removeProperty('--s1rows'); }
     // line the two headings up along the top of their capitals: the smaller one stays put and
@@ -1153,10 +1152,12 @@
      text takes the largest size that fits under the heading, so nothing scrolls inside the landing */
   (() => {
     const phone = matchMedia('(max-aspect-ratio: 4/5)'), stage = document.getElementById('stage'), text = document.getElementById('abText');
-    window.parent.postMessage({ landingGrow: 0 }, '*');
-    let t = null;
+    let t = null, grow = -1;
+    const send = g => { if (g !== grow) { grow = g; window.parent.postMessage({ landingGrow: g }, '*'); } };
     function check() {
       cancelAnimationFrame(t);
+      // open on phones, Jihae Cha fills the screen and the landing grows by Designs' row, which sits just below
+      send(phone.matches && stage.classList.contains('s1') && window.parent !== window ? +stage.dataset.desH || 0 : 0);
       if (!phone.matches) { text.style.removeProperty('--fit'); return; }
       if (!stage.classList.contains('s1')) return;
       t = requestAnimationFrame(() => {
