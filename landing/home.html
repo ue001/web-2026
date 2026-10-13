@@ -1129,7 +1129,8 @@
         const need = name.offsetHeight - head.offsetHeight - text.clientHeight + headH + text.scrollHeight;
         const base = innerHeight - grow;   // the landing's height before it grew
         const des = +stage.dataset.desH || 0;   // Designs' row keeps its own height
-        send(Math.max(0, Math.ceil(need + des - base)));
+        // Jihae Cha fills the whole screen at least, so Designs starts below it, not half in view
+        send(Math.max(0, Math.ceil(Math.max(need, base) + des - base)));
       });
     }
     new MutationObserver(check).observe(stage, { attributes: true, attributeFilter: ['class'] });
