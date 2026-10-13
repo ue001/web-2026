@@ -325,9 +325,6 @@
   .ab .links { display: flex; flex-direction: column; align-items: flex-start; gap: .2em; margin-top: 2em; font-size: clamp(15px, 1.4vw, 23px); letter-spacing: -.012em; }
   .ab .links a { color: color-mix(in srgb, var(--fg) 50%, var(--bg)); text-decoration: none; display: inline-flex; gap: .5em; padding: .15em 0; transition: padding .3s cubic-bezier(.25,1,.45,1), color .3s ease; }   /* soft at rest, like "More about Jihae" */
   .ab .links a:hover, .ab .links a:focus-visible { padding-left: .5em; outline: 0; color: var(--fg); }   /* the whole link is pushed aside */
-  @media (max-width: 600px) {   /* phones: the links stay pinned at the bottom of the panel, in one row; only the text scrolls above them */
-    .ab .links { position: sticky; bottom: calc(var(--pad) * -1); flex-direction: row; flex-wrap: wrap; gap: 0 1.2em; margin: 1em 0 0; padding: .6em 0 var(--pad); background: var(--bg); }
-  }
   @media (prefers-reduced-motion: reduce) { .ab * { transition-duration: 0s !important; animation: none !important; } }
 </style>
 </head>
@@ -1106,6 +1103,28 @@
   new MutationObserver(() => { if (!document.getElementById('stage').classList.contains('s1')) mode(false); })
     .observe(document.getElementById('stage'), { attributes: true, attributeFilter: ['class'] });
 })();
+</script>
+<script>
+  /* phones: the whole bio shows. When the Jihae Cha panel opens, the landing asks the page for
+     the extra height its text needs, so Designs moves down instead of the text scrolling */
+  (() => {
+    const phone = matchMedia('(max-aspect-ratio: 4/5)'), stage = document.getElementById('stage'), text = document.getElementById('abText');
+    let grow = 0, t = null;
+    const send = g => { if (g !== grow) { grow = g; window.parent.postMessage({ landingGrow: g }, '*'); } };
+    function check() {
+      clearTimeout(t);
+      if (!phone.matches || !stage.classList.contains('s1') || window.parent === window) { send(0); return; }
+      // once the panel has opened, grow by what the text is short of; the name's row is 6 of 7 parts
+      t = setTimeout(() => {
+        // the text's own height plus everything above it in the panel (heading, buttons, line)
+        const name = stage.querySelector('.panel.name'), need = name.offsetHeight - text.clientHeight + text.scrollHeight;
+        const base = innerHeight - grow;   // the landing's height before it grew
+        send(Math.max(0, Math.ceil(need * 7 / 6 - base)));
+      }, 1100);
+    }
+    new MutationObserver(check).observe(stage, { attributes: true, attributeFilter: ['class'] });
+    addEventListener('resize', () => { send(0); check(); });
+  })();
 </script>
 </body>
 </html>

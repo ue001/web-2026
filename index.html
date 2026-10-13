@@ -931,9 +931,6 @@
   .ab .links { display: flex; flex-direction: column; align-items: flex-start; gap: .2em; margin-top: 2em; font-size: clamp(15px, 1.4vw, 23px); letter-spacing: -.012em; }
   .ab .links a { color: color-mix(in srgb, var(--fg) 50%, var(--bg)); text-decoration: none; display: inline-flex; gap: .5em; padding: .15em 0; transition: padding .3s cubic-bezier(.25,1,.45,1), color .3s ease; }   /* soft at rest, like &quot;More about Jihae&quot; */
   .ab .links a:hover, .ab .links a:focus-visible { padding-left: .5em; outline: 0; color: var(--fg); }   /* the whole link is pushed aside */
-  @media (max-width: 600px) {   /* phones: the links stay pinned at the bottom of the panel, in one row; only the text scrolls above them */
-    .ab .links { position: sticky; bottom: calc(var(--pad) * -1); flex-direction: row; flex-wrap: wrap; gap: 0 1.2em; margin: 1em 0 0; padding: .6em 0 var(--pad); background: var(--bg); }
-  }
   @media (prefers-reduced-motion: reduce) { .ab * { transition-duration: 0s !important; animation: none !important; } }
 &lt;/style&gt;
 &lt;/head&gt;
@@ -1639,6 +1636,28 @@
   new MutationObserver(() =&gt; { if (!document.getElementById(&#x27;stage&#x27;).classList.contains(&#x27;s1&#x27;)) mode(false); })
     .observe(document.getElementById(&#x27;stage&#x27;), { attributes: true, attributeFilter: [&#x27;class&#x27;] });
 })();
+&lt;/script&gt;
+&lt;script&gt;
+  /* phones: the whole bio shows. When the Jihae Cha panel opens, the landing asks the page for
+     the extra height its text needs, so Designs moves down instead of the text scrolling */
+  (() =&gt; {
+    const phone = matchMedia(&#x27;(max-aspect-ratio: 4/5)&#x27;), stage = document.getElementById(&#x27;stage&#x27;), text = document.getElementById(&#x27;abText&#x27;);
+    let grow = 0, t = null;
+    const send = g =&gt; { if (g !== grow) { grow = g; window.parent.postMessage({ landingGrow: g }, &#x27;*&#x27;); } };
+    function check() {
+      clearTimeout(t);
+      if (!phone.matches || !stage.classList.contains(&#x27;s1&#x27;) || window.parent === window) { send(0); return; }
+      // once the panel has opened, grow by what the text is short of; the name&#x27;s row is 6 of 7 parts
+      t = setTimeout(() =&gt; {
+        // the text&#x27;s own height plus everything above it in the panel (heading, buttons, line)
+        const name = stage.querySelector(&#x27;.panel.name&#x27;), need = name.offsetHeight - text.clientHeight + text.scrollHeight;
+        const base = innerHeight - grow;   // the landing&#x27;s height before it grew
+        send(Math.max(0, Math.ceil(need * 7 / 6 - base)));
+      }, 1100);
+    }
+    new MutationObserver(check).observe(stage, { attributes: true, attributeFilter: [&#x27;class&#x27;] });
+    addEventListener(&#x27;resize&#x27;, () =&gt; { send(0); check(); });
+  })();
 &lt;/script&gt;
 &lt;/body&gt;
 &lt;/html&gt;
@@ -2948,6 +2967,7 @@
     });
     addEventListener('message', function(e){ if(e.data && e.data.landingOpen) root.classList.add('landing-open'); });
     addEventListener('message', function(e){ if(e.data && typeof e.data.landingName==='boolean') root.classList.toggle('jihae-open', e.data.landingName); });
+    addEventListener('message', function(e){ if(!e.data || typeof e.data.landingGrow!=='number') return; var b=document.querySelector('.band--landing'); if(b) b.style.height=e.data.landingGrow ? 'calc(100svh + '+e.data.landingGrow+'px)' : ''; });   // phones: the landing grows so the whole bio shows
     setTimeout(function(){ root.classList.add('landing-open'); setTimeout(function(){ root.classList.add('landing-hinted'); }, 4500); }, 8000);   /* in case the landing never reports */
     var hintT=null, hinted=function(){ root.classList.add('landing-hinted'); };
     addEventListener('message', function(e){ if(e.data && e.data.landingOpen && !hintT) hintT=setTimeout(hinted, 4500); });
