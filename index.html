@@ -2315,6 +2315,207 @@
   html.proj-past-hero .ratio{
     opacity:1; translate:0 0; visibility:visible; pointer-events:auto;
     transition:opacity .45s ease, translate .45s cubic-bezier(.2,.7,.2,1), visibility 0s linear 0s; }
+
+  /* ---- Generative Title Slide: its live plates (the sections in its
+     <template> below; content/01-generative.js) ---------------------- */
+  /* ---- live plates, in the site's ink ------------------------------ */
+  .proj[data-chapter="media/generative"] .g-lab{ font-size:13px; font-weight:500; color:var(--ink-soft); }
+  /* System: the two questions, clickable */
+  .proj[data-chapter="media/generative"] .g-axes{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); grid-template-areas:"tl tr" "bl br"; position:relative; padding:56px 0; }
+  .proj[data-chapter="media/generative"] .g-axes::before{ content:""; position:absolute; left:50%; top:0; bottom:0; border-left:1px solid var(--ink); }
+  .proj[data-chapter="media/generative"] .g-axes::after{ content:""; position:absolute; top:50%; left:0; right:0; border-top:1px solid var(--ink); }
+  .proj[data-chapter="media/generative"] .g-axes > span{ position:absolute; font-size:14px; font-weight:500; background:var(--paper); padding:2px 8px; z-index:1; line-height:1.3; text-align:center; }
+  .proj[data-chapter="media/generative"] .g-axes small{ display:block; font-weight:400; color:var(--ink-soft); font-size:12px; }
+  .proj[data-chapter="media/generative"] .g-axes > .t{ top:0; left:50%; transform:translateX(-50%); }
+  .proj[data-chapter="media/generative"] .g-axes > .b{ bottom:0; left:50%; transform:translateX(-50%); }
+  .proj[data-chapter="media/generative"] .g-axes > .l{ left:0; top:50%; transform:translateY(-50%); text-align:left; }
+  .proj[data-chapter="media/generative"] .g-axes > .r{ right:0; top:50%; transform:translateY(-50%); text-align:right; }
+  .proj[data-chapter="media/generative"] .g-axes button{ font:inherit; font-size:14px; background:transparent; color:var(--ink); border:0; padding:44px 24px; cursor:pointer; min-height:130px; }
+  .proj[data-chapter="media/generative"] .g-axes button:hover{ background:var(--shot-bg); }
+  .proj[data-chapter="media/generative"] .g-axes button[aria-pressed="true"]{ background:var(--ink); color:var(--paper); }
+  .proj[data-chapter="media/generative"] .g-sl{ display:grid; grid-template-columns:5rem minmax(0,1fr) 2.4rem; gap:8px; align-items:center; font-size:12px; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .proj[data-chapter="media/generative"] .g-sl span{ text-align:right; }
+  .proj[data-chapter="media/generative"] .g-sl input[type=range]{ accent-color:var(--ink); width:100%; margin:0; }
+  .proj[data-chapter="media/generative"] .slide{ position:relative; aspect-ratio:16/9; background:var(--shot-bg); overflow:hidden; }
+  .proj[data-chapter="media/generative"] .slide canvas{ position:absolute; inset:0; width:100%; height:100%; }
+  .proj[data-chapter="media/generative"] .slide .t{ position:absolute; left:5%; bottom:7%; color:#fff; font-size:clamp(13px,1.8vw,22px); line-height:1.1; text-shadow:0 0 12px rgba(0,0,0,.25); }
+  .proj[data-chapter="media/generative"] .slide .t small{ display:block; font-size:.5em; margin-bottom:4px; }
+  .proj[data-chapter="media/generative"] .slide .lg{ position:absolute; left:5%; top:6%; font-size:9px; letter-spacing:.08em; color:#fff; }
+  .proj[data-chapter="media/generative"] .slide .dt{ position:absolute; right:5%; top:6%; font-size:9px; letter-spacing:.08em; color:#fff; }
+  .proj[data-chapter="media/generative"] .pills{ display:flex; flex-wrap:wrap; gap:6px; }
+  .proj[data-chapter="media/generative"] .pills button, .proj[data-chapter="media/generative"] .pill{ font:inherit; font-size:12px; padding:5px 10px; border:1px solid var(--rule-idle); border-radius:999px; background:transparent; color:var(--ink); cursor:pointer; }
+  .proj[data-chapter="media/generative"] .pills button[aria-pressed="true"]{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .proj[data-chapter="media/generative"] .g-try summary{ cursor:pointer; font-size:14px; font-weight:500; width:max-content; border-bottom:1px solid currentColor; }
+  .proj[data-chapter="media/generative"] .g-try summary::marker, .proj[data-chapter="media/generative"] .g-try summary::-webkit-details-marker{ display:none; content:""; }
+  .proj[data-chapter="media/generative"] .g-try[open] summary{ margin-bottom:var(--pad); }
+  .proj[data-chapter="media/generative"] .g-play{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2fr); gap:var(--pad); align-items:start; }
+  .proj[data-chapter="media/generative"] .g-ctl{ display:flex; flex-direction:column; gap:20px; }
+  .proj[data-chapter="media/generative"] .g-uf{ display:flex; flex-direction:column; gap:8px; }
+  .proj[data-chapter="media/generative"] .g-uf select{ font:inherit; font-size:14px; padding:8px; border:1px solid var(--rule-idle); border-radius:0; background:var(--paper); color:var(--ink); }
+  .proj[data-chapter="media/generative"] .g-tags{ display:flex; gap:6px; flex-wrap:wrap; font-size:12px; }
+  .proj[data-chapter="media/generative"] .g-tags span{ background:var(--shot-bg); padding:3px 8px; color:var(--ink-soft); }
+  .proj[data-chapter="media/generative"] .g-src{ display:flex; gap:12px; align-items:center; }
+  .proj[data-chapter="media/generative"] .g-src img{ width:64px; display:block; }
+  .proj[data-chapter="media/generative"] .g-tg{ display:flex; gap:8px; align-items:center; font-size:13px; }
+  .proj[data-chapter="media/generative"] .g-tg input{ accent-color:var(--ink); }
+  /* the keyword scales, in the tool's blue */
+  .proj[data-chapter="media/generative"] .g-ks{ --blue:#2236c8; display:flex; flex-direction:column; gap:18px; max-width:560px; }
+  [data-theme="dark"] .proj[data-chapter="media/generative"] .g-ks{ --blue:#2236c8; }
+  .proj[data-chapter="media/generative"] .g-k{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) minmax(0,1fr); gap:12px; align-items:center; font-size:13px; line-height:1.2; }
+  .proj[data-chapter="media/generative"] .g-k > span:first-child{ text-align:right; }
+  .proj[data-chapter="media/generative"] .g-k > span{ color:var(--blue); }
+  .proj[data-chapter="media/generative"] .g-k small{ display:block; opacity:.6; }
+  .proj[data-chapter="media/generative"] .g-k i{ position:relative; height:1px; background:var(--ink-soft); }
+  .proj[data-chapter="media/generative"] .g-k b{ position:absolute; top:50%; left:var(--v,50%); width:11px; height:11px; margin:-5.5px 0 0 -5.5px; border-radius:50%; background:var(--blue);
+    transition:left .9s cubic-bezier(.45,0,.2,1); }
+  @media (max-width:760px){
+    .proj[data-chapter="media/generative"] .g-k{ font-size:11px; }
+  }
+  /* the keyword scales in the right corner of the exploration video */
+  .proj[data-chapter="media/generative"] .g-exv{ position:relative; }
+  /* the team's structure on the left, the keywords top right: side by side, never over each other */
+  .proj[data-chapter="media/generative"] .plate.g-exv > .g-exst{ position:absolute; left:50%; top:54%; translate:-50% -50%; width:56%; height:auto; background:none !important; pointer-events:none; }
+  .proj[data-chapter="media/generative"] .g-exks{ --blue:#2236c8; position:absolute; right:2%; top:5%; width:19%; gap:12px; }
+  .proj[data-chapter="media/generative"] .g-exks .g-k{ font-size:clamp(9px, .9vw, 12px); gap:8px; }
+  .proj[data-chapter="media/generative"] .g-exks .g-k i{ background:rgba(255,255,255,.6); }
+  .proj[data-chapter="media/generative"] .g-exks .g-k b{ width:9px; height:9px; margin:-4.5px 0 0 -4.5px; }
+  @media (max-width:760px){
+    .proj[data-chapter="media/generative"] .plate.g-exv > .g-exst{ width:96%; }
+  }
+  @media (max-width:760px){
+    .proj[data-chapter="media/generative"] .g-exks{ position:static; width:100%; margin-top:16px; --blue:#2236c8; }
+    [data-theme="dark"] .proj[data-chapter="media/generative"] .g-exks{ --blue:#2236c8; }
+    .proj[data-chapter="media/generative"] .g-exks .g-k{ font-size:11px; }
+    .proj[data-chapter="media/generative"] .g-exks .g-k i{ background:var(--ink-soft); }
+  }
+  /* System: framed in the generator's blue (title-slide-generator-10), with room above and below */
+  .proj[data-chapter="media/generative"] .g-sys{ --blue:#2236c8; --tint:rgba(34,54,200,.06); --bline:rgba(34,54,200,.22); --bmut:rgba(34,54,200,.62);
+    padding:clamp(40px,7vw,96px) clamp(20px,4vw,56px); gap:clamp(28px,4vw,48px); }
+  [data-theme="dark"] .proj[data-chapter="media/generative"] .g-sys{ --blue:#2236c8; --tint:rgba(34,54,200,.06); --bline:rgba(34,54,200,.24); --bmut:rgba(34,54,200,.65); }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes::before{ border-left-color:var(--blue); }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes::after{ border-top-color:var(--blue); }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes > span{ color:#fff; background:transparent; }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes > span{ isolation:isolate; }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes small{ color:rgba(255,255,255,.6); }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes button:hover{ background:var(--tint); }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes button[aria-pressed="true"]{ background:var(--blue); color:var(--paper); }
+  .proj[data-chapter="media/generative"] .g-sys .g-ks{ --blue:inherit; }
+  .proj[data-chapter="media/generative"] .g-sys .g-k i{ background:var(--bline); }
+  .proj[data-chapter="media/generative"] .g-sys .g-k small{ color:var(--bmut); opacity:1; }
+  .proj[data-chapter="media/generative"] .g-exks .g-k b{ transition:left .7s cubic-bezier(.45,0,.2,1); }
+  /* the dots only move to a meeting, never on their own */
+  /* the structure, rebuilt from 03-structure.png: lines on its 1280 x 720 grid, meetings clickable */
+  .proj[data-chapter="media/generative"] .plate.g-exv > .g-exst{ aspect-ratio:16/9; container-type:inline-size; color:#fff; pointer-events:auto; }
+  .proj[data-chapter="media/generative"] .g-exst svg{ position:absolute; inset:0; width:100%; height:100%; }
+  .proj[data-chapter="media/generative"] .g-exst path{ fill:none; stroke:rgba(255,255,255,.75); stroke-width:1; vector-effect:non-scaling-stroke; }
+  .proj[data-chapter="media/generative"] .g-exst span, .proj[data-chapter="media/generative"] .g-exst button{ position:absolute; translate:-50% -50%; white-space:nowrap; line-height:1; }
+  .proj[data-chapter="media/generative"] .g-exst .h1{ font-size:1.75cqi; font-weight:400; }
+  .proj[data-chapter="media/generative"] .g-exst .h2{ font-size:1.15cqi; font-weight:600; }
+  .proj[data-chapter="media/generative"] .g-exst button{ appearance:none; translate:none; display:grid; place-items:center; background:transparent; border:0; padding:0; margin:0;
+    font:inherit; font-size:1.15cqi; color:#fff; cursor:pointer; transition:background .25s ease, color .25s ease; }
+  .proj[data-chapter="media/generative"] .g-exst button:hover{ background:rgba(255,255,255,.12); }
+  .proj[data-chapter="media/generative"] .g-exst button.on{ background:var(--blue, #2236c8); color:#fff; }
+  .proj[data-chapter="media/generative"] .g-exst button:focus-visible{ outline:1px solid #fff; outline-offset:2px; }
+  .proj[data-chapter="media/generative"] .g-exks.pick .g-k b{ transition:left .7s cubic-bezier(.45,0,.2,1); }
+  /* parameters: white words, only the dots in the generator's blue (a step lighter in dark) */
+  .proj[data-chapter="media/generative"] .g-k > span{ color:var(--ink) !important; }
+  .proj[data-chapter="media/generative"] .g-exks .g-k > span{ color:#fff !important; }
+  .proj[data-chapter="media/generative"] .g-k b{ background:#2236c8 !important; }
+  [data-theme="dark"] .proj[data-chapter="media/generative"] .g-k b{ background:#3a55e6 !important; }
+  /* System: a live slide in each quadrant, the source photo where the axes cross */
+  .proj[data-chapter="media/generative"] .g-sys .g-axes{ padding:64px 0; }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes button{ display:flex; flex-direction:column; gap:10px; padding:44px 28px; min-height:0; text-align:left; transition:background .25s ease, color .25s ease; }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes button[aria-pressed="true"]{ color:#fff; }
+  .proj[data-chapter="media/generative"] .g-qs{ display:block; width:100%; }
+  .proj[data-chapter="media/generative"] .g-qs .slide{ display:block; }
+  .proj[data-chapter="media/generative"] .g-src0{ position:absolute; left:50%; top:50%; translate:-50% -50%; width:clamp(48px,7%,84px); z-index:2; display:block; outline:6px solid var(--paper); }
+  @media (max-width:760px){
+    .proj[data-chapter="media/generative"] .g-sys .g-axes button{ padding:30px 8px; }
+    .proj[data-chapter="media/generative"] .g-sys .g-axes > span{ font-size:12px; }
+    .proj[data-chapter="media/generative"] .g-sys .g-axes small{ font-size:10px; }
+  }
+  .proj[data-chapter="media/generative"] #q-ec .slide .t{ text-shadow:none; }
+  @media (max-width:760px){
+    .proj[data-chapter="media/generative"] .stack > .plate{ max-width:100% !important; margin:0 !important; }
+  }
+  /* phones: every plate full width */
+  /* the exploration video again, with the question over it */
+  .proj[data-chapter="media/generative"] .g-exq{ position:relative; }
+  .proj[data-chapter="media/generative"] .g-exq__say{ position:absolute; inset:0; display:grid; place-items:center; margin:0; padding:0 12%; text-align:center;
+    color:#fff; font-weight:500; letter-spacing:-.025em; line-height:1.15; font-size:clamp(18px, 2.6vw, 40px); text-wrap:balance; }
+  /* System: the slides smaller, centred in their quadrant */
+  .proj[data-chapter="media/generative"] .g-sys .g-qs{ width:60%; align-self:center; }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes button{ align-items:center; }
+  @media (max-width:760px){
+    .proj[data-chapter="media/generative"] .g-sys .g-qs{ width:85%; }
+  }
+  /* System, tidied: lines stop short of the labels, grey; the pick is a blue outline */
+  .proj[data-chapter="media/generative"] .g-sys .g-axes::before{ top:64px; bottom:64px; border-left-color:var(--rule-on) !important; }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes::after{ left:clamp(110px,13%,170px); right:clamp(110px,13%,170px); border-top-color:var(--rule-on) !important; }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes > span{ font-size:14px; }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes small{ font-size:12px; line-height:1.4; margin-top:2px; }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes small em{ font-style:normal; color:rgba(255,255,255,.4); }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes button:hover{ background:transparent; }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes button{ cursor:default; }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes button[aria-pressed="true"]{ background:transparent; }
+  .proj[data-chapter="media/generative"] .g-sys .g-axes button .slide{ outline:1px solid transparent; outline-offset:6px; transition:outline-color .25s ease; }
+  .proj[data-chapter="media/generative"] .g-exv > img{ filter:brightness(.6); }
+  /* the still exploration wall, darker behind the table */
+  /* System: more room above and below */
+  /* Usability: bits of the tool, small, three across */
+  .proj[data-chapter="media/generative"] .g-bits{ display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr); grid-template-rows:auto auto; gap:var(--pad); align-items:start; }
+  .proj[data-chapter="media/generative"] .g-bit--big{ grid-row:1 / 3; }
+  .proj[data-chapter="media/generative"] .g-bit video{ aspect-ratio:16/9; object-fit:cover; }
+  /* a placeholder box until the clip exists */
+  .proj[data-chapter="media/generative"] .g-bit{ margin:0; }
+  .proj[data-chapter="media/generative"] .g-bit video, .proj[data-chapter="media/generative"] .g-bit img{ width:100%; height:auto; display:block; background:var(--shot-bg); }
+  .proj[data-chapter="media/generative"] .g-bit figcaption{ font-size:13px; font-weight:500; margin-top:8px; }
+  @media (max-width:760px){
+    .proj[data-chapter="media/generative"] .g-bits{ grid-template-columns:1fr; }
+    .proj[data-chapter="media/generative"] .g-bit--big{ grid-row:auto; }
+  }
+  /* a clear pause between sections; plates inside a section stay close */
+  .proj[data-chapter="media/generative"] section.prow + section.prow > .pc{ padding-top:calc(var(--pad) + clamp(64px,11vw,200px)); }
+  /* padding, not margin, so the vertical rule runs unbroken */
+  /* Usability at a smaller scale: three equal small tiles */
+  .proj[data-chapter="media/generative"] .g-bits{ grid-template-columns:repeat(3,minmax(0,1fr)) !important; max-width:80%; }
+  .proj[data-chapter="media/generative"] .g-bit--big{ grid-row:auto !important; }
+  @media (max-width:760px){
+    .proj[data-chapter="media/generative"] .g-bits{ max-width:100%; grid-template-columns:1fr !important; }
+  }
+  .proj[data-chapter="media/generative"] .g-bit figcaption b{ font-weight:500; }
+  .proj[data-chapter="media/generative"] .g-bit figcaption span{ color:var(--ink-soft); }
+  /* Exploration: structure and keywords side by side, larger type */
+  .proj[data-chapter="media/generative"] .plate.g-exv > .g-exst{ left:4% !important; top:50% !important; translate:0 -50% !important; width:52% !important; }
+  .proj[data-chapter="media/generative"] .g-exks{ right:4% !important; top:50% !important; translate:0 -50%; width:32% !important; gap:clamp(14px,2vw,28px) !important; }
+  .proj[data-chapter="media/generative"] .g-exks .g-k{ font-size:clamp(11px,1.2vw,17px) !important; }
+  .proj[data-chapter="media/generative"] .g-exks .g-k b{ width:11px; height:11px; margin:-5.5px 0 0 -5.5px; }
+  .proj[data-chapter="media/generative"] .g-exst .h1{ font-size:2.3cqi !important; }
+  .proj[data-chapter="media/generative"] .g-exst .h2, .proj[data-chapter="media/generative"] .g-exst button{ font-size:1.7cqi !important; }
+  @media (max-width:760px){
+    .proj[data-chapter="media/generative"] .plate.g-exv > .g-exst{ left:2% !important; width:96% !important; }
+    .proj[data-chapter="media/generative"] .g-exks{ translate:none; width:100% !important; }
+    .proj[data-chapter="media/generative"] .g-exks .g-k{ font-size:12px !important; }
+  }
+  .proj[data-chapter="media/generative"] .g-exbg{ aspect-ratio:16/9; background:#161616; }
+  /* a plain dark frame behind the structure and keywords */
+  @media (max-width:760px){
+    .proj[data-chapter="media/generative"] .g-exbg{ aspect-ratio:4/3; }
+  }
+  /* Starting point: the diagram on the same dark frame as the structure plate */
+  .proj[data-chapter="media/generative"] .plate.g-kef{ background:#161616; aspect-ratio:16/9; padding:4% 6%; }
+  .proj[data-chapter="media/generative"] .plate.g-kef > img{ width:100%; height:100%; object-fit:contain; object-position:left center; background:transparent; }
+  /* Exploration follows Starting point closely */
+  @media (max-width:760px){
+    .proj[data-chapter="media/generative"] .plate.g-kef{ aspect-ratio:auto; }
+  }
+  @media (max-width:760px){
+    .proj[data-chapter="media/generative"] .g-axes button{ padding:36px 10px; font-size:12.5px; }
+    .proj[data-chapter="media/generative"] .g-play{ grid-template-columns:1fr; }
+  }
+  @media (prefers-reduced-motion:reduce){
+    .proj[data-chapter="media/generative"] .prow, .proj[data-chapter="media/generative"] .proj h3, .proj[data-chapter="media/generative"] .proj .body{ transition:none; }
+  }
 </style>
 
 <div class="proj" id="proj" aria-hidden="true" data-mode="even">
@@ -2343,6 +2544,165 @@
 })();
 </script>
 <script>window.CHAPTERS = {};</script>
+<template data-chapter="media/generative">
+<!-- 01 CONTEXT -->
+  <section class="prow" id="sec-0">
+    <div class="pc pc--rule sec-text" style="grid-column:1 / 3"><div class="hold">
+      <h3>Context</h3>
+      <p class="body">CLEVER°FRANKE’s identity is black and white, so client work stays in front and color only ever comes from the projects themselves. Title slides had no consistent approach: some used project images, some stayed black and white, and none felt fully part of the brand.</p>
+      <p class="body more">The brief was to expand the colored treemap into a bigger role in the identity and to build a generative system that gives every deck its own title slide. It had to be simple enough for anyone in the studio to use, from designers to HR, produce at least three options per deck, and include motion for decks shared digitally.</p>
+    </div></div>
+    <div class="pc stack" style="grid-column:3 / 13">
+      <figure class="plate"><img src="media/01-generative-title-slide/01-output.jpg" alt="A generated title slide on a conference stage screen" decoding="async"></figure>
+    </div>
+  </section>
+
+  <!-- 02 STARTING POINT -->
+  <section class="prow" id="sec-1">
+    <div class="pc pc--rule sec-text" style="grid-column:1 / 3"><div class="hold">
+      <h3>Starting point</h3>
+      <p class="body">How can a brand element expand into a system? Instead of adding something new, I extended what was already there. The treemap appeared on the website, in videos and on social media, always built from colors extracted from project images.</p>
+      <p class="body more">I kept the two things that made it recognisable, the treemap and the color extraction, and asked three questions of it: how the treemap could take more forms, how motion could create variation, and how color could live beyond the treemap.</p>
+    </div></div>
+    <div class="pc stack" style="grid-column:3 / 13">
+      <figure class="plate g-kef"><img src="media/01-generative-title-slide/02-keep-expand.png" alt="Keep: the treemap and color extraction. Expand: more forms, motion, color beyond the treemap" loading="lazy" decoding="async"></figure>
+    </div>
+  </section>
+
+  <!-- 03 EXPLORATION -->
+  <section class="prow" id="sec-2">
+    <div class="pc pc--rule sec-text" style="grid-column:1 / 3"><div class="hold">
+      <h3>Exploration</h3>
+      <p class="body">How can one system still give space to each use case? Explorations ran across shapes, gradients, image crops and subdivisions, then were sorted two ways: by who watches and who it’s for, and by keywords that tell each use case’s story.</p>
+      <p class="body more">Every meeting the studio holds went into one table, split into internal and external use, and external use into client and non-client. Three keyword scales came out of it: wild to calm, less to more branding, abstract to literal.</p>
+    </div></div>
+    <div class="pc stack" style="grid-column:3 / 13">
+      <figure class="plate g-exv"><div class="g-exbg" aria-hidden="true"></div>
+        <div class="g-exst" id="gexst" aria-label="Use cases: internal and external, client and non-client">
+          <svg viewBox="0 0 1280 720" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M62 0V710M441 0V710M814 106V710M1216 0V710M0 106H1280M0 192H1280M0 278H1280M0 364H1280M0 450H1280M814 536H1280M814 622H1280"/>
+          </svg>
+            <span class="h1" style="left:19.688%;top:6.944%">Internal use</span>
+            <span class="h1" style="left:64.688%;top:6.944%">External use</span>
+            <span class="h2" style="left:49.062%;top:20.833%">Non-client</span>
+            <span class="h2" style="left:79.375%;top:20.833%">Client</span>
+            <button type="button" data-g="in" style="left:4.844%;top:26.667%;width:29.609%;height:11.944%">Breakfast session</button>
+            <button type="button" data-g="in" style="left:4.844%;top:38.611%;width:29.609%;height:11.944%">Intro</button>
+            <button type="button" data-g="in" style="left:4.844%;top:50.556%;width:29.609%;height:11.944%">Team meeting</button>
+            <button type="button" data-g="nc" style="left:34.453%;top:26.667%;width:29.141%;height:11.944%">Meetups</button>
+            <button type="button" data-g="nc" style="left:34.453%;top:38.611%;width:29.141%;height:11.944%">Conference</button>
+            <button type="button" data-g="nc" style="left:34.453%;top:50.556%;width:29.141%;height:11.944%">PR deck</button>
+            <button type="button" data-g="cl" style="left:63.594%;top:26.667%;width:31.406%;height:11.944%">New Business deck</button>
+            <button type="button" data-g="cl" style="left:63.594%;top:38.611%;width:31.406%;height:11.944%">Kick-off</button>
+            <button type="button" data-g="cl" style="left:63.594%;top:50.556%;width:31.406%;height:11.944%">Client project update</button>
+            <button type="button" data-g="cl" style="left:63.594%;top:62.500%;width:31.406%;height:11.944%">Demo</button>
+            <button type="button" data-g="cl" style="left:63.594%;top:74.444%;width:31.406%;height:11.944%">Keynote case</button>
+        </div>
+
+        <div class="g-ks g-exks" aria-label="Keywords">
+          <div class="g-k"><span>wild<small>internal</small></span><i><b></b></i><span>calm<small>external</small></span></div>
+          <div class="g-k"><span>less branding<small>client</small></span><i><b></b></i><span>more branding<small>non-client</small></span></div>
+          <div class="g-k"><span>abstract</span><i><b></b></i><span>literal</span></div>
+        </div></figure>
+      <figure class="plate g-exq"><video src="media/01-generative-title-slide/03-explorations.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+        <p class="g-exq__say">How can I create a system, while still giving space for each use case?</p></figure>
+    </div>
+  </section>
+
+  <!-- 04 SYSTEM -->
+  <section class="prow" id="sec-3">
+    <div class="pc pc--rule sec-text" style="grid-column:1 / 3"><div class="hold">
+      <h3>System</h3>
+      <p class="body">The keywords became two rules: who it’s for sets the form, where it’s shown sets the motion. The deck’s images set the colors, and its use case sets the form and the motion. Two questions place every deck: is it for a client, and is it shown inside the studio or outside it?</p>
+      <p class="body more">Client decks use the treemap, where each color takes as much of the frame as it covers in the photograph. Non-client decks lay the extracted colors over the image as a mosaic. External decks vary in motion intensity, and internal decks vary in motion type.</p>
+    </div></div>
+    <div class="pc stack" style="grid-column:3 / 13">
+      <figure class="plate g-sys">
+        <div class="g-axes" id="axes">
+          <span class="t">External<small><em>calm</em> · motion intensity</small></span>
+          <span class="b">Internal<small><em>wild</em> · motion type</small></span>
+          <span class="l">Non-client<small><em>more branding, literal</em><br>mosaic</small></span>
+          <span class="r">Client<small><em>less branding, abstract</em><br>treemap</small></span>
+          <img class="g-src0" src="media/01-generative-title-slide/flower-source.png" alt="The one source photo behind all four slides">
+          <button type="button" data-q="en" style="grid-area:tl"><span class="g-qs" id="q-en"></span></button>
+          <button type="button" data-q="ec" style="grid-area:tr"><span class="g-qs" id="q-ec"></span></button>
+          <button type="button" data-q="in" style="grid-area:bl"><span class="g-qs" id="q-in"></span></button>
+          <button type="button" data-q="ic" style="grid-area:br"><span class="g-qs" id="q-ic"></span></button>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 06 GENERATOR -->
+  <section class="prow" id="sec-5">
+    <div class="pc pc--rule sec-text" style="grid-column:1 / 3"><div class="hold">
+      <h3>Tool</h3>
+      <p class="body">I built the generator as a browser tool. Anyone can drop in a project image, pick the meeting, and export a title slide, still or moving. The meeting type sets the look and the motion; only two sliders are left to touch.</p>
+      <p class="body more">Behind the presets, the controls go further: the number of colors and cells, the gutter, how colors are extracted, pinning a color picked from the image, and the motion itself, from a simple rise to a ragged reveal, with duration, stagger and order. A new seed gives a new variation, and each one exports as PNG, SVG or a recorded loop.</p>
+    </div></div>
+    <div class="pc stack" style="grid-column:3 / 13">
+      <div class="g-bits">
+        <figure class="g-bit"><video src="media/01-generative-title-slide/06-tool-treemap.mp4" autoplay muted loop playsinline preload="metadata" aria-label="The treemap tool"></video><figcaption><b>Treemap.</b> <span>Color as a share of the image.</span></figcaption></figure>
+        <figure class="g-bit"><video src="media/01-generative-title-slide/06-tool-mosaic.mp4" autoplay muted loop playsinline preload="metadata" aria-label="The mosaic tool"></video><figcaption><b>Mosaic.</b> <span>Colors kept in the image's own positions.</span></figcaption></figure>
+        <figure class="g-bit"><video src="media/01-generative-title-slide/06-tool-color.mp4" autoplay muted loop playsinline preload="metadata" aria-label="The color palette tool"></video><figcaption><b>Color palette.</b> <span>The extracted colors as a set.</span></figcaption></figure>
+      </div>
+      <figure class="plate"><video src="media/01-generative-title-slide/07-tool.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Screen recording of the final tool"></video></figure>
+      <details class="g-try"><summary>Try a simplified version</summary>
+        <div class="g-play">
+          <div class="g-ctl">
+            <label class="g-uf"><span class="g-lab">1 · Meeting</span>
+              <select id="u-meet">
+                <optgroup label="External · client"><option>Pitch</option><option selected>Kick-off</option><option>Client update</option><option>Demo</option><option>Keynote</option></optgroup>
+                <optgroup label="External · non-client"><option>Conference</option><option>Meetup</option><option>PR deck</option></optgroup>
+                <optgroup label="Internal · client"><option>Internal project update</option></optgroup>
+                <optgroup label="Internal · non-client"><option>Breakfast session</option><option>Intro</option><option>Team meeting</option></optgroup>
+              </select></label>
+            <div class="g-tags" id="u-quad"></div>
+            <div class="g-uf"><span class="g-lab">2 · Image</span>
+              <div class="g-src"><img id="u-thumb" src="media/01-generative-title-slide/flower-source.png" alt="Current source image">
+                <div class="pills"><label class="pill">Upload<input id="u-up" type="file" accept="image/*" hidden></label><button type="button" id="u-tul">Tulips</button><button type="button" id="u-none">No image</button></div></div></div>
+            <div class="g-uf"><span class="g-lab">3 · Intensity</span><div id="u-sl" class="g-uf"></div></div>
+            <label class="g-tg"><input id="u-bw" type="checkbox"> Black and white</label>
+            <div class="g-uf" id="u-mow"><span class="g-lab">4 · Motion</span><div class="pills" id="u-mo"></div></div>
+          </div>
+          <div class="slide"><canvas id="u-cv"></canvas><span class="lg">Studio</span><span class="dt">Date</span><div class="t"><small id="u-sub">Kick-off</small>This is a title</div></div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 07 USABILITY -->
+  <section class="prow" id="sec-6">
+    <div class="pc pc--rule sec-text" style="grid-column:1 / 3"><div class="hold">
+      <h3>Usability</h3>
+      <p class="body">Small details, big difference. The tool is for everyone in the studio, so most of the work went into what you don’t have to think about.</p>
+      <p class="body more">Motion timing, treatment and text position stay hidden under Advanced until you need them, with one reset back to the system’s values.</p>
+    </div></div>
+    <div class="pc stack" style="grid-column:3 / 13">
+      <div class="g-bits">
+        <figure class="g-bit g-bit--big"><video src="media/01-generative-title-slide/08-tool-bw.mp4" autoplay muted loop playsinline preload="metadata" aria-label="The tool with no image"></video><figcaption>No image: black and white</figcaption></figure>
+        <figure class="g-bit"><video src="media/01-generative-title-slide/11-advanced.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Advanced settings: editing the motion"></video><figcaption>Advanced: edit the motion</figcaption></figure>
+        <figure class="g-bit"><video src="media/01-generative-title-slide/12-motion-touch.mp4" autoplay muted loop playsinline preload="metadata" aria-label="A final touch on the motion"></video><figcaption>A final touch on the motion</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 IN USE -->
+  <section class="prow" id="sec-7">
+    <div class="pc pc--rule sec-text" style="grid-column:1 / 3"><div class="hold">
+      <h3>In use</h3>
+      <p class="body">The same system scales from a conference stage to a meeting-room screen, branded each time and different each time.</p>
+      <p class="body more">Testing with the team pointed to what comes next: more room to adjust the title area, fewer cell divisions and a tighter color range on request, choosing a still frame from the motion for PDF decks, and pulling the title from the deck itself so the whole presentation can be branded from one image.</p>
+      <h3 style="margin-top:calc(var(--pad) * 2)">Next step</h3>
+      <p class="body">A Figma plugin, to generate the slide where the deck is already being made.</p>
+    </div></div>
+    <div class="pc stack" style="grid-column:3 / 13">
+      <figure class="plate"><video src="media/01-generative-title-slide/09-conference.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Title slide on a conference stage"></video></figure>
+      <figure class="plate" style="max-width:56%;margin-left:auto"><video src="media/01-generative-title-slide/10-client-meeting.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Title slide in a client meeting"></video></figure>
+    </div>
+  </section>
+</template>
+<script src="content/01-generative-photo.js"></script>
 <script src="content/01-generative.js"></script>
 <script src="content/02-motion-explainer.js"></script>
 <script src="content/03-monell.js"></script>
@@ -2658,7 +3018,11 @@
     if(hero.tagName==='VIDEO'){ hero.autoplay=true; hero.muted=true; hero.loop=true; hero.playsInline=true; }
     slot.appendChild(hero);
 
-    sections.forEach(function(sec,n){
+    /* a chapter may write its sections out as HTML instead: a <template
+       data-chapter> with its key, below the styles */
+    var tpl=document.querySelector('template[data-chapter="'+k+'"]');
+    if(tpl) inner.appendChild(tpl.content.cloneNode(true));
+    else sections.forEach(function(sec,n){
       inner.appendChild(sectionRow(sec,n));
     });
 
@@ -2677,6 +3041,7 @@
         cell([3,13],'',false);
     }
     inner.appendChild(foot);
+    if(ch.init) ch.init();
 
     return slug(title);
   }
