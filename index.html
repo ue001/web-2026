@@ -318,7 +318,7 @@
     pointer-events:none;   /* the reel itself takes the click */
   }
   .band--work .reel .shot-link a{ pointer-events:auto; }
-  .band--work .shot:hover .shot-link, .band--work .shot:focus-within .shot-link{ opacity:1; transition:opacity .3s ease .3s, border-color 600ms ease; }   /* once the lines have arrived */
+  html:not(.scrolling) .band--work .shot:hover .shot-link, html:not(.scrolling) .band--work .shot:focus-within .shot-link{ opacity:1; transition:opacity .3s ease .3s, border-color 600ms ease; }   /* once the lines have arrived */
   .band--work .strip:first-child > .cell{ transition:border-color 600ms ease, padding var(--move); }
   .grid-on .band--work .strip:first-child > .cell{ transition:border-color 0ms, padding var(--move); }
   /* THIS VERSION, at rest (no hover needed): every reel already meets its grid lines. The divider keeps
@@ -332,19 +332,19 @@
      in white, so it reads over light and dark footage alike */
   @media (hover:hover) and (min-width:761px){
     .band--work .reel img, .band--work .reel video{ transition:filter .35s ease; }
-    .band--work .shot:hover .reel img, .band--work .shot:hover .reel video{ filter:brightness(.65); }
+    html:not(.scrolling) .band--work .shot:hover .reel img, html:not(.scrolling) .band--work .shot:hover .reel video{ filter:brightness(.65); }
     /* the project's cell grows clearly: the divider moves left by two gaps and the room under the
        reel shrinks by the same, so the lines and the reel inside them both get bigger; the text cell gives
        up the same amount of its own padding, so its type stays the same size */
-    html:not([data-mode="grid"]) .band--work .strip:first-child:has(.reel:hover){
+    html:not([data-mode="grid"]):not(.scrolling) .band--work .strip:first-child:has(.reel:hover){
       grid-template-columns:calc(var(--split) * 0.8 - var(--pad) * 2) 1fr !important; }
-    html:not([data-mode="grid"]) .band--work .strip:first-child:has(.reel:hover) > .cell:first-child{ padding-right:0; }
-    html:not([data-mode="grid"]) .band--work .strip:first-child > .shot:has(.reel:hover){ padding-bottom:calc(clamp(110px, 20svh, 260px) - var(--pad) * 2); }
+    html:not([data-mode="grid"]):not(.scrolling) .band--work .strip:first-child:has(.reel:hover) > .cell:first-child{ padding-right:0; }
+    html:not([data-mode="grid"]):not(.scrolling) .band--work .strip:first-child > .shot:has(.reel:hover){ padding-bottom:calc(clamp(110px, 20svh, 260px) - var(--pad) * 2); }
     .band--work .reel .shot-link{ left:50%; top:50%; translate:-50% -50%; padding:0;
       background:none; -webkit-backdrop-filter:none; backdrop-filter:none; border:0;
       color:#fff; text-shadow:0 1px 14px rgba(0,0,0,.4);
       font-size:clamp(16px, 1.8vw, 30px); font-weight:500; letter-spacing:-.02em; }
-    .band--work .shot:hover .shot-link{ transition:opacity .3s ease .15s; }
+    html:not(.scrolling) .band--work .shot:hover .shot-link{ transition:opacity .3s ease .15s; }
   }
   /* phones and touch screens keep the original link: "View more", small and grey, under the reel */
   @media (hover:none), (max-width:760px){
@@ -3298,6 +3298,18 @@
 
 
 <script>
+/* while the page scrolls, the Designs reels don't answer hover: each reel
+   passing under a resting pointer would widen its row and pull it back,
+   so the lines slid to and fro and seemed to leave traces (Chrome) */
+(function(){
+  var root=document.documentElement, t=null;
+  addEventListener('scroll',function(){
+    root.classList.add('scrolling'); clearTimeout(t);
+    t=setTimeout(function(){ root.classList.remove('scrolling'); },180);
+  },{capture:true,passive:true});
+})();
+</script>
+<script>
 /* window.__flyLines(from, to) — from and to are viewport rects.
    Four lines: the two verticals of the box and its two horizontals,
    each extended across the viewport, animated from the box it left to
@@ -3474,7 +3486,25 @@
     const layer = document.createElement('div');
     layer.setAttribute('aria-hidden', 'true');
     layer.style.cssText = 'position:fixed;inset:0;pointer-events:none;overflow:hidden;display:none';
-    document.body.appendChild(layer);
+    // the layer rides inside the page's scroller, on a zero-height anchor at its end, so
+    // Chrome scrolls the drawn outlines with the images and text. As a fixed layer they
+    // stayed where they were for the frames before a scroll was noticed, leaving traces.
+    const scroller = document.querySelector('.content');
+    let anchor = null;
+    if (scroller) {
+      anchor = document.createElement('div');
+      anchor.setAttribute('aria-hidden', 'true');
+      anchor.style.cssText = 'position:relative;height:0;margin:0;padding:0;border:0;pointer-events:none';
+      layer.style.position = 'absolute'; layer.style.inset = 'auto';
+      anchor.appendChild(layer); scroller.appendChild(anchor);
+    } else document.body.appendChild(layer);
+    // line the layer up with the screen as it is now; it then scrolls along with the page
+    function pin() {
+      if (!anchor) return;
+      const a = anchor.getBoundingClientRect();
+      layer.style.left = -a.left + 'px'; layer.style.top = -a.top + 'px';
+      layer.style.height = innerHeight + 'px';
+    }
     const css = document.createElement('style');
     css.textContent =
       '.rounding .strip,.rounding .cell,.rounding .band:not(.band--landing){border-color:transparent!important}' +
@@ -3528,6 +3558,7 @@
       const W = viewW(), H = innerHeight;
       L = lineW();
       layer.style.width = W + 'px';
+      pin();
       const X0 = -40, X1 = W + 40, Y0 = -MARGIN, Y1 = H + MARGIN;
       const segs = rules().map(s => {
         // a rule that runs off the screen counts as running on to the frame
