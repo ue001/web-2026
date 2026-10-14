@@ -94,10 +94,22 @@
     b.classList.remove('on'); setTimeout(function(){ b.remove(); },300);
     removeEventListener('keydown',onKey,true);
     document.removeEventListener('pointerdown',onOut,true);
-    removeEventListener('scroll',shut,true);
+    removeEventListener('scroll',onScroll,true);
     removeEventListener('resize',shut);
   }
   function onKey(e){ if(e.key==='Escape'){ e.stopPropagation(); shut(); } }
+  /* only a real scroll away closes it: a snap settling, trackpad momentum
+     or a list scrolling inside a reel moves a few pixels and would
+     otherwise shut the field while the password is being typed */
+  var from=null, under=null;
+  function onScroll(e){
+    var t=e.target===document?document.scrollingElement:e.target;
+    if(!t||!from) return;
+    if(under && t!==document.scrollingElement && !t.contains(under)) return;   /* a scroller inside the reel, not around it */
+    if(!from.has(t)){ from.set(t,[t.scrollTop,t.scrollLeft]); return; }
+    var s=from.get(t);
+    if(Math.abs(t.scrollTop-s[0])>40||Math.abs(t.scrollLeft-s[1])>40) shut();
+  }
   function onOut(e){ if(box && !box.contains(e.target)) shut(); }
   window.__lockUnlocked=unlocked;
   /* href is an address to go to, or a function to call once the password is right */
@@ -105,6 +117,7 @@
     var go=function(){ if(typeof href==='function') href(); else location.href=href; };
     if(unlocked(id)){ go(); return; }
     shut();
+    under=document.elementFromPoint(r.left+r.width/2, r.top+r.height/2);   /* the reel, before the field covers it */
     box=document.createElement('div');
     box.className='lock-box';
     box.style.left=r.left+'px'; box.style.top=r.top+'px';
@@ -118,7 +131,8 @@
     box.querySelector('input').focus({ preventScroll:true });
     addEventListener('keydown',onKey,true);
     document.addEventListener('pointerdown',onOut,true);
-    addEventListener('scroll',shut,true);   /* it sits over the reel, so a scroll would leave it behind */
+    from=new Map();
+    addEventListener('scroll',onScroll,true);   /* it sits over the reel, so a scroll would leave it behind */
     addEventListener('resize',shut);
   };
 })();
