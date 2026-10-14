@@ -156,8 +156,7 @@ window.CHAPTERS['media/generative.mp4'] = {
   const vis=new Set();
   const io=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting?vis.add(e.target):vis.delete(e.target)));
   function drawAll(t){S.forEach(([cv,q])=>{if(!vis.has(cv))return;const[W,H]=size(cv);
-    if(q.hold&&performance.now()<q.hold)return;
-    if(q.mini){if(!W||q.drawnW===W)return;q.drawnW=W;t=2.2}const x=cv.getContext('2d');BW=!!q.bw;
+    const x=cv.getContext('2d');BW=!!q.bw;
     if(q.none){noimg(x,W,H,q,t);return}(q.eng==='tree'?tree:sweep)(x,W,H,q,t)})}
   function frame(ms){if(!S[0][0].isConnected)return;   /* the index rebuilt the chapter: this copy stops */
    if(px)drawAll(ms/1000);requestAnimationFrame(frame)}

@@ -2351,6 +2351,7 @@
   .proj[data-chapter="media/generative"] .g-play{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2fr); gap:var(--pad); align-items:start; }
   .proj[data-chapter="media/generative"] .g-ctl{ display:flex; flex-direction:column; gap:20px; }
   .proj[data-chapter="media/generative"] .g-uf{ display:flex; flex-direction:column; gap:8px; }
+  .proj[data-chapter="media/generative"] .g-uf[hidden]{ display:none; }   /* fixed meetings have no motion to choose */
   .proj[data-chapter="media/generative"] .g-uf select{ font:inherit; font-size:14px; padding:8px; border:1px solid var(--rule-idle); border-radius:0; background:var(--paper); color:var(--ink); }
   .proj[data-chapter="media/generative"] .g-tags{ display:flex; gap:6px; flex-wrap:wrap; font-size:12px; }
   .proj[data-chapter="media/generative"] .g-tags span{ background:var(--shot-bg); padding:3px 8px; color:var(--ink-soft); }
@@ -2475,14 +2476,29 @@
     .proj[data-chapter="media/generative"] .g-bit--big{ grid-row:auto; }
   }
   /* a clear pause between sections; plates inside a section stay close */
-  .proj[data-chapter="media/generative"] section.prow + section.prow > .pc{ padding-top:calc(var(--pad) + clamp(64px,11vw,200px)); }
+  .proj[data-chapter="media/generative"] section.prow + section.prow > .pc{ padding-top:calc(var(--pad) + clamp(32px,5vw,96px)); }
+  /* Output, Starting point and Exploration sit as close as on the other subpages */
+  .proj[data-chapter="media/generative"] section.prow:is(#sec-1,#sec-2) > .pc{ padding-top:var(--pad); }
+  /* System gets more room above */
+  .proj[data-chapter="media/generative"] section.prow:has(.g-sys) > .pc{ padding-top:calc(var(--pad) + clamp(64px,10vw,180px)); }
   /* padding, not margin, so the vertical rule runs unbroken */
   /* Usability at a smaller scale: three equal small tiles */
   .proj[data-chapter="media/generative"] .g-bits{ grid-template-columns:repeat(3,minmax(0,1fr)) !important; max-width:80%; }
   .proj[data-chapter="media/generative"] .g-bit--big{ grid-row:auto !important; }
+  /* Tool: room between the three motions and the recording below */
+  .proj[data-chapter="media/generative"] #sec-5 .g-bits{ margin-bottom:clamp(32px,5vw,96px); }
+  /* Usability: one row at one height; the tall Advanced panel ends it as a narrow detail */
+  .proj[data-chapter="media/generative"] #sec-6 .g-bits{ grid-template-columns:minmax(0,1.778fr) minmax(0,1.778fr) minmax(0,.549fr) !important; }   /* 80% wide, like the Tool row */
+  .proj[data-chapter="media/generative"] #sec-6 .g-bit:nth-child(3) video{ aspect-ratio:576/1050; }
   @media (max-width:760px){
     .proj[data-chapter="media/generative"] .g-bits{ max-width:100%; grid-template-columns:1fr !important; }
+    .proj[data-chapter="media/generative"] #sec-6 .g-bits{ grid-template-columns:1fr !important; }
+    .proj[data-chapter="media/generative"] #sec-6 .g-bit:nth-child(3){ max-width:42%; }
+    .proj[data-chapter="media/generative"] .g-src0{ width:32px; outline-width:3px; }
+    .proj[data-chapter="media/generative"] .g-sys .g-axes > .l, .proj[data-chapter="media/generative"] .g-sys .g-axes > .r{ background:var(--paper); z-index:3; }   /* the axis line stops at the labels */   /* small enough to clear the Client / Non-client labels */
   }
+  .proj[data-chapter="media/generative"] .g-cap{ font-size:13px; font-weight:500; margin-top:8px; }   /* the final tool's caption, like the tiles' */
+  .proj[data-chapter="media/generative"] .g-cap span{ color:var(--ink-soft); }
   .proj[data-chapter="media/generative"] .g-bit figcaption b{ font-weight:500; }
   .proj[data-chapter="media/generative"] .g-bit figcaption span{ color:var(--ink-soft); }
   /* Exploration: structure and keywords side by side, larger type */
@@ -2493,7 +2509,8 @@
   .proj[data-chapter="media/generative"] .g-exst .h1{ font-size:2.3cqi !important; }
   .proj[data-chapter="media/generative"] .g-exst .h2, .proj[data-chapter="media/generative"] .g-exst button{ font-size:1.7cqi !important; }
   @media (max-width:760px){
-    .proj[data-chapter="media/generative"] .plate.g-exv > .g-exst{ left:2% !important; width:96% !important; }
+    /* centred in the 4:3 dark frame, not in frame + keywords: (75% - 54%) / 2 of the width */
+    .proj[data-chapter="media/generative"] .plate.g-exv > .g-exst{ left:2% !important; width:96% !important; top:0 !important; translate:0 0 !important; margin-top:10.5%; }
     .proj[data-chapter="media/generative"] .g-exks{ translate:none; width:100% !important; }
     .proj[data-chapter="media/generative"] .g-exks .g-k{ font-size:12px !important; }
   }
@@ -2624,10 +2641,10 @@
           <span class="l">Non-client<small><em>more branding, literal</em><br>mosaic</small></span>
           <span class="r">Client<small><em>less branding, abstract</em><br>treemap</small></span>
           <img class="g-src0" src="media/01-generative-title-slide/flower-source.jpg" alt="The one source photo behind all four slides">
-          <button type="button" data-q="en" style="grid-area:tl"><span class="g-qs" id="q-en"><video class="slide" src="media/01-generative-title-slide/sys-conference.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video></span></button>
-          <button type="button" data-q="ec" style="grid-area:tr"><span class="g-qs" id="q-ec"><video class="slide" src="media/01-generative-title-slide/sys-kickoff.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video></span></button>
-          <button type="button" data-q="in" style="grid-area:bl"><span class="g-qs" id="q-in"><video class="slide" src="media/01-generative-title-slide/sys-team.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video></span></button>
-          <button type="button" data-q="ic" style="grid-area:br"><span class="g-qs" id="q-ic"><video class="slide" src="media/01-generative-title-slide/sys-internal.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video></span></button>
+          <button type="button" data-q="en" style="grid-area:tl"><span class="g-qs" id="q-en"><video class="slide" src="media/01-generative-title-slide/05-sys-ex-nonclient.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video></span></button>
+          <button type="button" data-q="ec" style="grid-area:tr"><span class="g-qs" id="q-ec"><video class="slide" src="media/01-generative-title-slide/05-sys-ex-client.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video></span></button>
+          <button type="button" data-q="in" style="grid-area:bl"><span class="g-qs" id="q-in"><video class="slide" src="media/01-generative-title-slide/05-sys-in-nonclient.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video></span></button>
+          <button type="button" data-q="ic" style="grid-area:br"><span class="g-qs" id="q-ic"><video class="slide" src="media/01-generative-title-slide/05-sys-in-client.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video></span></button>
         </div>
       </figure>
     </div>
@@ -2646,7 +2663,7 @@
         <figure class="g-bit"><video src="media/01-generative-title-slide/06-tool-mosaic.mp4" autoplay muted loop playsinline preload="metadata" aria-label="The mosaic tool"></video><figcaption><b>Mosaic.</b> <span>Colors kept in the image's own positions.</span></figcaption></figure>
         <figure class="g-bit"><video src="media/01-generative-title-slide/06-tool-color.mp4" autoplay muted loop playsinline preload="metadata" aria-label="The color palette tool"></video><figcaption><b>Color palette.</b> <span>The extracted colors as a set.</span></figcaption></figure>
       </div>
-      <figure class="plate"><video src="media/01-generative-title-slide/07-tool.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Screen recording of the final tool"></video></figure>
+      <figure class="plate"><video src="media/01-generative-title-slide/07-tool.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Screen recording of the final tool"></video><figcaption class="g-cap"><b>Final tool.</b> <span>Pick the meeting, drop in an image, export the slide.</span></figcaption></figure>
       <details class="g-try"><summary>Try a simplified version</summary>
         <div class="g-play">
           <div class="g-ctl">
@@ -2681,8 +2698,8 @@
     <div class="pc stack" style="grid-column:3 / 13">
       <div class="g-bits">
         <figure class="g-bit g-bit--big"><video src="media/01-generative-title-slide/08-tool-bw.mp4" autoplay muted loop playsinline preload="metadata" aria-label="The tool with no image"></video><figcaption>No image: black and white</figcaption></figure>
-        <figure class="g-bit"><video src="media/01-generative-title-slide/11-advanced.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Advanced settings: editing the motion"></video><figcaption>Advanced: edit the motion</figcaption></figure>
-        <figure class="g-bit"><video src="media/01-generative-title-slide/12-motion-touch.mp4" autoplay muted loop playsinline preload="metadata" aria-label="A final touch on the motion"></video><figcaption>A final touch on the motion</figcaption></figure>
+        <figure class="g-bit"><video src="media/01-generative-title-slide/09-motion-touch.mp4" autoplay muted loop playsinline preload="metadata" aria-label="A final touch on the motion"></video><figcaption>A final touch on the motion</figcaption></figure>
+        <figure class="g-bit"><video src="media/01-generative-title-slide/10-advanced.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Advanced settings: editing the motion"></video><figcaption>Advanced: edit the motion</figcaption></figure>
       </div>
     </div>
   </section>
@@ -2697,8 +2714,8 @@
       <p class="body">A Figma plugin, to generate the slide where the deck is already being made.</p>
     </div></div>
     <div class="pc stack" style="grid-column:3 / 13">
-      <figure class="plate"><video src="media/01-generative-title-slide/09-conference.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Title slide on a conference stage"></video></figure>
-      <figure class="plate" style="max-width:56%;margin-left:auto"><video src="media/01-generative-title-slide/10-client-meeting.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Title slide in a client meeting"></video></figure>
+      <figure class="plate"><video src="media/01-generative-title-slide/11-conference.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Title slide on a conference stage"></video></figure>
+      <figure class="plate" style="max-width:56%;margin-left:auto"><video src="media/01-generative-title-slide/12-client-meeting.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Title slide in a client meeting"></video></figure>
     </div>
   </section>
 </template>
