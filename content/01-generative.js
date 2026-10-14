@@ -72,10 +72,7 @@ window.CHAPTERS['media/generative.mp4'] = {
    in:{eng:'sweep',sub:'Team meeting',a:['Bands',3,40,24],b:['Columns',40,200,90],modes:['thickness opens','reveal','palette bloom','shuffle','push, pull']},
    ic:{eng:'tree',sub:'Internal project update',a:['Division',3,200,60],b:['Colors',3,16,9],modes:['revealing','push, pull','size sets direction']}};
   const S=[];
-  Object.entries(Q).forEach(([id,q])=>{const el=document.getElementById('q-'+id);
-   q.A=q.a[3];q.B=q.b[3];q.mode=q.modes?q.modes[0]:null;
-   el.innerHTML=`<span class="slide"><canvas></canvas><span class="lg">Studio</span><span class="dt">Date</span><div class="t"><small>${q.sub}</small>This is a title</div></span>`;
-   S.push([el.querySelector('canvas'),q]);});
+  /* System's four slides are videos now (index.html, sys-*.mp4); Q stays for the tool below */
 
 
 
