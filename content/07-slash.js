@@ -21,6 +21,15 @@ window.CHAPTERS['media/slash.mp4'] = {
   year:'2024',
   context:'Graduation show, Royal Academy of Art, The Hague',
   lede:'An identity where the students become the slash.',
+  /* TODO My role: add solo or team, and which applications you made. */
+  top:[
+    {name:'My role',         body:'I designed the identity and art direction for the 2024 Interactive/Media/Design graduation show.'},
+    {name:'Key decision',    body:'The students become the slash, one flexible mark tilting between the digital and the physical.'}
+  ],
+  bottom:[
+    {name:'What I learned',  body:'A simple mark built on one clear idea can stretch across many formats and voices.'},
+    {name:'What\u2019s next', body:'I\u2019d explore how the slash could react to live input or move generatively.'}
+  ],
   role:'Identity design, Art direction, Photoshoot',
   tools:'After Effects, Photoshop',
   sections:[

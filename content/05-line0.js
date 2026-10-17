@@ -37,6 +37,14 @@ window.CHAPTERS['media/line0.mp4'] = {
   context:'Graduation project, Royal Academy of Art, The Hague',
   note:'Awarded by Pulchri Studio',
   lede:'A speculative metro environment where space is given on invisible terms.',
+  top:[
+    {name:'My role',         body:'I conceived and built this speculative metro in 3D, including the spatial design and motion, for my graduation show at the Royal Academy of Art, The Hague. It was awarded by Pulchri Studio.'},
+    {name:'Key decision',    body:'The invisible factors that shape personal space, such as gender, identity and financial status, become the rules of the space, instead of size and appearance.'}
+  ],
+  bottom:[
+    {name:'What I learned',  body:'Speculative design works best when the rules are strict enough that the audience feels the unfairness for themselves.'},
+    {name:'What\u2019s next', body:'I\u2019d like to turn it into an interactive or installation version that people can move through.'}
+  ],
   role:'3D design, Motion design, Spatial design',
   tools:'Blender, After Effects, Photoshop',
   sections:[

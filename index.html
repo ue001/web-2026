@@ -304,6 +304,7 @@
   .band--work .reel{ position:relative; width:100%; min-height:0; display:flex; flex-direction:column; }
   .shot-link a{ border-bottom:0; color:inherit; }
   .shot-link a span{ display:inline-block; transition:translate .3s ease; }
+  .shot-link .lock-ico{ width:.8em; height:.8em; margin-right:.4em; vertical-align:-.05em; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; }
   .shot-link a:hover{ color:inherit; }
   .shot-link a:hover span, .shot-link a:focus-visible span{ translate:4px 0; }
   .band--work .reel .shot-link{
@@ -328,23 +329,39 @@
   @media (min-width:761px){
     html:not([data-mode="grid"]) .band--work .strip:first-child > .shot{ padding-left:0; padding-top:0; }
   }
-  /* hover, in this version: no tab — the reel dims a little and "View more →" comes up in its middle,
-     in white, so it reads over light and dark footage alike */
+  /* hover, in this version ("steady push"): the project grows as before, its picture reaching two gaps
+     further left over the text and two gaps further down, the divider sliding with it. But the grid
+     never changes: the reel is laid out that much bigger from the start, the extra hidden by a
+     clip-path that opens on hover, and the divider is a line that slides with a transform. So the
+     text never re-wraps and nothing moves under a still cursor. The row's .hot is set by the
+     hover-intent script below the grid, from the picture's visible area. */
   @media (hover:hover) and (min-width:761px){
-    .band--work .reel img, .band--work .reel video{ transition:filter .35s ease; }
-    html:not(.scrolling) .band--work .shot:hover .reel img, html:not(.scrolling) .band--work .shot:hover .reel video{ filter:brightness(.65); }
-    /* the project's cell grows clearly: the divider moves left by two gaps and the room under the
-       reel shrinks by the same, so the lines and the reel inside them both get bigger; the text cell gives
-       up the same amount of its own padding, so its type stays the same size */
-    html:not([data-mode="grid"]):not(.scrolling) .band--work .strip:first-child:has(.reel:hover){
-      grid-template-columns:calc(var(--split) * 0.8 - var(--pad) * 2) 1fr !important; }
-    html:not([data-mode="grid"]):not(.scrolling) .band--work .strip:first-child:has(.reel:hover) > .cell:first-child{ padding-right:0; }
-    html:not([data-mode="grid"]):not(.scrolling) .band--work .strip:first-child > .shot:has(.reel:hover){ padding-bottom:calc(clamp(110px, 20svh, 260px) - var(--pad) * 2); }
+    html:not([data-mode="grid"]) .band--work .strip:first-child{ --grow:calc(var(--pad) * 2); --hover:500ms cubic-bezier(.22,1,.36,1); }
+    html:not([data-mode="grid"]) .band--work .strip:first-child > .shot{ position:relative; overflow:visible; z-index:1;
+      padding-bottom:calc(clamp(110px, 20svh, 260px) - var(--grow)); }   /* the reel already reaches into the room below; the clip hides it */
+    html:not([data-mode="grid"]) .band--work .strip:first-child > .shot > .reel{
+      margin-left:calc(var(--grow) * -1);
+      clip-path:inset(0 0 var(--grow) var(--grow)); transition:clip-path var(--hover); }
+    /* the text keeps a fixed measure, narrower by the reach, so the picture
+       only ever covers empty space and the lines never re-wrap */
+    html:not([data-mode="grid"]) .band--work .strip:first-child > .cell:first-child{ border-right-color:transparent; }
+    html:not([data-mode="grid"]) .band--work .strip:first-child > .cell:first-child > *{ max-width:calc(100% - var(--grow)); }   /* the type keeps its size: the cell, which sizes it, stays as wide */
+    /* the divider that travels, standing in for the text cell's own rule (hidden while the rounding
+       outlines are drawn: they trace the moved divider themselves) */
+    html.rounding .band--work .strip:first-child > .shot::before{ visibility:hidden; }
+    html:not([data-mode="grid"]) .band--work .strip:first-child > .shot::before{ content:""; position:absolute; z-index:3; top:0; bottom:0; left:calc(var(--line) * -1);
+      border-left:var(--line) solid var(--rule); transition:transform var(--hover), border-color 600ms ease; pointer-events:none; }
+    html:not([data-mode="grid"]):not(.lock-open) .band--work .strip.hot > .shot > .reel{ clip-path:inset(0); }
+    html:not([data-mode="grid"]):not(.lock-open) .band--work .strip.hot > .shot::before{ transform:translateX(calc(var(--grow) * -1)); }
+    .band--work .reel::after{ content:""; position:absolute; inset:0; z-index:1; background:#000; opacity:0; pointer-events:none; transition:opacity var(--hover, 500ms cubic-bezier(.22,1,.36,1)); }
+    html:not(.lock-open) .band--work .strip.hot .reel::after{ opacity:.45; }   /* a dark veil, so the white "View more" reads over light footage */
     .band--work .reel .shot-link{ left:50%; top:50%; translate:-50% -50%; padding:0;
       background:none; -webkit-backdrop-filter:none; backdrop-filter:none; border:0;
       color:#fff; text-shadow:0 1px 14px rgba(0,0,0,.4);
       font-size:clamp(16px, 1.8vw, 30px); font-weight:500; letter-spacing:-.02em; }
-    html:not(.scrolling) .band--work .shot:hover .shot-link{ transition:opacity .3s ease .15s; }
+    .band--work .reel .shot-link{ transition:opacity var(--hover, 500ms cubic-bezier(.22,1,.36,1)); }
+    .band--work .shot:hover .shot-link{ opacity:0; }   /* "View more" follows the row's hover intent, not the raw hover */
+    html:not(.lock-open) .band--work .strip.hot .shot .shot-link{ opacity:1; }
   }
   /* phones and touch screens keep the original link: "View more", small and grey, under the reel */
   @media (hover:none), (max-width:760px){
@@ -356,6 +373,8 @@
   }
   @media (prefers-reduced-motion: reduce){
     .band--work .strip:first-child, .band--work .strip:first-child > .cell{ transition:border-color 600ms ease; }
+    .band--work .strip:first-child > .shot > .reel{ clip-path:inset(0 0 calc(var(--pad) * 2) 0) !important; margin:0 !important; }   /* no growing: only the veil and "View more" fade */
+    .band--work .strip:first-child > .shot::before{ display:none; }
   }
 
   /* Look: title and tags only, the project description stays hidden */
@@ -957,6 +976,7 @@
             &lt;a role=&quot;link&quot; tabindex=&quot;0&quot; style=&quot;cursor:pointer&quot; onclick=&quot;parent.postMessage({ landingWorks: true }, &#x27;*&#x27;)&quot; onkeydown=&quot;if (event.key === &#x27;Enter&#x27;) this.click()&quot;&gt;Works &lt;span aria-hidden=&quot;true&quot;&gt;→&lt;/span&gt;&lt;/a&gt;
             &lt;a href=&quot;mailto:jihae.cha9@gmail.com&quot; target=&quot;_top&quot;&gt;Email &lt;span aria-hidden=&quot;true&quot;&gt;→&lt;/span&gt;&lt;/a&gt;
             &lt;a href=&quot;https://www.linkedin.com/in/jihae-cha&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;LinkedIn &lt;span aria-hidden=&quot;true&quot;&gt;→&lt;/span&gt;&lt;/a&gt;
+            &lt;a href=&quot;media/jihae-cha-cv.pdf&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;CV &lt;span aria-hidden=&quot;true&quot;&gt;→&lt;/span&gt;&lt;/a&gt;
           &lt;/nav&gt;
         &lt;/div&gt;
         &lt;div class=&quot;tgrid&quot; id=&quot;tgrid&quot; aria-hidden=&quot;true&quot;&gt;&lt;/div&gt;
@@ -2170,6 +2190,11 @@
   .proj .more{ display:none; }
   .proj[data-mode="read"] .more{ display:block; }
   .proj[data-mode="look"] .body{ display:none; }
+  .proj .pnote{ margin-top:.6rem; max-width:34ch; text-wrap:pretty; hanging-punctuation:first; }   /* a narrow column, no lone last words */
+  .proj[data-mode="look"] .pnote{ display:block; }   /* role, decision, learned and next stay at every text size */
+  .proj .prow.prow--say:has(+ .prow--note) .pc{ padding-bottom:calc(var(--pad) * 2); }   /* the statement, then the notes, then the rule */
+  .proj .prow.prow--say:has(+ .prow--note){ border-bottom-color:transparent !important; }
+  .prow--end .pc{ padding-top:calc(var(--pad) * 3); padding-bottom:calc(var(--pad) * 3); }
 
   /* the title and the statement stand outside the moving split */
   .proj .prow--open{
@@ -2290,6 +2315,8 @@
   @media (max-width:1000px){ .proj{ --cols:6; } }
   @media (max-width:760px){
     .proj{ --cols:1; }
+    .proj__inner{ padding-bottom:calc(var(--pad) * 2 + 40px); }
+    .proj .prow--note .pc + .pc{ padding-top:0; }   /* stacked: the second part follows the first closely */   /* room under "Continue" for the fixed menu, at its open height */
     .proj .prow{ grid-template-columns:1fr !important; }
     .pc{ grid-column:1 / -1 !important; border-right:0; border-bottom:var(--line) solid transparent; }
     .prow > .pc:last-child{ border-bottom:0; }
@@ -2729,6 +2756,19 @@
 <script src="content/07-slash.js"></script>
 <script src="subpage/lock.js"></script>
 <script src="subpage/protect.js"></script>
+<script>
+/* a protected project says so before it is clicked, as an invitation rather than a wall: "View with
+   password →" with a lock in place of "View more →", until it has been unlocked in this visit */
+(function(){
+  if(!window.CHAPTERS) return;
+  document.querySelectorAll('.band--work .shot .reel').forEach(function(reel){
+    var m=reel.querySelector('video, img'), a=reel.querySelector('.shot-link a'); if(!m||!a) return;
+    var k=m.getAttribute('src'), ch=CHAPTERS[k];
+    if(!ch||!ch.locked||(window.__lockUnlocked&&window.__lockUnlocked(k))) return;
+    a.innerHTML='<svg class="lock-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>View with password <span aria-hidden="true">&rarr;</span>';
+  });
+})();
+</script>
 
 <script>
 (function(){
@@ -2789,6 +2829,13 @@
 
   function cell(span,html,rule){
     return '<div class="pc'+(rule?' pc--rule':'')+'" style="grid-column:'+span[0]+' / '+span[1]+'">'+(html||'')+'</div>';
+  }
+  /* two labelled paragraphs side by side, in the title's and the meta's columns */
+  function notesCells(list){
+    var spans=[[1,5],[6,10]];
+    return list.map(function(t,n){
+      return cell(spans[n]||[1,13],'<p class="mkey">'+esc(t.name)+'</p><p class="body pnote">'+esc(t.body)+'</p>',false);
+    }).join('')+cell([10,13],'',false);
   }
   function cellEl(span,rule){
     var d=document.createElement('div');
@@ -3022,6 +3069,9 @@
       '</div>';
     }
 
+    /* My role and Key decision, under the statement and before the first plate */
+    if(ch.top&&ch.top.length) html+='<div class="prow prow--open prow--say prow--note">'+notesCells(ch.top)+'</div>';
+
     inner.innerHTML=html;
 
     var slot=inner.querySelector('#projSlot');
@@ -3042,6 +3092,13 @@
     else sections.forEach(function(sec,n){
       inner.appendChild(sectionRow(sec,n));
     });
+
+    /* What I learned and What's next, after the last plate and before Continue */
+    if(ch.bottom&&ch.bottom.length){
+      var end=row(); end.className+=' prow--open prow--note prow--end';
+      end.innerHTML=notesCells(ch.bottom);
+      inner.appendChild(end);
+    }
 
     /* the loop */
     var nx=ch.next;
@@ -3151,9 +3208,8 @@
 
   function open(i,push){
     if(busy) return;
-    if(locked(i)){   // a protected project asks for the password over its reel, then opens here like the rest
-      if(push && window.__lockAsk) window.__lockAsk(startRect(i), function(){ open(i,push); }, key(shots[i]));
-      else if(ch0(i).file) location.href=ch0(i).file;   // a direct link: its own page asks, then comes back
+    if(locked(i)){   // a protected project goes to its own password page, which opens it here once unlocked
+      if(ch0(i).file) location.href=ch0(i).file;
       return;
     }
     busy=true;
@@ -3314,6 +3370,49 @@
 </script>
 
 
+<script>
+/* hover intent for the Designs rows: a row turns .hot 80ms after the pointer comes onto its
+   picture and cools 150ms after it leaves it, so brushing past doesn't flip it. The picture
+   (.reel) listens: its box never changes, and the hidden reach is clipped, which also takes it
+   out of hit-testing. So at rest only the visible picture counts; once grown, the whole grown
+   picture does, and on leaving it shrinks away from the pointer rather than back under it.
+   window.__coolRows() resets every row at once (the password screen calls it). */
+(function(){
+  var mq=matchMedia('(hover:hover) and (min-width:761px)');
+  var rows=document.querySelectorAll('.band--work .strip:first-child');
+  /* while a row grows or settles, the rounded outlines slide their sides instead of jumping */
+  var root=document.documentElement, mt=null;
+  function moving(){ root.classList.add('row-moving'); clearTimeout(mt); mt=setTimeout(function(){ root.classList.remove('row-moving'); },560); }
+  rows.forEach(function(row){
+    var t=null, reel=row.querySelector('.shot .reel')||row;
+    reel.addEventListener('pointerenter',function(e){
+      if(e.pointerType!=='mouse'||!mq.matches||held) return;
+      clearTimeout(t); t=setTimeout(function(){ row._set(true); },80);
+    });
+    reel.addEventListener('pointerleave',function(){
+      clearTimeout(t); t=setTimeout(function(){ row._set(false); },150);
+    });
+    row._cool=function(){ clearTimeout(t); row.classList.remove('hot'); };
+    row._set=function(on){ moving(); row.classList.toggle('hot',on); if(window.__regrid) window.__regrid(); };
+  });
+  window.__coolRows=function(){ rows.forEach(function(r){ r._cool(); }); };
+  /* scrolling: the row that was grown settles once as the scroll starts and stays at rest all the
+     way through (no flicker between wheel bursts); once the page has been still for 220ms, the
+     picture under a resting pointer grows once */
+  var held=false, ht=null, at=null;
+  addEventListener('pointermove',function(e){ if(e.pointerType==='mouse') at=[e.clientX,e.clientY]; },{passive:true});
+  addEventListener('scroll',function(){
+    if(!mq.matches) return;
+    if(!held){ held=true; rows.forEach(function(r){ if(r.classList.contains('hot')) r._set(false); else r._cool(); }); }
+    clearTimeout(ht); ht=setTimeout(function(){
+      held=false;
+      if(!at||document.documentElement.classList.contains('lock-open')) return;
+      var el=document.elementFromPoint(at[0],at[1]), reel=el&&el.closest('.band--work .shot .reel');
+      var row=reel&&reel.closest('.strip'); if(row&&row._set) row._set(true);
+    },220);
+  },{capture:true,passive:true});
+})();
+</script>
 <script>
 /* while the page scrolls, the Designs reels don't answer hover: each reel
    passing under a resting pointer would widen its row and pull it back,
@@ -3528,6 +3627,7 @@
       '.rounding .cell{transition:none!important}' +
       '.rounding .strip{transition:grid-template-columns var(--move)!important}' +
       '.rcell{position:absolute;box-sizing:border-box;border:var(--line,1px) solid var(--rule);border-radius:var(--r,0px);transition:border-radius .5s cubic-bezier(.7,0,.15,1)}' +
+      '.row-moving .rcell{transition:border-radius .5s cubic-bezier(.7,0,.15,1),left .5s cubic-bezier(.22,1,.36,1),width .5s cubic-bezier(.22,1,.36,1)}' +   /* only while a Designs row grows or settles: its divider slides with its picture, on the same curve */
       '.rwall{position:absolute;background:var(--rule)}';
     document.head.appendChild(css);
 
@@ -3535,7 +3635,7 @@
     // off while a chapter is open, and in the stacked phone layout, where the reel's cell steps aside
     // and the cells it would trace no longer match what is on screen; the real rules stay
     const narrow = matchMedia('(max-width:760px)');
-    const blocked = () => narrow.matches || !!document.querySelector('.proj[data-open="true"]');
+    const blocked = () => narrow.matches || !!document.querySelector('.proj[data-open="true"]') || root.classList.contains('lock-open');
 
     // every drawn rule near the screen, as axis-aligned pixel runs
     // the visible width: the screen less any scrollbar, so lines stop where the page does
@@ -3545,6 +3645,13 @@
       return root.clientWidth || innerWidth;
     }
     const lineW = () => parseFloat(getComputedStyle(root).getPropertyValue('--line')) || 1;
+    // a hot Designs row reaches its picture over the text: its divider is drawn that much further left
+    function reach(el) {
+      const row = el.parentElement;
+      if (!row || !row.classList.contains('hot') || el !== row.firstElementChild) return 0;
+      const shot = row.querySelector('.shot'), reel = shot && shot.querySelector('.reel');
+      return reel ? Math.max(0, shot.getBoundingClientRect().left - reel.getBoundingClientRect().left) : 0;
+    }
     function rules() {
       const W = viewW(), H = innerHeight, out = [];
       const near = r => r.bottom >= -MARGIN && r.top <= H + MARGIN && r.right >= 0 && r.left <= W;
@@ -3562,7 +3669,7 @@
           if (s === 'top') push(false, r.top, r.left, r.right);
           if (s === 'bottom') push(false, r.bottom - w, r.left, r.right);
           if (s === 'left') push(true, r.left, r.top, r.bottom);
-          if (s === 'right') push(true, r.right - w, r.top, r.bottom);
+          if (s === 'right') push(true, r.right - w - reach(el), r.top, r.bottom);
         });
       });
       return out;
@@ -3622,8 +3729,16 @@
     function draw() {
       const sy = Math.round(scrollY()), seen = new Set();
       layer.style.zIndex = '3';
+      // a cell is known by its band and its place in it (first, second...), not by where its sides
+      // are, so when a Designs row's divider moves the same outline slides instead of being replaced
+      const nth = new Map();
+      cells.slice().sort((p, q) => p.x0 - q.x0).forEach(c => {
+        const band = Math.round(c.y0 + sy) + ',' + Math.round(c.y1 + sy);
+        const n = (nth.get(band) || 0); nth.set(band, n + 1);
+        c.key = band + '#' + n;
+      });
       cells.forEach(c => {
-        const key = c.x0 + ',' + c.x1 + ',' + Math.round(c.y0 + sy) + ',' + Math.round(c.y1 + sy);
+        const key = c.key;
         let el = pool.get(key);
         if (!el) { el = document.createElement('i'); el.className = 'rcell'; layer.appendChild(el); pool.set(key, el); }
         seen.add(key);
@@ -3696,7 +3811,7 @@
           const q = e.getBoundingClientRect(), qp = [[q.left, q.top], [q.right, q.top], [q.right, q.bottom], [q.left, q.bottom]];
           const v = rm.map((x, k) => Math.hypot(qp[k][0] - pts[k][0], qp[k][1] - pts[k][1]) < 3 ? x : 0);
           if (i && v.every(x => !x)) break;
-          e.style.transition = 'border-radius .5s cubic-bezier(.7,0,.15,1)';
+          e.style.transition = 'border-radius .5s cubic-bezier(.7,0,.15,1), clip-path .5s cubic-bezier(.22,1,.36,1)';   // keeps a Designs reel's opening clip on its own curve
           e.style.borderRadius = v.map(x => x.toFixed(1) + 'px').join(' ');
           bent.add(e); done.add(e);
         }
@@ -3726,6 +3841,7 @@
       tick = setInterval(refresh, 250);   // layouts keep moving under a still cursor
     }
     function refresh() { if (!on) return; if (blocked()) return stop(true); solve(); draw(); }
+    window.__regrid = refresh;   // the hover-intent script calls it as a row turns hot or cools
     function stop(now) {
       at = null; if (!on) return;
       clearInterval(tick); tick = null; shape();

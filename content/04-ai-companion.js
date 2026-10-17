@@ -21,6 +21,14 @@ window.CHAPTERS['media/AI-companion.mp4'] = {
   year:'2025',
   context:'Team of three',
   lede:'An AI companion for the seconds before an impulse purchase.',
+  top:[
+    {name:'My role',         body:'In a team of three, I led the user research and turned primary and secondary research into clear insights. From those insights I defined a sharp problem and shaped the concept into a service with a longer-term fix. I also designed the small touchpoints that bring it to life, like push notifications and regular check-ins.'},
+    {name:'Key decision',    body:'The companion steps in when someone lingers in a shopping app. It\u2019s a pause rather than a block, paired with longer-term reflection on where the spending comes from.'}
+  ],
+  bottom:[
+    {name:'What I learned',  body:'A sharp problem definition does most of the design work. Once we knew the real issue was where the spending comes from, not the purchase itself, the concept followed. Small details like a well-timed notification turned it from an idea into a service people could picture using.'},
+    {name:'What\u2019s next', body:'I\u2019d explore how motion and presence could make the companion feel caring without being intrusive.'}
+  ],
   role:'UX research, UX/UI design, Prototyping',
   tools:'Figma, custom-prompted GPT (for testing)',
   sections:[

@@ -22,6 +22,14 @@ window.CHAPTERS['media/bodiless.jpg'] = {
   context:'Graduation thesis, Royal Academy of Art, The Hague',
   note:'Selected for the exhibition Matter Does Matter',
   lede:'A thesis that asks how personal space, the invisible distance between oneself and others, can be materialized.',
+  top:[
+    {name:'My role',         body:'I researched and wrote the thesis, ran experiments in physical and digital space, and designed the book. It was selected for Matter Does Matter.'},
+    {name:'Key decision',    body:'Spacing itself is the medium. The distance between letters, lines and elements lets the book perform the distance it describes.'}
+  ],
+  bottom:[
+    {name:'What I learned',  body:'A static page can still move. Rhythm and spacing are a kind of motion design.'},
+    {name:'What\u2019s next', body:'This research became the foundation for Line 0, and I want to keep exploring personal space in interactive form.'}
+  ],
   role:'Editorial design, Writing',
   tools:'InDesign, Photoshop',
   sections:[

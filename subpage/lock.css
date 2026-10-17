@@ -42,11 +42,12 @@
   .lock-back:hover, .lock-back:focus-visible{ color:var(--ink); outline:0; }
 
   /* ---- on the index: over the reel that was clicked ---- */
-  .lock-box{ position:fixed; z-index:70; display:grid; place-items:center; padding:20px; box-sizing:border-box;
+  .lock-layer{ position:fixed; inset:0; z-index:70; cursor:pointer; overscroll-behavior:contain; touch-action:none; }   /* above everything: takes every pointer, so nothing under it scrolls or hovers */
+  .lock-box{ position:fixed; display:grid; place-items:center; padding:20px; box-sizing:border-box;
     background:rgba(11,11,10,.62); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
-    color:#f2f2f0; opacity:0; transition:opacity .3s ease; cursor:pointer; }
-  .lock-box .lock-form{ cursor:default; }
-  .lock-box.on{ opacity:1; }
+    color:#f2f2f0; opacity:0; transition:opacity .3s ease; }
+  .lock-box .lock-form{ cursor:default; touch-action:auto; }
+  .lock-layer.on .lock-box{ opacity:1; }
   .lock-box .lock-form{ width:min(240px,100%); }
   .lock-box .lock-note{ font-size:14px; line-height:1.4; color:#b5b5b0; }
   .lock-box .lock-ask:hover, .lock-box .lock-ask:focus-visible{ color:#fff; }

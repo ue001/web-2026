@@ -10,6 +10,15 @@ CHAPTERS['media/monell.mp4'] = {
   cover:'media/monell.mp4',
   file:null,   /* opens in the index overlay; only the protected projects have pages */
   lede:'A brand identity and website that bring a cosmetics line to Gen Z.',
+  /* TODO My role: add whether this was a real client or self-initiated. */
+  top:[
+    {name:'My role',         body:'I extended the identity, designed the website and art-directed the photoshoot.'},
+    {name:'Key decision',    body:'The mature packaging and logo stayed as they were. The website and photography do the work of reaching a younger audience, vintage in feel but modern in tone.'}
+  ],
+  bottom:[
+    {name:'What I learned',  body:'Working inside an existing identity takes restraint. The job was to translate the brand for a new audience, not to replace it.'},
+    {name:'What\u2019s next', body:'I\u2019d carry the same tone into social media and short motion content.'}
+  ],
   role:'Identity design, Web design, Photoshoot art direction',
   tools:'Figma, Nano Banana',
   sections:[

@@ -10,6 +10,14 @@ window.CHAPTERS['media/motion-explainer.mp4'] = {
   year:'2026',
   context:'Internship, CLEVER°FRANKE',
   lede:'A motion-driven entry point that replaces search.',
+  top:[
+    {name:'My role',         body:'I ran the UX research and designed the interaction and motion. I prototyped it in Figma first, then built a working prototype with Claude Code to test how the data points follow the cursor and gather by role.'},
+    {name:'Key decision',    body:'Movement replaces the search bar. The system does the gathering, so the user only has to choose.'}
+  ],
+  bottom:[
+    {name:'What I learned',  body:'Moving from a Figma prototype to a coded one showed me what static prototypes miss, like timing, the feel of the cursor and how motion responds to real input.'},
+    {name:'What\u2019s next', body:'I want to test how the interaction holds up with larger datasets, and with touch and keyboard input.'}
+  ],
   role:'UX research, Motion design, Prototyping',
   tools:'Figma Motion, JavaScript (built with Claude Code)',
   sections:[

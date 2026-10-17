@@ -87,52 +87,54 @@
     }
   }
 
-  /* ---- the index: the field over the clicked reel --------------------- */
-  var box=null;
+  /* ---- the index: the field over the clicked reel ---------------------
+     A fixed layer over the whole page takes every pointer and wheel event,
+     so nothing underneath scrolls or answers hover while it is open; the
+     field itself sits over the reel that was clicked. The page's scroll
+     position is kept and put back exactly on close. Escape, or a click
+     anywhere outside the field, closes it. */
+  var layer=null, scroller=null, keptTop=0;
+  function stop(e){ e.preventDefault(); }
   function shut(){
-    if(!box) return; var b=box; box=null;
-    b.classList.remove('on'); setTimeout(function(){ b.remove(); },300);
+    if(!layer) return; var l=layer; layer=null;
+    l.classList.remove('on'); setTimeout(function(){ l.remove(); },300);
+    document.documentElement.classList.remove('lock-open');
+    if(scroller) scroller.scrollTop=keptTop;   /* in case anything nudged it */
     removeEventListener('keydown',onKey,true);
-    document.removeEventListener('pointerdown',onOut,true);
-    removeEventListener('scroll',onScroll,true);
     removeEventListener('resize',shut);
   }
-  function onKey(e){ if(e.key==='Escape'){ e.stopPropagation(); shut(); } }
-  /* only a real scroll away closes it: a snap settling, trackpad momentum
-     or a list scrolling inside a reel moves a few pixels and would
-     otherwise shut the field while the password is being typed */
-  var from=null, under=null;
-  function onScroll(e){
-    var t=e.target===document?document.scrollingElement:e.target;
-    if(!t||!from) return;
-    if(under && t!==document.scrollingElement && !t.contains(under)) return;   /* a scroller inside the reel, not around it */
-    if(!from.has(t)){ from.set(t,[t.scrollTop,t.scrollLeft]); return; }
-    var s=from.get(t);
-    if(Math.abs(t.scrollTop-s[0])>40||Math.abs(t.scrollLeft-s[1])>40) shut();
+  function onKey(e){
+    if(e.key==='Escape'){ e.stopPropagation(); shut(); return; }
+    if(/^(PageUp|PageDown|Home|End|ArrowUp|ArrowDown)$/.test(e.key) && !(e.target && e.target.tagName==='INPUT')) e.preventDefault();
+    if(e.key===' ' && !(e.target && e.target.tagName==='INPUT')) e.preventDefault();
   }
-  function onOut(e){ if(box && !box.contains(e.target)) shut(); }
   window.__lockUnlocked=unlocked;
   /* href is an address to go to, or a function to call once the password is right */
   window.__lockAsk=function(r, href, id){
     var go=function(){ if(typeof href==='function') href(); else location.href=href; };
     if(unlocked(id)){ go(); return; }
     shut();
-    under=document.elementFromPoint(r.left+r.width/2, r.top+r.height/2);   /* the reel, before the field covers it */
-    box=document.createElement('div');
+    scroller=document.querySelector('.content')||document.scrollingElement;
+    keptTop=scroller.scrollTop;
+    document.documentElement.classList.add('lock-open');
+    if(window.__coolRows) window.__coolRows();   /* any project in its hover state goes back to rest */
+    layer=document.createElement('div');
+    layer.className='lock-layer';
+    var box=document.createElement('div');
     box.className='lock-box';
     box.style.left=r.left+'px'; box.style.top=r.top+'px';
     box.style.width=r.width+'px'; box.style.height=r.height+'px';
     var f=form(id, function(){ shut(); go(); });
     box.appendChild(f);
-    /* a second click on the reel, anywhere but the field, puts the reel back */
-    box.addEventListener('click',function(e){ if(!f.contains(e.target)) shut(); });
-    document.body.appendChild(box);
-    requestAnimationFrame(function(){ if(box) box.classList.add('on'); });
+    layer.appendChild(box);
+    /* a click anywhere but the field, on the reel or beside it, puts the page back */
+    layer.addEventListener('click',function(e){ if(!f.contains(e.target)) shut(); });
+    layer.addEventListener('wheel',stop,{passive:false});
+    layer.addEventListener('touchmove',stop,{passive:false});
+    document.body.appendChild(layer);
+    requestAnimationFrame(function(){ if(layer) layer.classList.add('on'); });
     box.querySelector('input').focus({ preventScroll:true });
     addEventListener('keydown',onKey,true);
-    document.addEventListener('pointerdown',onOut,true);
-    from=new Map();
-    addEventListener('scroll',onScroll,true);   /* it sits over the reel, so a scroll would leave it behind */
-    addEventListener('resize',shut);
+    addEventListener('resize',shut);   /* the field would no longer sit over its reel */
   };
 })();

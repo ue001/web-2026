@@ -10,6 +10,14 @@ window.CHAPTERS['media/generative.mp4'] = {
   year:'2026',
   context:'Internship, CLEVER°FRANKE',
   lede:'A title slide that draws itself from the image behind it.',
+  top:[
+    {name:'My role',         body:'I designed the rule system and the logic behind the generator, and built the tool with Claude Code in an AI-assisted workflow. I defined how a deck\u2019s images become a cover, and the AI helped turn that into working code.'},
+    {name:'Key decision',    body:'Instead of fixed templates, the deck\u2019s own content drives the composition. Every cover fits its client and still stays on-brand.'}
+  ],
+  bottom:[
+    {name:'What I learned',  body:'Designing a system means designing its limits. The hardest part was deciding what the generator should never do. Building it myself with AI-assisted code let me test those rules right away instead of imagining them.'},
+    {name:'What\u2019s next', body:'I\u2019d like to let users adjust the parameters live, and bring the same approach to other brand touchpoints.'}
+  ],
   role:'Generative design, System design, Motion design',
   tools:'Figma Motion, JavaScript / HTML Canvas (built with Claude Code)',
   /* the sections are written out in index.html (<template data-chapter="media/generative">)
