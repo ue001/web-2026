@@ -76,7 +76,7 @@
       document.documentElement.dataset.theme = t==='light' ? 'light' : 'dark';
       var page=document.createElement('div');
       page.className='lock-page';
-      page.innerHTML='<a class="lock-name" href="index.html">Jihae Cha</a><div class="lock-wrap"><h1></h1></div>';
+      page.innerHTML='<a class="lock-name" href="index.html#works" aria-label="Jihae Cha, back to all work">Jihae Cha</a><div class="lock-wrap"><h1></h1></div>';
       var wrap=page.querySelector('.lock-wrap');
       wrap.querySelector('h1').textContent=body.getAttribute('data-title')||'';
       wrap.appendChild(form(id, function(){ if(!go) page.remove(); done(); }));

@@ -19,7 +19,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cstyle%3Erect%7Bfill:none;stroke:%23121211%7D@media (prefers-color-scheme:dark)%7Brect%7Bstroke:%23f2f2f0%7D%7D%3C/style%3E%3Crect x='4' y='4' width='24' height='24' rx='4' stroke-width='2.5'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=switzer@300,400,500&display=swap">
-<link rel="stylesheet" href="subpage/lock.css">
+<link rel="stylesheet" href="subpage/lock.css?v=2">
 <style>
 
   :root{
@@ -605,10 +605,10 @@
     color:#fff; mix-blend-mode:difference;
     text-decoration:none; border:0; cursor:pointer;
     opacity:0; visibility:hidden; translate:0 -8px;
-    transition:opacity .3s ease, translate .3s ease, visibility 0s linear .3s;
+    transition:opacity .3s ease, translate .3s ease, visibility 0s linear .3s, transform .2s ease;
   }
   html:not(.on-landing) .stuck-name{ opacity:1; visibility:visible; translate:0 0;
-    transition:opacity .45s ease, translate .45s cubic-bezier(.2,.7,.2,1); }
+    transition:opacity .45s ease, translate .45s cubic-bezier(.2,.7,.2,1), transform .2s ease; }
   .stuck-name:hover, .stuck-name:focus-visible{ color:#fff; outline:0; }
 
   /* ---- the menu, from the sketch: a small project strip. Text on the left, the
@@ -2428,11 +2428,21 @@
      stays out of the way over the cover image and arrives once the reader
      scrolls past it, as it does on the home page after the landing. */
   .proj__mode{ display:none !important; }
-  /* no Back button on the subpage: the name, top left, is the way home */
+  /* in a project the name itself is the way back: an arrow eases in before it, "← Jihae Cha",
+     read as "back to Jihae Cha" (clicking the name closes the project). No separate Back */
   .proj__exit{ display:none !important; }
+  /* the landing's scroll-down arrow (its same line, weight and round ends), turned to point left.
+     It sits just left of the name; in a project the name slides right to make room and the arrow
+     fades in. Both move by transform, so they glide between pixels instead of stepping */
+  .stuck-name::before{ content:""; position:absolute; right:calc(100% + .3em); top:50%; width:.9em; height:.9em; margin-top:-.45em; opacity:0;
+    background:no-repeat 50% 50% / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M17.5 10H3M9.5 3.5L3 10l6.5 6.5' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    transition:opacity .2s ease; }   /* leaving: arrow and name together, quickly */
+  .stuck-name{ transform:translateX(0); }
+  html:has(.proj[data-open="true"]) .stuck-name{ transform:translateX(1.2em); }
+  html:has(.proj[data-open="true"]) .stuck-name::before{ opacity:.6; transition:opacity .6s ease .45s; }   /* arriving: the name makes room first, then the arrow fades in */
   html:has(.proj[data-open="true"]) .stuck-name{
     z-index:72;   /* above the flying image (70), so the name never disappears under it */ opacity:1; visibility:visible; translate:0 0;
-    transition:opacity .45s ease, translate .45s cubic-bezier(.2,.7,.2,1); }
+    transition:opacity .45s ease, translate .45s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1); }   /* transform: the slow slide that makes room for the arrow */
   html:has(.proj[data-open="true"]) .ratio{ z-index:67; }
   html:has(.proj[data-open="true"]):not(.proj-past-hero) .ratio{
     opacity:0; translate:0 12px; visibility:hidden; pointer-events:none;
@@ -2852,7 +2862,7 @@
 <script src="content/05-line0.js"></script>
 <script src="content/06-bodiless.js"></script>
 <script src="content/07-slash.js"></script>
-<script src="subpage/lock.js"></script>
+<script src="subpage/lock.js?v=2"></script>
 <script src="subpage/protect.js"></script>
 <script>
 /* a protected project says so before it is clicked, as an invitation rather than a wall: "View with
@@ -3349,14 +3359,20 @@
       whenReady(heroEl,out,1500);
     }, 560);
 
-    if(push){ try{ history.pushState({proj:i},'', '#'+name); }catch(e){} }
+    depth=0; if(push){ try{ history.pushState({proj:i},'', '#'+name); depth=1; }catch(e){} }
     lock(true);
   }
 
+  var depth=0;   // history entries this visit pushed for the open chapter (open, then each Continue)
   function close(pop){
     if(busy||thumb<0) return; busy=true;
     var i=thumb;
     proj.scrollTop=0;
+    /* closing always lands on the work: if the page behind is elsewhere (the project was opened from
+       its password page or a link, so the landing sits behind it), it moves to this project's row
+       first, unseen, and the picture flies home to it */
+    var c=document.querySelector('.content'), row=shots[i].closest('.band--work'), rr=row&&row.getBoundingClientRect();
+    if(c&&rr&&(rr.bottom<0||rr.top>innerHeight)){ c.style.scrollSnapType='none'; c.scrollTop+=rr.top-c.getBoundingClientRect().top; c.style.scrollSnapType=''; }
     proj.dataset.settled='false';
 
     sweep();
@@ -3380,7 +3396,10 @@
       thumb=-1; busy=false;
     }, 560);
 
-    if(!pop){ try{ history.back(); }catch(e){} }
+    /* the address loses the project: back through the entries this visit added for it (that is the
+       homepage), or, if it came straight in with no entry of ours, just drop the #name */
+    if(!pop){ try{ if(depth>0) history.go(-depth); else history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
+    depth=0;
   }
 
   function jump(ni){
@@ -3400,7 +3419,7 @@
       proj.dataset.settled='true';
       pulse(1000);
       busy=false;
-      try{ history.pushState({proj:ni},'', '#'+name); }catch(e){}
+      try{ history.pushState({proj:ni},'', '#'+name); depth++; }catch(e){}
     }, 320);
   }
 
