@@ -80,7 +80,7 @@
       var wrap=page.querySelector('.lock-wrap');
       wrap.querySelector('h1').textContent=body.getAttribute('data-title')||'';
       wrap.appendChild(form(id, function(){ if(!go) page.remove(); done(); }));
-      var back=document.createElement('a'); back.className='lock-back'; back.href='index.html'; back.innerHTML='&larr; Back to all work';
+      var back=document.createElement('a'); back.className='lock-back'; back.href='index.html#works'; back.innerHTML='&larr; Back to all work';
       wrap.appendChild(back);
       body.insertBefore(page, body.firstChild);
       wrap.querySelector('input').focus();

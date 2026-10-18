@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<base href="../">   <!-- one folder down: every path below is from the site root -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Experiments — Jihae Cha</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cstyle%3Erect%7Bfill:none;stroke:%23121211%7D@media (prefers-color-scheme:dark)%7Brect%7Bstroke:%23f2f2f0%7D%7D%3C/style%3E%3Crect x='4' y='4' width='24' height='24' rx='4' stroke-width='2.5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=switzer@300,400,500&display=swap">
+<style>
+  :root{ --paper:#ffffff; --ink:#121211; --frame:#121211; --frame-w:1.5px; --pad:clamp(14px, 1.6vw, 24px); }
+  [data-theme="dark"]{ --paper:#0b0b0a; --ink:#f2f2f0; --frame:#ffffff; }   /* the frame: full white in dark, full black in light */
+  html, body{ margin:0; background:var(--paper); color:var(--ink); }
+  body{ font-family:"Switzer", "Helvetica Neue", system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+  *{ box-sizing:border-box; }
+  /* the same name and links as the homepage's top corners */
+  .bar{ position:fixed; z-index:2; top:var(--pad); left:var(--pad); right:var(--pad);
+    display:flex; justify-content:space-between; align-items:baseline;
+    color:#fff; mix-blend-mode:difference; pointer-events:none; font-size:20px; line-height:1; letter-spacing:-.01em; }
+  .bar a{ color:inherit; text-decoration:none; pointer-events:auto; transition:opacity .2s ease; }
+  .bar a:hover{ opacity:.55; }
+  .bar a:focus-visible{ outline:1px solid currentColor; outline-offset:4px; }
+  .bar nav{ display:flex; align-items:center; gap:20px; font-size:16px; }
+  .bar nav a{ translate:0 2px; }   /* onto the name's baseline, as on the homepage */
+  /* the light/dark icon, as on the homepage */
+  .theme{ appearance:none; background:none; border:0; padding:0; margin:0 -1.7px 0 0; color:inherit; cursor:pointer; pointer-events:auto;
+    display:flex; align-items:center; justify-content:center; width:20px; height:20px; translate:0 1.5px; transition:opacity .2s ease; }
+  .theme svg{ width:20px; height:20px; display:block; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+  .theme:hover{ opacity:.55; }
+  .theme:focus-visible{ outline:1px solid currentColor; outline-offset:4px; }
+  .page-head h1 .l{ display:inline-block; transition:transform .5s cubic-bezier(.22,1,.36,1); }   /* each letter keeps its distance from the cursor */
+  /* the page you are on stays full white; the other links rest soft and light up on hover, so the
+     menu reads apart from the white frames and title */
+  .bar nav a:not([aria-current]){ opacity:.45; }
+  .bar nav a:not([aria-current]):hover{ opacity:1; }
+  /* the page's own title, alone, then the work soon after */
+  .page-head{ min-height:100svh; display:flex; align-items:center; justify-content:center; padding:calc(var(--pad) * 2 + 20px) var(--pad); }   /* the first screen is the title alone; the work waits below */
+  .page-head h1{ width:100%; }
+  .page-head h1{ margin:0; font-weight:400; font-size:clamp(15px, 1.4vw, 23px); line-height:1.32; letter-spacing:0; padding:1.2em 0; text-align:center; }   /* the About text's size, centred; each letter is placed by the script */
+  /* each experiment is only the piece, full width, one under another; no text, no rules */
+  main{ display:flex; flex-direction:column; gap:calc(var(--pad) * 9); padding:calc(var(--pad) * 2) var(--pad) calc(var(--pad) * 4); counter-reset:exp; }
+  .exp{ position:relative; width:100%; height:min(84svh, 820px); counter-increment:exp; }
+  /* a piece in a .hold pins in place for a stretch of scrolling (the hold's extra height), then
+     moves on up with the page; the next piece follows after it and never covers it */
+  .hold{ height:calc(min(84svh, 820px) + 70svh); }
+  .hold > .exp{ position:sticky; top:calc(var(--pad) * 2 + 20px + 1.6rem); }
+  .exp video{ position:absolute; inset:0; width:100%; height:100%; display:block; object-fit:contain; background:var(--paper); }   /* the whole film, nothing cropped */
+  /* a piece can go without its frame (exp--bare), and can start small and grow to full size as it
+     scrolls up to the middle of the screen (exp--grow; --p set by the script) */
+  .exp--bare::after{ display:none; }
+  .exp--bare video{ background:transparent; }
+  /* the piece grows by scaling from its top edge (so the first one's tip shows on the landing);
+     its frame is drawn at that same size rather than scaled, so the line stays a crisp white
+     stroke at every size, and its number sits on the frame's corner */
+  .exp--grow{ --s:calc(.32 + .68 * var(--p, 0)); }
+  .exp--grow > video, .exp--grow > iframe{ transform:scale(var(--s)); transform-origin:50% 0; will-change:transform; }
+  .exp.exp--grow::after{ inset:0 calc((1 - var(--s)) * 50%) calc((1 - var(--s)) * 100%); }
+  .exp.exp--grow::before{ left:calc((1 - var(--s)) * 50%); opacity:calc(.35 + .65 * var(--p, 0)); }
+  /* the frame is drawn over the piece, and the piece is laid a few pixels past it on every side
+     and cut back to the frame, so a piece's own outer edge never shows as a second line beside it */
+  .exp::after{ content:""; position:absolute; inset:0; border:var(--frame-w) solid var(--frame); pointer-events:none; z-index:1; }
+  /* its number, small, above the frame on the left: 001, 002... counted by itself, in page order */
+  .exp::before{ content:counter(exp, decimal-leading-zero); position:absolute; left:0; bottom:100%; margin-bottom:.6rem;
+    font-size:13px; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums; letter-spacing:.02em; }
+  .exp:nth-of-type(-n+99)::before{ content:"0" counter(exp, decimal-leading-zero); }
+  .exp iframe{ position:absolute; inset:-8px; width:calc(100% + 16px); height:calc(100% + 16px); border:0; display:block; clip-path:inset(8px); }
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="./">Jihae Cha</a>
+  <nav aria-label="Site">
+    <a href="./#about">About</a>
+    <a href="experiments/" aria-current="page">Experiments</a>
+    <button type="button" id="theme" class="theme" aria-pressed="true"></button>
+  </nav>
+</div>
+<header class="page-head">
+  <h1>Experiments</h1>
+</header>
+
+<main>
+  <!-- one experiment per <article>: copy this block and change its piece (and its id and title) -->
+  <div class="hold">
+    <article class="exp" id="proxemics">
+      <iframe src="experiments/grid.html" title="Personal Space, an interactive grid" id="grid" loading="lazy"></iframe>
+    </article>
+  </div>
+  <article class="exp exp--bare exp--grow" id="3d-name">
+    <video src="media/00-experiments/3D-name-web.mp4" muted loop playsinline autoplay preload="metadata" aria-label="Jihae's name in 3D"></video>
+  </article>
+</main>
+<script>
+  /* the title's letters rest scattered a little off their line and keep their distance from the
+     cursor, as the words in About do, drifting back when it leaves */
+  (function(){
+    var h=document.querySelector('.page-head h1'); if(!h) return;
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var word=h.textContent; h.textContent=''; h.setAttribute('aria-label', word);
+    var ls=word.split('').map(function(ch){ var l=document.createElement('span'); l.className='l'; l.setAttribute('aria-hidden','true'); l.textContent=ch; h.appendChild(l); return l; });
+    var R=140, PUSH=14, mx=-1e4, my=-1e4, raf=0;
+    // scattered with no rhythm, and the spread itself changes every visit: some visits the
+    // letters huddle close, some the word stretches across the page with one or two long
+    // silences (an E at the far left, the rest far off to the right). Order always holds.
+    var rnd=function(a,b){ return a+Math.random()*(b-a); };
+    ls.forEach(function(l){ l.style.translate='0 '+rnd(-1.1,1.1).toFixed(2)+'em'; l.style.rotate=rnd(-14,14).toFixed(1)+'deg'; });
+    function spread(){
+      var free=h.clientWidth, letters=0;
+      ls.forEach(function(l){ l.style.marginRight='0px'; letters+=l.getBoundingClientRect().width; });
+      var room=Math.max(0, free-letters);
+      if(!h._span) h._span=Math.random()<.4 ? rnd(.02,.12) : Math.random()<.5 ? rnd(.25,.55) : rnd(.75,.98);   // huddled, loose, or across the page
+      var total=room*h._span, n=ls.length-1;
+      if(!h._w){   // gap weights: mostly small, and now and then one or two long silences
+        h._w=[]; for(var i=0;i<n;i++) h._w.push(Math.random()<.12 ? rnd(4,9) : Math.pow(Math.random(),2));
+      }
+      var sum=h._w.reduce(function(a,b){ return a+b; },0)||1;
+      ls.forEach(function(l,i){ l.style.marginRight=i<n ? (total*h._w[i]/sum).toFixed(1)+'px' : '0px'; });
+    }
+    spread(); addEventListener('resize',spread); if(document.fonts) document.fonts.ready.then(spread);
+    function lean(){
+      raf=0;
+      ls.forEach(function(l){
+        var r=l.getBoundingClientRect(), dx=r.left+r.width/2-mx, dy=r.top+r.height/2-my, d=Math.hypot(dx,dy);
+        if(d<R&&d>0){ var f=Math.pow(1-d/R,1.4)*PUSH; l.style.transform='translate('+(dx/d*f).toFixed(1)+'px,'+(dy/d*f*.6).toFixed(1)+'px)'; }
+        else if(l.style.transform) l.style.transform='';
+      });
+    }
+    var head=document.querySelector('.page-head');
+    if(matchMedia('(hover: hover)').matches){
+      head.addEventListener('pointermove',function(e){ mx=e.clientX; my=e.clientY; if(!raf) raf=requestAnimationFrame(lean); });
+      head.addEventListener('pointerleave',function(){ mx=my=-1e4; lean(); });
+    } else {   /* phones: a tap nudges the letters near the finger aside, and they drift back */
+      var back=null;
+      head.addEventListener('click',function(e){ mx=e.clientX; my=e.clientY; lean(); clearTimeout(back); back=setTimeout(function(){ mx=my=-1e4; lean(); },600); });
+    }
+  })();
+  /* exp--grow: 0 while its middle is at the bottom of the screen, 1 once it reaches the middle */
+  (function(){
+    var els=[].slice.call(document.querySelectorAll('.exp--grow')); if(!els.length) return;
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches){ els.forEach(function(el){ el.style.setProperty('--p',1); }); return; }
+    var raf=0;
+    function tick(){
+      raf=0; var H=innerHeight;
+      els.forEach(function(el){
+        var r=el.getBoundingClientRect(), mid=r.top+r.height/2, p=(H-mid)/(H/2);
+        p=Math.max(0,Math.min(1,p)); p=1-Math.pow(1-p,3);   // eases in as it arrives
+        el.style.setProperty('--p',p.toFixed(3));
+      });
+    }
+    addEventListener('scroll',function(){ if(!raf) raf=requestAnimationFrame(tick); },{passive:true});
+    addEventListener('resize',tick); tick();
+  })();
+  /* the grid's ending links: "her designs" goes to the homepage's work */
+  addEventListener('message', function(e){ if(e.data && e.data.landingWorks) location.href='./#works'; });
+  /* light and dark, as on the homepage: it opens dark, the icon shows the mode it switches to,
+     and the grid inside is told the theme too */
+  (function(){
+    var btn=document.getElementById('theme'), grid=document.getElementById('grid');
+    var SUN='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>';
+    var MOON='<svg viewBox="-1.5 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>';
+    function sync(){ if(grid.contentWindow) grid.contentWindow.postMessage({ landingTheme: document.documentElement.dataset.theme }, '*'); }
+    function set(dark){
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      btn.setAttribute('aria-pressed', String(dark));
+      btn.innerHTML = dark ? SUN : MOON;
+      btn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+      try{ localStorage.setItem('jihae-theme', dark ? 'dark' : 'light'); }catch(e){}
+      sync();
+    }
+    grid.addEventListener('load', sync);
+    btn.addEventListener('click', function(){ set(document.documentElement.dataset.theme !== 'dark'); });
+    set(true);   /* always opens in dark, like the homepage */
+  })();
+</script>
+</body>
+</html>
