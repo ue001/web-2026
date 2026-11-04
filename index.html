@@ -1924,6 +1924,30 @@
     </div>
   </section>
 
+  <script src="content/design-order.js"></script>
+  <script>
+  /* /design sends here with ?view=design: the work in the order from content/design-order.js.
+     It holds while moving around the site; arriving at the plain address from outside is always the original */
+  (function(){
+    var asked=/[?&]view=design\b/.test(location.search), on=asked;
+    try{
+      var inside=document.referrer.indexOf(location.origin+'/')===0;
+      if(asked) sessionStorage.setItem('jihae-view','design');
+      else if(!inside && !location.hash) sessionStorage.removeItem('jihae-view');
+      on=sessionStorage.getItem('jihae-view')==='design';
+    }catch(e){}
+    if(asked && history.replaceState) history.replaceState(null,'','/design'+location.hash);
+    if(!on || !window.DESIGN_ORDER) return;
+    var bands={};
+    [].forEach.call(document.querySelectorAll('.band--work'),function(b){
+      var t=b.querySelector('h2').textContent.toLowerCase().replace(/[^a-z0-9]/g,'');
+      Object.keys(window.DESIGN_ORDER_NAMES).forEach(function(k){ if(t.indexOf(window.DESIGN_ORDER_NAMES[k])===0) bands[k]=b; });
+    });
+    var foot=document.currentScript;
+    window.DESIGN_ORDER.forEach(function(k){ if(bands[k]) foot.parentNode.insertBefore(bands[k],foot); });
+  })();
+  </script>
+
   <footer class="site-foot" id="contact" aria-label="Contact">
     <div class="site-foot__row">
       <p class="site-foot__cell site-foot__say"><small>Hello</small><b>Open to new projects,<br>collaborations and<br>conversations.</b></p>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Order</title>
+<style>
+  body { background: #000; color: #fff; font: 16px/1.4 system-ui, sans-serif; margin: 0 auto; max-width: 560px; padding: 32px 20px; }
+  ol { list-style: none; margin: 0; padding: 0; }
+  li { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #fff; cursor: grab; user-select: none; touch-action: none; }
+  li.moving { opacity: .4; }
+  li span:first-child { width: 1.5em; }
+  button { background: #000; color: #fff; border: 1px solid #fff; font: inherit; padding: 8px 12px; cursor: pointer; margin: 24px 8px 16px 0; }
+  output { display: block; word-break: break-all; }
+</style>
+</head>
+<body>
+<ol id="list"></ol>
+<button id="copy">Copy order</button>
+<button id="original">Original order</button>
+<output id="line"></output>
+<script src="../content/design-order.js"></script>
+<script>
+  /* Drag the work into order, copy the line, and paste it over the first list in content/design-order.js */
+  var P = [['generative','Generative Title Slide'],['motion','Motion Explainer'],['monell','MoneLL'],['ai','AI Companion'],['line0','Line 0'],['bodiless','Bodiless Spacing'],['slash','Slash']];
+  var list = document.getElementById('list'), out = document.getElementById('line'), moving = null;
+  function text(){
+    return 'window.DESIGN_ORDER = [' + [].map.call(list.children, function(li){ return "'" + li.dataset.k + "'"; }).join(', ') + '];';
+  }
+  function refresh(){
+    [].forEach.call(list.children, function(li,i){ li.firstChild.textContent = i + 1; });
+    out.textContent = text();
+  }
+  function fill(keys){
+    list.innerHTML = '';
+    keys.forEach(function(k){
+      var p = P.filter(function(x){ return x[0] === k; })[0]; if (!p) return;
+      var li = document.createElement('li'); li.dataset.k = k;
+      li.innerHTML = '<span></span><span>' + p[1] + '</span>';
+      list.appendChild(li);
+    });
+    refresh();
+  }
+  list.addEventListener('pointerdown', function(e){
+    moving = e.target.closest('li'); if (!moving) return;
+    moving.classList.add('moving'); e.preventDefault();
+  });
+  document.addEventListener('pointermove', function(e){
+    if (!moving) return;
+    var over = document.elementFromPoint(e.clientX, e.clientY), li = over && over.closest('li');
+    if (!li || li === moving) return;
+    var r = li.getBoundingClientRect();
+    list.insertBefore(moving, e.clientY > r.top + r.height / 2 ? li.nextSibling : li);
+    refresh();
+  });
+  document.addEventListener('pointerup', function(){ if (moving) moving.classList.remove('moving'); moving = null; });
+  document.getElementById('original').onclick = function(){ fill(P.map(function(x){ return x[0]; })); };
+  document.getElementById('copy').onclick = function(){
+    var b = this;
+    navigator.clipboard.writeText(text()).then(function(){ b.textContent = 'Copied'; setTimeout(function(){ b.textContent = 'Copy order'; }, 1200); });
+  };
+  fill(window.DESIGN_ORDER);
+</script>
+</body>
+</html>
