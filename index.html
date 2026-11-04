@@ -1938,6 +1938,8 @@
     }catch(e){}
     if(asked && history.replaceState) history.replaceState(null,'','/design'+location.hash);
     if(!on || !window.DESIGN_ORDER) return;
+    /* no years on the work in this view */
+    [].forEach.call(document.querySelectorAll('.band--work .cell > .meta'),function(m){ if(/^\s*\d{4}\s*$/.test(m.textContent)) m.remove(); });
     var bands={};
     [].forEach.call(document.querySelectorAll('.band--work'),function(b){
       var t=b.querySelector('h2').textContent.toLowerCase().replace(/[^a-z0-9]/g,'');
