@@ -15,8 +15,8 @@ window.CHAPTERS['media/motion-explainer.mp4'] = {
     {name:'Key decision',    body:'Movement replaces the search bar. The system does the gathering, so the user only has to choose.'}
   ],
   bottom:[
-    {name:'What I learned',  body:'Moving from a Figma prototype to a coded one showed me what static prototypes miss, like timing, the feel of the cursor and how motion responds to real input.'},
-    {name:'What\u2019s next', body:'I want to test how the interaction holds up with larger datasets, and with touch and keyboard input.'}
+    {name:'What I learned',  body:'Scoping the problem takes time, but done well, it makes the design process faster. Moving from a Figma prototype to a coded one also showed me what static prototypes miss, like timing, the feel of the cursor and how motion responds to real input.'},
+    {name:'What\u2019s next', body:'I wanted to explore generative UI, but an interface that changes too much can get in the way of daily use. Instead, I\u2019d like the motion explainer itself to adapt to each user, based on their data and how they use the platform.'}
   ],
   role:'UX research, Motion design, Prototyping',
   tools:'Figma Motion, JavaScript (built with Claude Code)',

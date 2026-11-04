@@ -2844,9 +2844,7 @@
     <div class="pc pc--rule sec-text" style="grid-column:1 / 3"><div class="hold">
       <h3>In use</h3>
       <p class="body">The same system scales from a conference stage to a meeting-room screen, branded each time and different each time.</p>
-      <p class="body more">Testing with the team pointed to what comes next: more room to adjust the title area, fewer cell divisions and a tighter color range on request, choosing a still frame from the motion for PDF decks, and pulling the title from the deck itself so the whole presentation can be branded from one image.</p>
-      <h3 style="margin-top:calc(var(--pad) * 2)">Next step</h3>
-      <p class="body">A Figma plugin, to generate the slide where the deck is already being made.</p>
+      <p class="body more">Testing with the team pointed to what to improve: more room to adjust the title area, fewer cell divisions and a tighter color range on request, choosing a still frame from the motion for PDF decks, and pulling the title from the deck itself so the whole presentation can be branded from one image.</p>
     </div></div>
     <div class="pc stack" style="grid-column:3 / 13">
       <figure class="plate"><video src="media/01-generative-title-slide/11-conference.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Title slide on a conference stage"></video></figure>
@@ -4311,7 +4309,7 @@
   /* a chapter may open in its own mode (`mode:'look'` in its content file);
      leaving it brings back the reader's mode, unless they changed it there */
   var prev=null, ours=false;
-  function press(m){ var b=document.querySelector('.ratio button[data-mode="'+m+'"]'); if(b){ ours=true; b.click(); ours=false; } }
+  function press(m){ var b=document.querySelector('.ratio button[data-mode="'+m+'"]'); if(b){ ours=true; b.click(); } }   /* the observer below runs after this returns, and clears it */
   function chapterMode(){
     /* chapters are keyed by file (media/x.mp4) but the subpage carries the bare name (media/x) */
     var k=proj.dataset.chapter, c=null;
@@ -4321,12 +4319,12 @@
     if(want){ if(prev===null) prev=root.dataset.mode; if(root.dataset.mode!==want) press(want); }
     else if(prev!==null){ var p=prev; prev=null; if(root.dataset.mode!==p) press(p); }
   }
-  new MutationObserver(function(){ if(!ours) prev=null; follow(true); })
+  new MutationObserver(function(){ if(!ours) prev=null; ours=false; follow(true); })
     .observe(root,{attributes:true,attributeFilter:['data-mode']});
   new MutationObserver(function(){ chapterMode(); follow(false); pastHero(); })
     .observe(proj,{attributes:true,attributeFilter:['data-open','data-chapter']});
   proj.addEventListener('scroll', pastHero, {passive:true});
-  chapterMode();   /* a chapter opened from the address (#motion-explainer) opened before this ran */
+  chapterMode(); follow(false);   /* a chapter opened from the address (#motion-explainer) opened before this ran */
 })();
 </script>
 <script>

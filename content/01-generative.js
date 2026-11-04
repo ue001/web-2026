@@ -3,6 +3,7 @@
    each slide under these names, or change the paths. */
 window.CHAPTERS['media/generative.mp4'] = {
   numeral:'VII',
+  mode:'look',   /* opens in Image mode; leaving it brings back the reader's own mode */
   file:'generative-title/',
   locked:true,   /* asks for the password: see subpage/lock.js */
   head:'Generative Title Slide, CLEVER°FRANKE',
@@ -15,8 +16,8 @@ window.CHAPTERS['media/generative.mp4'] = {
     {name:'Key decision',    body:'Instead of fixed templates, the deck\u2019s own content drives the composition. Every cover fits its client and still stays on-brand.'}
   ],
   bottom:[
-    {name:'What I learned',  body:'Designing a system means designing its limits. The hardest part was deciding what the generator should never do. Building it myself with AI-assisted code let me test those rules right away instead of imagining them.'},
-    {name:'What\u2019s next', body:'I\u2019d like to let users adjust the parameters live, and bring the same approach to other brand touchpoints.'}
+    {name:'What I learned',  body:'A generative tool isn\u2019t about endless variations. It\u2019s about a system, a family built from a few chosen ingredients. I\u2019m naturally good at diverging, so I expected this to be easy, but it was really about converging, being selective so every variation still belongs.'},
+    {name:'What\u2019s next', body:'I\u2019d like to turn it into a Figma plugin, so designers can generate and fine-tune slides without leaving the file they\u2019re working in. I also want to test it with users from different departments.'}
   ],
   role:'Generative design, System design, Motion design',
   tools:'Figma Motion, JavaScript / HTML Canvas (built with Claude Code)',
