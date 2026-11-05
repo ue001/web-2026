@@ -656,6 +656,23 @@
 
   <!-- LANDING: updated (reels rest 10%, click to open) -->
   <section class="band band--landing">
+    <script src="content/design-order.js"></script>
+    <script>
+    /* /design sends here with ?view=design: the work and the landing's thumbnails in the order from
+       content/design-order.js. It holds while moving around the site; arriving at the plain address
+       from outside is always the original */
+    (function(){
+      var asked=/[?&]view=design\b/.test(location.search), on=asked;
+      try{
+        var inside=document.referrer.indexOf(location.origin+'/')===0;
+        if(asked) sessionStorage.setItem('jihae-view','design');
+        else if(!inside && !location.hash) sessionStorage.removeItem('jihae-view');
+        on=sessionStorage.getItem('jihae-view')==='design';
+      }catch(e){}
+      window.__designView=on;
+      if(asked && history.replaceState) history.replaceState(null,'','/design'+location.hash);
+    })();
+    </script>
     <iframe class="landing-frame" title="Jihae Cha" srcdoc="&lt;!doctype html&gt;
 &lt;html lang=&quot;en&quot;&gt;
 &lt;head&gt;
@@ -1126,6 +1143,13 @@
       [&#x27;Monell&#x27;, &#x27;media/monell.mp4&#x27;], [&#x27;AI Companion&#x27;, &#x27;media/AI-companion.mp4&#x27;], [&#x27;Line 0&#x27;, &#x27;media/line0-.mp4&#x27;],
       [&#x27;Bodiless Spacing&#x27;, &#x27;media/bodiless.jpg&#x27;], [&#x27;Slash&#x27;, &#x27;media/slash.mp4&#x27;]
     ];
+    try {   // /design: the thumbnails in the same order as the work
+      const P = window.parent;
+      if (P.__designView &amp;&amp; P.DESIGN_ORDER) {
+        const at = t =&gt; P.DESIGN_ORDER.findIndex(k =&gt; P.DESIGN_ORDER_NAMES[k] === t.toLowerCase().replace(/[^a-z0-9]/g, &#x27;&#x27;));
+        W.sort((a, b) =&gt; at(a[0]) - at(b[0]));
+      }
+    } catch (e) {}
     const HOLD = 3200;
     const items = W.map(([name, src]) =&gt; {
       const el = document.createElement(/\.(mp4|mov|webm)$/i.test(src) ? &#x27;video&#x27; : &#x27;img&#x27;);
@@ -1924,20 +1948,10 @@
     </div>
   </section>
 
-  <script src="content/design-order.js"></script>
   <script>
-  /* /design sends here with ?view=design: the work in the order from content/design-order.js.
-     It holds while moving around the site; arriving at the plain address from outside is always the original */
+  /* /design: the work in its own order (see the top of the landing) */
   (function(){
-    var asked=/[?&]view=design\b/.test(location.search), on=asked;
-    try{
-      var inside=document.referrer.indexOf(location.origin+'/')===0;
-      if(asked) sessionStorage.setItem('jihae-view','design');
-      else if(!inside && !location.hash) sessionStorage.removeItem('jihae-view');
-      on=sessionStorage.getItem('jihae-view')==='design';
-    }catch(e){}
-    if(asked && history.replaceState) history.replaceState(null,'','/design'+location.hash);
-    if(!on || !window.DESIGN_ORDER) return;
+    if(!window.__designView || !window.DESIGN_ORDER) return;
     /* no years on the work in this view */
     [].forEach.call(document.querySelectorAll('.band--work .cell > .meta'),function(m){ if(/^\s*\d{4}\s*$/.test(m.textContent)) m.remove(); });
     var bands={};
