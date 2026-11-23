@@ -3,7 +3,7 @@
    each slide under these names, or change the paths. */
 window.CHAPTERS['media/generative.mp4'] = {
   numeral:'VII',
-  mode:'look',   /* opens in Image mode; leaving it brings back the reader's own mode */
+  mode:'even',   /* opens in Even mode; leaving it brings back the reader's own mode */
   file:'generative-title/',
   locked:true,   /* asks for the password: see subpage/lock.js */
   head:'Generative Title Slide, CLEVER°FRANKE',
