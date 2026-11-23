@@ -10,7 +10,8 @@ window.CHAPTERS['media/generative.mp4'] = {
   title:'Generative Title Slide',
   year:'2026',
   context:'Internship, CLEVER°FRANKE',
-  lede:'A title slide that draws itself from the image behind it.',
+  lede:'A title slide that draws itself from the image behind\u00a0it.',
+  tool:{label:'Try the full tool \u2197', href:'generative-title/tool/'},   /* the link under the opening line */
   top:[
     {name:'My role',         body:'I designed the rule system and the logic behind the generator, and built the tool with Claude Code in an AI-assisted workflow. I defined how a deck\u2019s images become a cover, and the AI helped turn that into working code.'},
     {name:'Key decision',    body:'Instead of fixed templates, the deck\u2019s own content drives the composition. Every cover fits its client and still stays on-brand.'}

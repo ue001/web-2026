@@ -2520,6 +2520,9 @@
   .proj[data-chapter="media/generative"] .pills{ display:flex; flex-wrap:wrap; gap:6px; }
   .proj[data-chapter="media/generative"] .pills button, .proj[data-chapter="media/generative"] .pill{ font:inherit; font-size:12px; padding:5px 10px; border:1px solid var(--rule-idle); border-radius:999px; background:transparent; color:var(--ink); cursor:pointer; }
   .proj[data-chapter="media/generative"] .pills button[aria-pressed="true"]{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  /* the opening line stays on one line where there is room (the column beside it is empty) */
+  @media (min-width:900px){ .proj[data-chapter="media/generative"] .prow--say .statement{ white-space:nowrap; max-width:none; } }
+  .proj[data-chapter="media/generative"] .g-full{ display:block; font-size:14px; font-weight:500; width:max-content; max-width:100%; margin-top:var(--pad); }
   .proj[data-chapter="media/generative"] .g-try summary{ cursor:pointer; font-size:14px; font-weight:500; width:max-content; border-bottom:1px solid currentColor; }
   .proj[data-chapter="media/generative"] .g-try summary::marker, .proj[data-chapter="media/generative"] .g-try summary::-webkit-details-marker{ display:none; content:""; }
   .proj[data-chapter="media/generative"] .g-try[open] summary{ margin-bottom:var(--pad); }
@@ -3210,7 +3213,8 @@
     /* the statement */
     if(ch.lede){
       html+='<div class="prow prow--open prow--say">'+
-        cell([1,8],'<p class="statement">'+esc(ch.lede)+'</p>',false)+
+        cell([1,8],'<p class="statement">'+esc(ch.lede)+'</p>'+
+          (ch.tool?'<a class="g-full" href="'+esc(ch.tool.href)+'" target="_blank" rel="noopener">'+esc(ch.tool.label)+'</a>':''),false)+
         cell([9,13],'',false)+
       '</div>';
     }
